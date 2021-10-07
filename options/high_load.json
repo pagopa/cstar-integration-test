@@ -1,7 +1,7 @@
 {
   "stages": [
-      { "target": 100, "duration": "30s" },
-      { "target": 200, "duration": "4m" },
+      { "target": 1000, "duration": "30s" },
+      { "target": 2000, "duration": "4m" },
       { "target": 0, "duration": "30s" }
   ],
   "thresholds": {
@@ -9,6 +9,6 @@
       "http_req_duration": ["p(95) < 500"],
       "http_reqs": ["rate>=500"]
   },
-  "rps": 10000,
+  "rps": 100000,
   "batchPerHost": 0
 }
