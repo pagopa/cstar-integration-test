@@ -17,6 +17,6 @@
     "host": "api.uat.cstar.pagopa.it"
   },
   "prod_issuer": {
-    "baseUrl": "https://api.cstar.pagopa.it"
+    "baseUrl": "https://prod.cstar.pagopa.it"
   }
 }

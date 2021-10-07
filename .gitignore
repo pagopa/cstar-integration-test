@@ -1,1 +1,3 @@
 certs
+k6
+.env.development.local
