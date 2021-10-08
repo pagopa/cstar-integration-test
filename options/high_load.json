@@ -9,6 +9,6 @@
       "http_req_duration": ["p(95) < 500"],
       "http_reqs": ["rate>=500"]
   },
-  "rps": 100000,
+  "rps": 50000,
   "batchPerHost": 0
 }
