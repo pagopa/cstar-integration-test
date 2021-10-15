@@ -1,7 +1,7 @@
 import http from 'k6/http';
 import { check } from 'k6';
 
-export function GetBpdHbPaymentInstrumentSuccessV1(baseUrl, params, payInstrId) {
+export function GetBpdHbPaymentInstrumentSuccess(baseUrl, params, payInstrId) {
       
   const res = http.get(
     `${baseUrl}/bpd/hb/payment-instruments/${payInstrId}`,
