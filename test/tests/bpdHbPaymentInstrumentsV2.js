@@ -1,7 +1,7 @@
 import http from 'k6/http';
 import { check } from 'k6';
 
-export function GetBpdHbPaymentInstrumentSuccessV2(baseUrl, params, payInstrId) {
+export function GetBpdHbPaymentInstrumentSuccess(baseUrl, params, payInstrId) {
   
   let myParams = Object.assign({}, params)
   myParams.headers.id = payInstrId
