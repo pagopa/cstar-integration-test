@@ -1,13 +1,15 @@
 import http from 'k6/http';
-import { check, group, sleep, fail } from 'k6';
+import { check } from 'k6';
 
 export function GetCitizenSuccess(baseUrl, params, fiscalCode) {
   
-  params.headers.id = fiscalCode;
 
+  let myParams = Object.assign({}, params)
+  myParams.headers.id = fiscalCode
   const res = http.get(
     `${baseUrl}/bpd/hb/citizens/v2`,
-    params
+    myParams
+   
   );
 
   const isSuccessful = check(res, {
@@ -24,11 +26,12 @@ export function GetCitizenSuccess(baseUrl, params, fiscalCode) {
 
 export function GetCitizenNotFound(baseUrl, params, fiscalCode) {
   
-  params.headers.id = fiscalCode;
+  let myParams = Object.assign({}, params)
+  myParams.headers.id = fiscalCode
 
   const res = http.get(
     `${baseUrl}/bpd/hb/citizens/v2`,
-    params
+    myParams
   );
 
   const isSuccessful = check(res, { 'Resource Not Found': (r) => r.status === 404 });
@@ -41,11 +44,12 @@ export function GetCitizenNotFound(baseUrl, params, fiscalCode) {
 
 export function GetCitizenBadFormat(baseUrl, params, fiscalCode) {
   
-  params.headers.id = fiscalCode;
+  let myParams = Object.assign({}, params)
+  myParams.headers.id = fiscalCode
 
   const res = http.get(
     `${baseUrl}/bpd/hb/citizens/v2`,
-    params
+    myParams
   );
 
   const isSuccessful = check(res, { 'Bad Format': (r) => r.status === 400 });
@@ -53,27 +57,6 @@ export function GetCitizenBadFormat(baseUrl, params, fiscalCode) {
     console.log(`Attempted ${res.headers['Ocp-Apim-Operationid']}. Unsuccessful. Response status ${res.status}. Please check trace ${res.headers['Ocp-Apim-Trace-Location']}`)
   }
 }
-
-export function PutCitizenSuccessV1(baseUrl, params, fiscalCode) {
-
-   const res = http.put(
-     `${baseUrl}/bpd/hb/citizens/${fiscalCode}`,
-     null,
-     params
-   );
- 
-   const isSuccessful = check(res, {
-     'Status: HTTP Success': (r) => r.status === 200,
-
-   });
-  
-  console.log(res.body);
-  
-   if (!isSuccessful) {
-     console.log(`Attempted ${res.headers['Ocp-Apim-Operationid']}. Unsuccessful. Response status ${res.status}. Please check trace ${res.headers['Ocp-Apim-Trace-Location']}`)
-   }
- 
- }
 
 export function PutCitizenSuccessV2(baseUrl, params, body) {
     
@@ -118,15 +101,10 @@ export function PatchCitizenV1(baseUrl, params, fiscalCode, body) {
 
 export function GetCitizenV1Success(baseUrl, params, fiscalCode) {
 
-  // params.headers['Content-Type'] = "application/json";
-
-
-  const res = http.patch(
+  const res = http.get(
     `${baseUrl}/bpd/hb/citizens/${fiscalCode}`,
     params
   );
-
-  console.log(res.body);
 
   const isSuccessful = check(res, {
     'Status: HTTP Success': (r) => r.status === 200,
@@ -136,3 +114,40 @@ export function GetCitizenV1Success(baseUrl, params, fiscalCode) {
     console.log(`Attempted ${res.headers['Ocp-Apim-Operationid']}. Unsuccessful. Response status ${res.status}. Please check trace ${res.headers['Ocp-Apim-Trace-Location']}`)
   }
 }
+
+export function GetRankingV1Success(baseUrl, params, fiscalCode, awardPeriodId) {
+
+  const res = http.get(
+    `${baseUrl}/bpd/hb/citizens/${fiscalCode}/ranking?awardPeriodId=${awardPeriodId}`,
+    params
+  );
+
+  const isSuccessful = check(res, {
+    'Status: HTTP Success': (r) => r.status === 200,
+  });
+
+  if (!isSuccessful) {
+    console.log(`Attempted ${res.headers['Ocp-Apim-Operationid']}. Unsuccessful. Response status ${res.status}. Please check trace ${res.headers['Ocp-Apim-Trace-Location']}`)
+  }
+}
+
+
+export function GetRankingV2Success(baseUrl, params, fiscalCode, awardPeriodId) {
+
+  let myParams = Object.assign({}, params)
+  myParams.headers.id = fiscalCode
+
+  const res = http.get(
+    `${baseUrl}/bpd/hb/citizens/v2/ranking?awardPeriodId=${awardPeriodId}`,
+    myParams
+  );
+
+  const isSuccessful = check(res, {
+    'Status: HTTP Success': (r) => r.status === 200,
+  });
+
+  if (!isSuccessful) {
+    console.log(`Attempted ${res.headers['Ocp-Apim-Operationid']}. Unsuccessful. Response status ${res.status}. Please check trace ${res.headers['Ocp-Apim-Trace-Location']}`)
+  }
+}
+

@@ -4,18 +4,19 @@ import dotenv from 'k6/x/dotenv';
 
 
 
-export let options = JSON.parse(open('../../../options/low_load.json'));
+export let options = JSON.parse(open('../../../options/ramp_load.json'));
 export let services = JSON.parse(open('../../../services/environments.json'));
 
 // open is only available in global scope
 const myEnv = dotenv.parse(open(".env.development.local"))
 
 
+// patch options
 options.tlsAuth = [
   {
     domains: [services.uat_issuer.baseUrl],
-    cert: open('../../../certs/cstar_u_test.cert'),
-    key: open('../../../certs/cstar_u_test.key'),
+    cert: open(`../../../certs/${myEnv.MAUTH_CERT_NAME}`),
+    key: open(`../../../certs/${myEnv.MAUTH_PRIVATE_KEY_NAME}`),
   }
 ];
 
