@@ -1,21 +1,20 @@
 import http from 'k6/http';
-import { check, group, sleep, fail } from 'k6';
+import { check } from 'k6';
 
-export function GetBpdIoPaymentInstrumentSuccess(baseUrl, params, payInstrId) {
-
-  console.log(
-    `${baseUrl}/bpd/io/payment-instruments/${payInstrId}`);
+export function GetBpdIoPaymentInstrumentSuccessV1(baseUrl, params, payInstrId) {
       
   const res = http.get(
     `${baseUrl}/bpd/io/payment-instruments/${payInstrId}`,
     params
   );
-  
+
   const isSuccessful = check(res, { 'Success': (r) => r.status === 200 });
   if (!isSuccessful) {
     console.log(`Attempted ${res.headers['Ocp-Apim-Operationid']}. Unsuccessful. Response status ${res.status}. Please check trace ${res.headers['Ocp-Apim-Trace-Location']}`)
   }
 }
+
+
   
 export function GetBpdIoPaymentInstrumentAuthError(baseUrl, params, payInstrId) {
     const res = http.get(
