@@ -12,6 +12,8 @@ export function GetCitizenSuccess(baseUrl, params, fiscalCode) {
    
   );
 
+  console.log(`Attempted ${res.headers['Ocp-Apim-Operationid']}. Unsuccessful. Response status ${res.status}. Please check trace ${res.headers['Ocp-Apim-Trace-Location']}`)
+
   const isSuccessful = check(res, {
     'Status: HTTP Success': (r) => r.status === 200,
     'Body: Fiscal Code is OK': (r) => r.json().fiscalCode === fiscalCode,
