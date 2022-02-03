@@ -1,5 +1,13 @@
 import { group, check } from 'k6';
-import { GetCitizenWithOptInStatusNOREQ, PutCitizenWithOptInStatusACCEPTED } from '../../tests/bpdIoCitizensV2.js';
+import {
+  GetCitizenWithOptInStatusNOREQ,
+  PutCitizenWithOptInStatusACCEPTED,
+  PutCitizenWithOptInStatusNOREQAfterACCEPTED,
+  PutCitizenWithOptInStatusDENIED,
+  PutCitizenWithOptInStatusNOREQAfterDENIED,
+  PutCitizenWithoutOptInStatus,
+  DeleteCitizen
+} from '../../tests/bpdIoCitizensV2.js';
 import dotenv from 'k6/x/dotenv';
 import { URL } from 'https://jslib.k6.io/url/1.0.0/index.js';
 import http from 'k6/http';
@@ -32,10 +40,27 @@ export default (authToken) => {
       }
     }
 
+    // Enroll the citizen
+    group('Should PUT Citizen without an opt in status', () => PutCitizenWithoutOptInStatus(
+      services.uat_io.baseUrl, params, myEnv.FISCAL_CODE_EXISTING));
     group('Should GET Citizen with NOREQ status', () => GetCitizenWithOptInStatusNOREQ(
       services.uat_io.baseUrl, params, myEnv.FISCAL_CODE_EXISTING));
     group('Should PUT Citizen with ACCEPTED status', () => PutCitizenWithOptInStatusACCEPTED(
       services.uat_io.baseUrl, params, myEnv.FISCAL_CODE_EXISTING));
-
+    group('Should NOT PUT Citizen with NOREQ after ACCEPTED', () => PutCitizenWithOptInStatusNOREQAfterACCEPTED(
+      services.uat_io.baseUrl, params, myEnv.FISCAL_CODE_EXISTING));
+    group('Should DELETE a Citizen and restore NOREQ status', () => DeleteCitizen(
+      services.uat_io.baseUrl, params, myEnv.FISCAL_CODE_EXISTING));
+    group('Should PUT Citizen without an opt in status', () => PutCitizenWithoutOptInStatus(
+      services.uat_io.baseUrl, params, myEnv.FISCAL_CODE_EXISTING));
+    group('Should GET Citizen with NOREQ status', () => GetCitizenWithOptInStatusNOREQ(
+      services.uat_io.baseUrl, params, myEnv.FISCAL_CODE_EXISTING));
+    group('Should PUT Citizen with DENIED status', () => PutCitizenWithOptInStatusDENIED(
+      services.uat_io.baseUrl, params, myEnv.FISCAL_CODE_EXISTING));
+    group('Should NOT PUT Citizen with NOREQ after DENIED', () => PutCitizenWithOptInStatusNOREQAfterDENIED(
+      services.uat_io.baseUrl, params, myEnv.FISCAL_CODE_EXISTING));
+    group('Should DELETE a Citizen and restore NOREQ status', () => DeleteCitizen(
+      services.uat_io.baseUrl, params, myEnv.FISCAL_CODE_EXISTING));
+      
   });
 }
