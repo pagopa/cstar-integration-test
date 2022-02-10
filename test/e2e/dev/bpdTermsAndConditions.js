@@ -35,7 +35,6 @@ export default () => {
 
     group('Should get BPD T&C via Blob Get', () => GetBpdTermsAndConditionsViaBlob(services.dev_issuer.baseUrl, params));
     group('Should get BPD T&C via dedicated API', () => GetBpdTermsAndConditions(services.dev_issuer.baseUrl, params));
-    group('Should get BPD privacy policy via dedicated API', () => GetBpdPrivacyPolicy(services.dev_issuer.baseUrl, params));
 
   });
 }
