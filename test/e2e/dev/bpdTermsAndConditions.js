@@ -24,7 +24,7 @@ options.tlsAuth = [
 
 export default () => {
 
-  group('GET Award Period', () => {
+  group('Blob API', () => {
     let params = {
       headers: {
         'Ocp-Apim-Subscription-Key': `${myEnv.APIM_SK};product=issuer-api-product`,
