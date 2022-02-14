@@ -32,7 +32,7 @@ export default () => {
       }
     }
 
-    group('Should get BPD T&C via Blob Get', () => GetFaTermsAndConditionsViaBlob(services.dev_issuer.baseUrl, params));
+    group('Shouldn\'t get BPD T&C via Blob Get', () => GetFaTermsAndConditionsViaBlob(services.dev_issuer.baseUrl, params));
     group('Should get BPD T&C via dedicated API', () => GetFaTermsAndConditions(services.dev_issuer.baseUrl, params));
 
   });

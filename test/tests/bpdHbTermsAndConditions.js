@@ -8,7 +8,7 @@ export function GetBpdTermsAndConditionsViaBlob(baseUrl, params) {
     params
   );
 
-  const isSuccessful = check(res, { 'Success': (r) => r.status === 200 });
+  const isSuccessful = check(res, { 'Success': (r) => r.status > 299 });
   if (!isSuccessful) {
     console.log(`Attempted ${res.headers['Ocp-Apim-Operationid']}. Unsuccessful. Response status ${res.status}. Please check trace ${res.headers['Ocp-Apim-Trace-Location']}`)
   }
