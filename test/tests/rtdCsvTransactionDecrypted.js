@@ -1,5 +1,5 @@
 import http from 'k6/http';
-import { check } from 'k6';
+import { CheckStatusForbidden } from './common.js';
 
 export function GetAdeSas(baseUrl, params ) {
 
@@ -7,9 +7,9 @@ export function GetAdeSas(baseUrl, params ) {
     `${baseUrl}/rtd/csv-transaction-decrypted/ade/sas`,
 	{}, // Empty payload
     params
-  );
+  )
 
-  check(res, { 'Forbidden': (r) => r.status === 403 });
+  CheckStatusForbidden(res);
 }
 
 export function GetRtdSas(baseUrl, params ) {
@@ -20,5 +20,5 @@ export function GetRtdSas(baseUrl, params ) {
     params
   );
 
-  check(res, { 'Forbidden': (r) => r.status === 403 });
+  CheckStatusForbidden(res);
 }
