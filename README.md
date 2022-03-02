@@ -20,4 +20,3 @@ Please intall them before running any test suite.
 9. Customize env variables in `./test/e2e/prod/.env.production.local` [`./test/e2e/uat/.env.test.local`]
 10. Run the following test in prod [uat]
 ```./k6  run test/e2e/prod/bpdHbAwardPeriod.js [./k6  run test/e2e/uat/bpdHbAwardPeriod.js]```
-

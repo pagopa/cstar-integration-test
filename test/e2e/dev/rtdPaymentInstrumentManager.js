@@ -22,12 +22,16 @@ export default () => {
   group('Payment Instrument API', () => {
     let params = {
       headers: {
-        'Ocp-Apim-Subscription-Key': `${myEnv.APIM_SK}`,
+        'Ocp-Apim-Subscription-Key': myEnv.APIM_RTDPRODUCT_SK,
         'Ocp-Apim-Trace': 'true'
       }
     }
 
-    group('Should get hashed pans', () => GetHashedPan(services.dev_issuer.baseUrl, params));
+    let getHashedPanOpts = {
+      maxContentLength: myEnv.RTD_HASHPAN_MAX_CONTENT_LENGTH
+    }
+    group('Should get hashed pans', () => GetHashedPan(services.dev_issuer.baseUrl, params, getHashedPanOpts));
+
     group('Should get salt', () => GetSalt(services.dev_issuer.baseUrl, params));
 
   })

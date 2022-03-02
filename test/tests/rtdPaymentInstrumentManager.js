@@ -1,28 +1,25 @@
 import http from 'k6/http';
-import { check } from 'k6';
+import { CheckStatusOk, CheckBodyLengthBetween } from './common.js';
 
-export function GetHashedPan(baseUrl, params ) {
+const API_PREFIX = '/rtd/payment-instrument-manager';
+
+export function GetHashedPan(baseUrl, params, opts) {
 
   const res = http.get(
-    `${baseUrl}/rtd/payment-instrument-manager/hashed-pans`,
+    `${baseUrl}${API_PREFIX}/hashed-pans`,
     params
   );
 
-  const isSuccessful = check(res, { 'Success': (r) => r.status === 200 });
-  if (!isSuccessful) {
-    console.log(`Attempted ${res.headers['Ocp-Apim-Operationid']}. Unsuccessful. Response status ${res.status}. Please check trace ${res.headers['Ocp-Apim-Trace-Location']}`);
-  }
+  CheckStatusOk(res);
+  CheckBodyLengthBetween(res, 0, opts.maxContentLength);
 }
 
-export function GetSalt(baseUrl, params ) {
+export function GetSalt(baseUrl, params) {
 
   const res = http.get(
-    `${baseUrl}/rtd/payment-instrument-manager/salt`,
+    `${baseUrl}${API_PREFIX}/salt`,
     params
   );
 
-  const isSuccessful = check(res, { 'Success': (r) => r.status === 200 });
-  if (!isSuccessful) {
-    console.log(`Attempted ${res.headers['Ocp-Apim-Operationid']}. Unsuccessful. Response status ${res.status}. Please check trace ${res.headers['Ocp-Apim-Trace-Location']}`);
-  }
+  CheckStatusOk(res);
 }

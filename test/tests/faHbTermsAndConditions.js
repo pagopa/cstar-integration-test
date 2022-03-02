@@ -1,17 +1,14 @@
 import http from 'k6/http';
-import { check } from 'k6';
+import { CheckStatusConflict, CheckStatusOk } from './common.js';
 
 export function GetFaTermsAndConditionsViaBlob(baseUrl, params) {
 
   const res = http.get(
     `${baseUrl}/pagopastorage/fa-terms-and-conditions/fa-tc.html`,
     params
-  );
+  )
 
-  const isSuccessful = check(res, { 'Success': (r) => r.status === 200 });
-  if (!isSuccessful) {
-    console.log(`Attempted ${res.headers['Ocp-Apim-Operationid']}. Unsuccessful. Response status ${res.status}. Please check trace ${res.headers['Ocp-Apim-Trace-Location']}`)
-  }
+  CheckStatusConflict(res);
 }
 
 export function GetFaTermsAndConditions(baseUrl, params) {
@@ -21,8 +18,5 @@ export function GetFaTermsAndConditions(baseUrl, params) {
     params
   );
 
-  const isSuccessful = check(res, { 'Success': (r) => r.status === 200 });
-  if (!isSuccessful) {
-    console.log(`Attempted ${res.headers['Ocp-Apim-Operationid']}. Unsuccessful. Response status ${res.status}. Please check trace ${res.headers['Ocp-Apim-Trace-Location']}`)
-  }
+  CheckStatusOk(res);
 }

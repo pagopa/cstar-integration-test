@@ -1,8 +1,7 @@
 import { group } from 'k6';
 import {
   GetBpdTermsAndConditionsViaBlob,
-  GetBpdTermsAndConditions,
-  GetBpdPrivacyPolicy
+  GetBpdTermsAndConditions
 } from '../../tests/bpdHbTermsAndConditions.js';
 import dotenv from 'k6/x/dotenv';
 
@@ -35,6 +34,5 @@ export default () => {
 
     group('Should get BPD T&C via Blob Get', () => GetBpdTermsAndConditionsViaBlob(services.dev_issuer.baseUrl, params));
     group('Should get BPD T&C via dedicated API', () => GetBpdTermsAndConditions(services.dev_issuer.baseUrl, params));
-
   });
 }

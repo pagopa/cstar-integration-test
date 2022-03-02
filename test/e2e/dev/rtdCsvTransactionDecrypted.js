@@ -22,7 +22,7 @@ export default () => {
   group('CSV Transaction Decrypted API', () => {
     let params = {
       headers: {
-        'Ocp-Apim-Subscription-Key': `${myEnv.APIM_SK}`,
+        'Ocp-Apim-Subscription-Key': myEnv.APIM_RTDPRODUCT_SK,
         'Ocp-Apim-Trace': 'true'
       }
     }
