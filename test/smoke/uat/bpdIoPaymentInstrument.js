@@ -1,7 +1,6 @@
-import http from 'k6/http'
 import { group } from 'k6'
 import { login } from '../../common/api/bpdIoLogin.js'
-import { GetBpdIoPaymentInstrumentV1 } from '../../common/api/bpdIoPaymentInstruments.js'
+import { getBpdIoPaymentInstrumentV1 } from '../../common/api/bpdIoPaymentInstruments.js'
 import {
     assert,
     statusOk,
@@ -30,7 +29,7 @@ export default (authToken) => {
 
         group('Should get payment instrument', () =>
             assert(
-                GetBpdIoPaymentInstrumentV1(
+                getBpdIoPaymentInstrumentV1(
                     services.uat_io.baseUrl,
                     params,
                     myEnv.PAYMENT_INSTRUMENT_EXISTING

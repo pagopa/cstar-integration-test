@@ -1,9 +1,15 @@
 import { group } from 'k6'
 import {
-    CreateAdeSas,
-    CreateRtdSas,
-} from '../../common/api/rtdCsvTransactionDecrypted.js'
-import { assert, statusForbidden } from '../../common/assertions.js'
+    getPublicKey,
+    createAdeSas,
+    createRtdSas,
+} from '../../common/api/rtdCsvTransaction.js'
+import {
+    assert,
+    statusOk,
+    statusCreated,
+    bodyPgpPublicKey,
+} from '../../common/assertions.js'
 import dotenv from 'k6/x/dotenv'
 
 export let options = {}
@@ -21,7 +27,7 @@ options.tlsAuth = [
 ]
 
 export default () => {
-    group('CSV Transaction Decrypted API', () => {
+    group('CSV Transaction API', () => {
         let params = {
             headers: {
                 'Ocp-Apim-Subscription-Key': myEnv.APIM_RTDPRODUCT_SK,
@@ -29,14 +35,20 @@ export default () => {
             },
         }
 
+        group('Should get public key', () =>
+            assert(getPublicKey(services.dev_issuer.baseUrl, params), [
+                statusOk(),
+                bodyPgpPublicKey(),
+            ])
+        )
         group('Should create AdE SAS', () =>
-            assert(CreateAdeSas(services.dev_issuer.baseUrl, params), [
-                statusForbidden(),
+            assert(createAdeSas(services.dev_issuer.baseUrl, params), [
+                statusCreated(),
             ])
         )
         group('Should create RTD SAS', () =>
-            assert(CreateRtdSas(services.dev_issuer.baseUrl, params), [
-                statusForbidden(),
+            assert(createRtdSas(services.dev_issuer.baseUrl, params), [
+                statusCreated(),
             ])
         )
     })

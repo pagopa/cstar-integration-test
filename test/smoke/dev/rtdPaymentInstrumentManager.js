@@ -1,15 +1,9 @@
 import { group } from 'k6'
 import {
-    GetPublicKey,
-    CreateAdeSas,
-    CreateRtdSas,
-} from '../../common/api/rtdCsvTransaction.js'
-import {
-    assert,
-    statusOk,
-    statusCreated,
-    bodyPgpPublicKey,
-} from '../../common/assertions.js'
+    getHashedPan,
+    getSalt,
+} from '../../common/api/rtdPaymentInstrumentManager.js'
+import { assert, statusOk, bodyLengthBetween } from '../../common/assertions.js'
 import dotenv from 'k6/x/dotenv'
 
 export let options = {}
@@ -27,7 +21,7 @@ options.tlsAuth = [
 ]
 
 export default () => {
-    group('CSV Transaction API', () => {
+    group('Payment Instrument API', () => {
         let params = {
             headers: {
                 'Ocp-Apim-Subscription-Key': myEnv.APIM_RTDPRODUCT_SK,
@@ -35,21 +29,14 @@ export default () => {
             },
         }
 
-        group('Should get public key', () =>
-            assert(GetPublicKey(services.dev_issuer.baseUrl, params), [
+        group('Should get hashed pans', () =>
+            assert(getHashedPan(services.dev_issuer.baseUrl, params), [
                 statusOk(),
-                bodyPgpPublicKey(),
+                bodyLengthBetween(0, myEnv.RTD_HASHPAN_MAX_CONTENT_LENGTH),
             ])
         )
-        group('Should create AdE SAS', () =>
-            assert(CreateAdeSas(services.dev_issuer.baseUrl, params), [
-                statusCreated(),
-            ])
-        )
-        group('Should create RTD SAS', () =>
-            assert(CreateRtdSas(services.dev_issuer.baseUrl, params), [
-                statusCreated(),
-            ])
+        group('Should get salt', () =>
+            assert(getSalt(services.dev_issuer.baseUrl, params), [statusOk()])
         )
     })
 }

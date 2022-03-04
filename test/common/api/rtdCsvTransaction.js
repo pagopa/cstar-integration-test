@@ -2,22 +2,28 @@ import http from 'k6/http'
 
 const API_PREFIX = '/rtd/csv-transaction'
 
-export function GetPublicKey(baseUrl, params) {
-    return http.get(`${baseUrl}${API_PREFIX}/publickey`, params)
+export function getPublicKey(baseUrl, params) {
+    const res = http.get(`${baseUrl}${API_PREFIX}/publickey`, params)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
+    return res
 }
 
-export function CreateAdeSas(baseUrl, params) {
-    return http.post(
+export function createAdeSas(baseUrl, params) {
+    const res = http.post(
         `${baseUrl}${API_PREFIX}/ade/sas`,
         {}, // Empty payload
         params
     )
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
+    return res
 }
 
-export function CreateRtdSas(baseUrl, params) {
-    return http.post(
+export function createRtdSas(baseUrl, params) {
+    const res = http.post(
         `${baseUrl}${API_PREFIX}/rtd/sas`,
         {}, // Empty payload
         params
     )
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
+    return res
 }

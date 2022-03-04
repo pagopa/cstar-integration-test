@@ -1,8 +1,8 @@
 import { group } from 'k6'
 import {
-    GetBpdTermsAndConditionsViaBlob,
-    GetBpdTermsAndConditionsHtml,
-    GetBpdTermsAndConditionsPdf,
+    getBpdTermsAndConditionsViaBlob,
+    getBpdTermsAndConditionsHtml,
+    getBpdTermsAndConditionsPdf,
 } from '../../common/api/bpdTc.js'
 import { assert, statusOk, statusConflict } from '../../common/assertions.js'
 import dotenv from 'k6/x/dotenv'
@@ -32,7 +32,7 @@ export default () => {
 
         group('Should get BPD T&C via Blob Get', () =>
             assert(
-                GetBpdTermsAndConditionsViaBlob(
+                getBpdTermsAndConditionsViaBlob(
                     services.dev_issuer.baseUrl,
                     params
                 ),
@@ -41,7 +41,7 @@ export default () => {
         )
         group('Should get BPD T&C HTML via dedicated API', () =>
             assert(
-                GetBpdTermsAndConditionsHtml(
+                getBpdTermsAndConditionsHtml(
                     services.dev_issuer.baseUrl,
                     params
                 ),
@@ -50,7 +50,7 @@ export default () => {
         )
         group('Should get BPD T&C PDF via dedicated API', () =>
             assert(
-                GetBpdTermsAndConditionsPdf(
+                getBpdTermsAndConditionsPdf(
                     services.dev_issuer.baseUrl,
                     params
                 ),

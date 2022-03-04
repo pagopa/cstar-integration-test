@@ -1,8 +1,8 @@
 import { group } from 'k6'
 import {
-    GetFaTermsAndConditionsViaBlob,
-    GetFaTermsAndConditionsHtml,
-    GetFaTermsAndConditionsPdf,
+    getFaTermsAndConditionsViaBlob,
+    getFaTermsAndConditionsHtml,
+    getFaTermsAndConditionsPdf,
 } from '../../common/api/faTc.js'
 import { assert, statusOk, statusConflict } from '../../common/assertions.js'
 import dotenv from 'k6/x/dotenv'
@@ -32,7 +32,7 @@ export default () => {
 
         group('Should get BPD T&C via Blob Get', () =>
             assert(
-                GetFaTermsAndConditionsViaBlob(
+                getFaTermsAndConditionsViaBlob(
                     services.dev_issuer.baseUrl,
                     params
                 ),
@@ -41,7 +41,7 @@ export default () => {
         )
         group('Should get BPD T&C HTML via dedicated API', () =>
             assert(
-                GetFaTermsAndConditionsHtml(
+                getFaTermsAndConditionsHtml(
                     services.dev_issuer.baseUrl,
                     params
                 ),
@@ -50,7 +50,7 @@ export default () => {
         )
         group('Should get BPD T&C PDF via dedicated API', () =>
             assert(
-                GetFaTermsAndConditionsPdf(services.dev_issuer.baseUrl, params),
+                getFaTermsAndConditionsPdf(services.dev_issuer.baseUrl, params),
                 [statusOk()]
             )
         )

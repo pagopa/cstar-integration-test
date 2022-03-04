@@ -1,18 +1,14 @@
-import http from 'k6/http'
 import { group } from 'k6'
 import { login } from '../../common/api/bpdIoLogin.js'
 import {
-    GetCitizenWithOptInStatusNOREQ,
-    PutCitizenWithOptInStatusACCEPTED,
-    PutCitizenWithOptInStatusNOREQAfterACCEPTED,
-    PutCitizenWithOptInStatusDENIED,
-    PutCitizenWithOptInStatusNOREQAfterDENIED,
-    PutCitizenWithoutOptInStatus,
-    DeleteCitizen,
+    getCitizen,
+	putCitizen,
+    deleteCitizen,
 } from '../../common/api/bpdIoCitizenV2.js'
 import {
     assert,
     statusOk,
+    statusNoContent,
     bodyJsonSelectorValue,
 } from '../../common/assertions.js'
 import dotenv from 'k6/x/dotenv'
@@ -35,10 +31,28 @@ export default (authToken) => {
                 'Ocp-Apim-Trace': 'true',
             },
         }
-
         group('Should PUT Citizen without an opt in status', () =>
             assert(
-                PutCitizenWithoutOptInStatus(
+                putCitizen(
+                    services.uat_io.baseUrl,
+                    params,
+					{},
+                    myEnv.FISCAL_CODE_EXISTING
+                ),
+                [
+                    statusOk(),
+                    bodyJsonSelectorValue(
+                        'fiscalCode',
+                        myEnv.FISCAL_CODE_EXISTING
+                    ),
+                    bodyJsonSelectorValue('enabled', true),
+                    bodyJsonSelectorValue('optInStatus', 'NOREQ'),
+                ]
+            )
+        )
+        group('Should GET Citizen with NOREQ status', () =>
+            assert(
+                getCitizen(
                     services.uat_io.baseUrl,
                     params,
                     myEnv.FISCAL_CODE_EXISTING
@@ -54,23 +68,138 @@ export default (authToken) => {
                 ]
             )
         )
-        // group('Should GET Citizen with NOREQ status', () => GetCitizenWithOptInStatusNOREQ(
-        //   services.uat_io.baseUrl, params, myEnv.FISCAL_CODE_EXISTING));
-        // group('Should PUT Citizen with ACCEPTED status', () => PutCitizenWithOptInStatusACCEPTED(
-        //   services.uat_io.baseUrl, params, myEnv.FISCAL_CODE_EXISTING));
-        // group('Should NOT PUT Citizen with NOREQ after ACCEPTED', () => PutCitizenWithOptInStatusNOREQAfterACCEPTED(
-        //   services.uat_io.baseUrl, params, myEnv.FISCAL_CODE_EXISTING));
-        // group('Should DELETE a Citizen and restore NOREQ status', () => DeleteCitizen(
-        //   services.uat_io.baseUrl, params, myEnv.FISCAL_CODE_EXISTING));
-        // group('Should PUT Citizen without an opt in status', () => PutCitizenWithoutOptInStatus(
-        //   services.uat_io.baseUrl, params, myEnv.FISCAL_CODE_EXISTING));
-        // group('Should GET Citizen with NOREQ status', () => GetCitizenWithOptInStatusNOREQ(
-        //   services.uat_io.baseUrl, params, myEnv.FISCAL_CODE_EXISTING));
-        // group('Should PUT Citizen with DENIED status', () => PutCitizenWithOptInStatusDENIED(
-        //   services.uat_io.baseUrl, params, myEnv.FISCAL_CODE_EXISTING));
-        // group('Should NOT PUT Citizen with NOREQ after DENIED', () => PutCitizenWithOptInStatusNOREQAfterDENIED(
-        //   services.uat_io.baseUrl, params, myEnv.FISCAL_CODE_EXISTING));
-        // group('Should DELETE a Citizen and restore NOREQ status', () => DeleteCitizen(
-        //   services.uat_io.baseUrl, params, myEnv.FISCAL_CODE_EXISTING));
+        group('Should PUT Citizen with ACCEPTED status', () =>
+            assert(
+                putCitizen(
+                    services.uat_io.baseUrl,
+                    params,
+					{ optInStatus: 'ACCEPTED' },
+                    myEnv.FISCAL_CODE_EXISTING
+                ),
+                [
+                    statusOk(),
+                    bodyJsonSelectorValue(
+                        'fiscalCode',
+                        myEnv.FISCAL_CODE_EXISTING
+                    ),
+                    bodyJsonSelectorValue('enabled', true),
+                    bodyJsonSelectorValue('optInStatus', 'ACCEPTED'),
+                ]
+            )
+        )
+        group('Should NOT PUT Citizen with NOREQ after ACCEPTED', () =>
+            assert(
+                putCitizen(
+                    services.uat_io.baseUrl,
+                    params,
+					{ optInStatus: 'NOREQ' },
+                    myEnv.FISCAL_CODE_EXISTING
+                ),
+                [
+                    statusOk(),
+                    bodyJsonSelectorValue(
+                        'fiscalCode',
+                        myEnv.FISCAL_CODE_EXISTING
+                    ),
+                    bodyJsonSelectorValue('enabled', true),
+                    bodyJsonSelectorValue('optInStatus', 'ACCEPTED'),
+                ]
+            )
+        )
+        group('Should DELETE a Citizen and restore NOREQ status', () =>
+            assert(
+                deleteCitizen(
+                    services.uat_io.baseUrl,
+                    params,
+                    myEnv.FISCAL_CODE_EXISTING
+                ),
+                [statusNoContent()]
+            )
+        )
+        group('Should PUT Citizen without an opt in status', () =>
+            assert(
+                putCitizen(
+                    services.uat_io.baseUrl,
+                    params,
+					{},
+                    myEnv.FISCAL_CODE_EXISTING
+                ),
+                [
+                    statusOk(),
+                    bodyJsonSelectorValue(
+                        'fiscalCode',
+                        myEnv.FISCAL_CODE_EXISTING
+                    ),
+                    bodyJsonSelectorValue('enabled', true),
+                    bodyJsonSelectorValue('optInStatus', 'NOREQ'),
+                ]
+            )
+        )
+        group('Should GET Citizen with NOREQ status', () =>
+            assert(
+                getCitizen(
+                    services.uat_io.baseUrl,
+                    params,
+                    myEnv.FISCAL_CODE_EXISTING
+                ),
+                [
+                    statusOk(),
+                    bodyJsonSelectorValue(
+                        'fiscalCode',
+                        myEnv.FISCAL_CODE_EXISTING
+                    ),
+                    bodyJsonSelectorValue('enabled', true),
+                    bodyJsonSelectorValue('optInStatus', 'NOREQ'),
+                ]
+            )
+        )
+        group('Should PUT Citizen with DENIED status', () =>
+            assert(
+                putCitizen(
+                    services.uat_io.baseUrl,
+                    params,
+					{ optInStatus: 'DENIED' },
+                    myEnv.FISCAL_CODE_EXISTING
+                ),
+                [
+                    statusOk(),
+                    bodyJsonSelectorValue(
+                        'fiscalCode',
+                        myEnv.FISCAL_CODE_EXISTING
+                    ),
+                    bodyJsonSelectorValue('enabled', true),
+                    bodyJsonSelectorValue('optInStatus', 'DENIED'),
+                ]
+            )
+        )
+        group('Should NOT PUT Citizen with NOREQ after DENIED', () =>
+            assert(
+                putCitizen(
+                    services.uat_io.baseUrl,
+                    params,
+					{ optInStatus: 'NOREQ' },
+                    myEnv.FISCAL_CODE_EXISTING
+                ),
+                [
+                    statusOk(),
+                    bodyJsonSelectorValue(
+                        'fiscalCode',
+                        myEnv.FISCAL_CODE_EXISTING
+                    ),
+                    bodyJsonSelectorValue('enabled', true),
+                    bodyJsonSelectorValue('optInStatus', 'DENIED'),
+                ]
+            )
+        )
+        group('Should DELETE a Citizen and restore NOREQ status', () =>
+            assert(
+                deleteCitizen(
+                    services.uat_io.baseUrl,
+                    params,
+                    myEnv.FISCAL_CODE_EXISTING
+                ),
+                [statusNoContent()]
+            )
+        )
     })
 }

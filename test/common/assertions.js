@@ -20,6 +20,12 @@ export function statusCreated() {
     }
 }
 
+export function statusNoContent() {
+    return function doCheck(res) {
+        check(res, { 'HTTP status is 204': (r) => r.status === 204 })
+    }
+}
+
 export function statusForbidden() {
     return function doCheck(res) {
         check(res, { 'HTTP status is 401': (r) => r.status === 401 })
