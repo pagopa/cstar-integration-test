@@ -9,13 +9,8 @@ test
     ├── common       <-- building blocks (API method, checks, ...)
     │   └── api
     ├── e2e          <-- end-to-end tests
-    │   └── uat
     ├── performance  <-- load tests
-    │   └── dev
     └── smoke        <-- smoke tests
-        ├── dev
-        ├── prod
-        └── uat
 ```
 
 ## Installation
