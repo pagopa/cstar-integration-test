@@ -5,6 +5,7 @@
 #
 # Usage: ./smoke_env.sh <dev|uat|prod>
 
+
 TESTS_DIR="test/smoke"
 K6_BINARY="k6"
 K6_TEST_FILEEXT=".js"
