@@ -18,18 +18,19 @@ test
         └── uat
 ```
 
-## Usage
+## Installation
 
 1. Install `go` (on Mac OS X `brew install golang`)
-2. Clone this repository and move in the root folder
-3. Create a folder named `certs`
-4. Put the private key and the corresponding certificate for mutual-auth in the folder `certs`
-5. Check that the certificate is signed by CA PAGOPA 05 [CA PAGOPA 04]
-6. Install `xk6`, which is a tool for building customized versione of `k6` executable, with the following command `go install go.k6.io/xk6/cmd/xk6@latest`
-7. Build a customized version of `k6` with `dotenv` support. The following command will create e customized `k6` executable in the current folder `$ xk6 build --with github.com/szkiba/xk6-dotenv@latest`
-8. Create a copy of the file `./test/e2e/prod/env.production.local.sample` [`./test/e2e/uat/env.test.local.sample`] and rename it as `./test/e2e/prod/.env.production.local` [`./test/e2e/uat/.env.test.local`]
-9. Customize env variables in `./test/e2e/prod/.env.production.local` [`./test/e2e/uat/.env.test.local`]
-10. Run the following test in prod [uat] `./k6  run test/e2e/prod/bpdHbAwardPeriod.js [./k6  run test/e2e/uat/bpdHbAwardPeriod.js]`
+2. Install `xk6` with the following command `go install go.k6.io/xk6/cmd/xk6@latest`
+3. Build a customized version of `k6` with `dotenv` support. The following command will create e customized `k6` executable in the current folder `xk6 build --with github.com/szkiba/xk6-dotenv@latest`
+
+## Usage
+
+1. Create a folder named `certs`
+2. Put the private key and the corresponding certificate for mutual-auth in the folder `certs`
+3. Create a copy of the file `./env.local.sample` and rename it as `./.env.dev.local` [`./.env.uat.local` | `./.env.prod.local`]
+4. Customize env variables in `./.env.dev.local` [`./.env.uat.local` | `./.env.prod.local`]
+5. Run a test with `TARGET_ENV=<ENV> ./k6 run test/smoke/rtdCsvTransaction.js`
 
 ### Perform the whole suite of smoke tests on a target environment
 

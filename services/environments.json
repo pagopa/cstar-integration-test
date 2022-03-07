@@ -3,8 +3,7 @@
     "baseUrl": "https://api-io.dev.cstar.pagopa.it"
   },
   "uat_io": {
-    "baseUrl": "https://api-io.uat.cstar.pagopa.it",
-    "host": "api-io.uat.cstar.pagopa.it"
+    "baseUrl": "https://api-io.uat.cstar.pagopa.it"
   },
   "prod_io": {
     "baseUrl": "https://api-io.cstar.pagopa.it"
@@ -13,8 +12,7 @@
     "baseUrl": "https://api.dev.cstar.pagopa.it"
   },
   "uat_issuer": {
-    "baseUrl": "https://api.uat.cstar.pagopa.it",
-    "host": "api.uat.cstar.pagopa.it"
+    "baseUrl": "https://api.uat.cstar.pagopa.it"
   },
   "prod_issuer": {
     "baseUrl": "https://api.cstar.pagopa.it"
