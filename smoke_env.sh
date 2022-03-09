@@ -1,7 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Quickly perform a smoke test on target environment by running each
-# test found under test/smoke/<ENV> once.
+# test found under test/smoke once.
+#
+# Usage: ./smoke_env.sh <dev|uat|prod>
+
 
 TESTS_DIR="test/smoke"
 K6_BINARY="k6"
@@ -11,11 +14,11 @@ set -e
 
 ENV=$1
 
-if [ -z "$ENV" ]; then
-  echo "ENV should be: dev, uat or prod."
+if [[ -z "$ENV" || ! "$ENV" =~ ^(dev|uat|prod)$ ]]; then
+  echo "Usage: ./smoke_env.sh <dev|uat|prod>"
   exit 0
 fi
 
-for TEST in $(ls $TESTS_DIR/$ENV/*$K6_TEST_FILEEXT); do
-	./$K6_BINARY run $TEST
+for TEST in $(ls $TESTS_DIR/*$K6_TEST_FILEEXT); do
+	TARGET_ENV=$ENV ./$K6_BINARY run $TEST
 done;
