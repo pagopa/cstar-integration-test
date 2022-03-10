@@ -12,13 +12,13 @@ export function getBpdTermsAndConditionsViaBlob(baseUrl, params) {
 }
 
 export function getBpdTermsAndConditionsHtml(baseUrl, params) {
-    const res = http.get(`${baseUrl}/bpd/tc/html`, params)
+    const res = http.get(`${baseUrl}${API_PREFIX}/html`, params)
     __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
     return res
 }
 
 export function getBpdTermsAndConditionsPdf(baseUrl, params) {
-    const res = http.get(`${baseUrl}/bpd/tc/pdf`, params)
+    const res = http.get(`${baseUrl}${API_PREFIX}/pdf`, params)
     __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
     return res
 }
