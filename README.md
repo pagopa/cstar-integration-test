@@ -33,6 +33,12 @@ test
 ./smoke_env.sh <ENV>
 ```
 
+### Perform the whole suite of load tests on a target environment
+
+```
+./load_env.sh <ENV>
+```
+
 ### Enable HTTP tracing
 
 With tracing enabled all HTTP responses will be printed to standard output.
