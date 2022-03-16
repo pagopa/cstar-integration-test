@@ -1,9 +1,9 @@
 #!/bin/bash
 #
-# Quickly perform a smoke test on target environment by running each
-# test found under test/smoke once.
+# Quickly perform a load tests on target environment by running each
+# test found under test/performance once.
 #
-# Usage: ./smoke_env.sh <dev|uat|prod>
+# Usage: ./load_env.sh <dev|uat|prod>
 
 
 TESTS_DIR="test/performance"
@@ -15,7 +15,7 @@ set -e
 ENV=$1
 
 if [[ -z "$ENV" || ! "$ENV" =~ ^(dev|uat|prod)$ ]]; then
-  echo "Usage: ./smoke_env.sh <dev|uat|prod>"
+  echo "Usage: ./load_env.sh <dev|uat|prod>"
   exit 0
 fi
 
