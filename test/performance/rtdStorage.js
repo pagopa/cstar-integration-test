@@ -1,9 +1,15 @@
+// This test will upload many transaction files concurrently, and
+// each file will have a progressing naming thus enabling to verify
+// that the expected files are been stored as unencrypted on the
+// destination container.
+// However, to guarantee uniqueness in the file naming no more than
+// 9 VUs should be used and the test shall not be longer than 99 seconds.
 import { group, sleep } from 'k6'
 import { putBlob } from '../common/api/rtdStorage.js'
 import { assert, statusCreated } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
-import exec from 'k6/execution';
+import exec from 'k6/execution'
 
 const REGISTERED_ENVS = [DEV, UAT]
 
@@ -13,7 +19,7 @@ const BLOB_SUFFIX = '.NNN.csv.pgp'
 export let options = {
 	vus: 9,
 	duration: '1m',
-  }
+}
 let params = {}
 let baseUrl
 let myEnv
@@ -34,7 +40,6 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
 
 	params.headers = {
 		'Ocp-Apim-Subscription-Key': myEnv.APIM_RTDPRODUCT_SK,
-		'Ocp-Apim-Trace': 'true',
 	}
 
 	payload = open(`../../assets/trx-list-input.csv.pgp`, 'b')
