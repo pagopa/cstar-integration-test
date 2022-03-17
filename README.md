@@ -42,7 +42,7 @@ test
 ### Enable HTTP tracing
 
 With tracing enabled all HTTP responses will be printed to standard output.
-To enable it just set the environment variable *REQ_DUMP*:
+To enable it just set the environment variable _REQ_DUMP_:
 
 ```sh
 REQ_DUMP=1 ./k6 run <TEST>
