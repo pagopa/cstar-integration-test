@@ -41,3 +41,13 @@ To enable it just set the environment variable _REQ_DUMP_:
 ```sh
 REQ_DUMP=1 ./k6 run <TEST>
 ```
+
+## Contributing
+
+Ensure your code is formatted correctly. The codestyle is defined in the file _.prettierrc_ and enforced via Prettier itself.
+
+To automatically check (and eventually format) files before committing install the pre-commit hooks on your machine:
+
+```
+pre-commit Installation
+```
