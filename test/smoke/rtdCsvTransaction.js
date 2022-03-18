@@ -10,10 +10,16 @@ import {
     statusCreated,
     bodyPgpPublicKey,
 } from '../common/assertions.js'
-import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
+import {
+    isEnvValid,
+    isTestEnabledOnEnv,
+    DEV,
+    UAT,
+    PROD,
+} from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
 
-const REGISTERED_ENVS = [DEV, UAT]
+const REGISTERED_ENVS = [DEV, UAT, PROD]
 
 const services = JSON.parse(open('../../services/environments.json'))
 export let options = {}
