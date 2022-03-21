@@ -1,7 +1,7 @@
 import { group } from 'k6'
 import exec from 'k6/execution'
-import { createRtdSas, createAdeSas } from '../common/api/rtdCsvTransaction.js'
-import { assert, statusCreated } from '../common/assertions.js'
+import { getPublicKey } from '../common/api/rtdCsvTransaction.js'
+import { assert, statusOk, bodyPgpPublicKey } from '../common/assertions.js'
 import {
     isEnvValid,
     isTestEnabledOnEnv,
@@ -54,14 +54,10 @@ if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
 
 export default () => {
     group('CSV Transaction API', () => {
-        group('Should create RTD SAS', () =>
-            assert(createRtdSas(services.dev_issuer.baseUrl, params), [
-                statusCreated(),
-            ])
-        )
-        group('Should create AdE SAS', () =>
-            assert(createAdeSas(services.dev_issuer.baseUrl, params), [
-                statusCreated(),
+        group('Should get public key', () =>
+            assert(getPublicKey(baseUrl, params), [
+                statusOk(),
+                bodyPgpPublicKey(),
             ])
         )
     })

@@ -1,4 +1,4 @@
-import { group } from 'k6'
+import { group, sleep } from 'k6'
 import { putBlob } from '../common/api/rtdStorage.js'
 import { assert, statusCreated } from '../common/assertions.js'
 import {
@@ -9,17 +9,22 @@ import {
     PROD,
 } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
+import exec from 'k6/execution'
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
 const services = JSON.parse(open('../../services/environments.json'))
 const BLOB_PREFIX = 'CSTAR.K6000.TRNLOG.'
-const BLOB_SUFFIX = '.001.csv.pgp'
-export let options = {}
+const BLOB_SUFFIX = '.NNN.csv.pgp'
+export let options = {
+    vus: 9,
+    duration: '1m',
+}
 let params = {}
 let baseUrl
 let myEnv
 let payload
+let n = 1
 
 if (isEnvValid(__ENV.TARGET_ENV)) {
     myEnv = dotenv.parse(open(`../../.env.${__ENV.TARGET_ENV}.local`))
@@ -35,10 +40,9 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
 
     params.headers = {
         'Ocp-Apim-Subscription-Key': myEnv.APIM_RTDPRODUCT_SK,
-        'Ocp-Apim-Trace': 'true',
     }
 
-    payload = open(`../../assets/trx-list-input.csv.pgp`, 'b')
+    payload = open(`../../assets/random.csv.pgp`, 'b')
 }
 
 export default () => {
@@ -58,7 +62,8 @@ export default () => {
         .replace(':', '')
         .replace(':', '')
         .substring(0, 15)
-    const blob = BLOB_PREFIX + blobDateTimePart + BLOB_SUFFIX
+    let blob = BLOB_PREFIX + blobDateTimePart + BLOB_SUFFIX
+    blob = blob.replace('NNN', exec.vu.idInTest + String(n).padStart(2, '0'))
 
     group('Storage API', () => {
         group('Should upload file via PUT', () =>
@@ -75,4 +80,10 @@ export default () => {
             )
         )
     })
+
+    n += 1
+    if (n > 99) {
+        n = 1
+    }
+    sleep(1)
 }
