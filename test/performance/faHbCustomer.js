@@ -1,14 +1,23 @@
 import { group } from 'k6'
 import exec from 'k6/execution'
-import { putFaCustomer } from '../common/api/faHbCustomer.js'
-import { assert, statusCreated } from '../common/assertions.js'
+import { getFaCustomer, putFaCustomer } from '../common/api/faHbCustomer.js'
+import { assert, statusOk } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
 
 const REGISTERED_ENVS = [DEV, UAT]
 
 const services = JSON.parse(open('../../services/environments.json'))
-export let options = JSON.parse(open('../../options/baseline_load.json'))
+export let options = {
+    stages: [
+        { duration: '1m', target: 10 },
+        { duration: '3m', target: 30 },
+        { duration: '1m', target: 10 },
+    ],
+    thresholds: {
+        http_req_duration: ['p(95)<500'],
+    },
+}
 let params = {}
 let baseUrl
 let myEnv
@@ -40,14 +49,19 @@ if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
 }
 
 const body = {
-    vatNumber: '1234567'
+    id: myEnv.FISCAL_CODE_EXISTING
 }
 
 export default () => {
 	group('FA HB Customer API', () => {
 		group('Should create an FA CUSTOMER', () =>
-			assert(putFaCustomer(services.dev_issuer.baseUrl, params, body), [
-				statusCreated(),
+			assert(putFaCustomer(baseUrl, params, body), [
+				statusOk(),
+			])
+		)
+		group('Should get an FA CUSTOMER', () =>
+			assert(getFaCustomer(baseUrl, params, body.id), [
+				statusOk(),
 			])
 		)
 	})

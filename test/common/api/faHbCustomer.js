@@ -20,7 +20,6 @@ export function putFaCustomer(baseUrl, params, body) {
         JSON.stringify(body),
         myParams
     )
-    console.log(JSON.stringify(res))
     __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
     return res
 }
