@@ -4,7 +4,7 @@ import { getFaCustomer, putFaCustomer } from '../common/api/faHbCustomer.js'
 import { assert, statusOk } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
-import { randomString } from "https://jslib.k6.io/k6-utils/1.1.0/index.js"
+import { randomFiscalCode } from '../common/utils.js'
 
 const REGISTERED_ENVS = [DEV, UAT]
 
@@ -52,18 +52,6 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
 if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
 	console.log('Test not enabled for target env')
 	exec.test.abort()
-}
-
-
-function randomFiscalCode() {
-	"^([A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST]{1}[0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z]{1}[0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]{1})$"
-  
-	const name = randomString(6);
-	const birth_y = (40 + (Math.floor(Math.random() * 50))).toString();
-	const birth_m = "M"
-	const birth_d = Math.floor(Math.random() * 30).toString()
-	const final = [randomString(1), (100 + Math.floor(Math.random() * 899)).toString(), randomString(1)].join("");
-	return [name, birth_y, birth_m, birth_d, final].join("");
 }
 
 
