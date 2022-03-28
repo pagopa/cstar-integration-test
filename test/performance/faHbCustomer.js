@@ -4,20 +4,26 @@ import { getFaCustomer, putFaCustomer } from '../common/api/faHbCustomer.js'
 import { assert, statusOk } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
+import { randomString } from "https://jslib.k6.io/k6-utils/1.1.0/index.js"
 
 const REGISTERED_ENVS = [DEV, UAT]
 
 const services = JSON.parse(open('../../services/environments.json'))
+
 export let options = {
-    stages: [
-        { duration: '1m', target: 10 },
-        { duration: '3m', target: 30 },
-        { duration: '1m', target: 10 },
-    ],
-    thresholds: {
-        http_req_duration: ['p(95)<500'],
-    },
+	scenarios: {
+		constant_request_rate: {
+		  executor: 'constant-arrival-rate',
+		  rate: 100,
+		  timeUnit: '1s',
+		  duration: '1m',
+		  preAllocatedVUs: 100,
+		  maxVUs: 10000,
+		},
+	},
+	summaryTrendStats: ['med', 'avg', 'min', 'max', 'p(10)', "p(20)", 'p(30)', 'p(40)', 'p(50)', 'p(60)', 'p(70)', 'p(80)', 'p(90)'],
 }
+
 let params = {}
 let baseUrl
 let myEnv
@@ -48,12 +54,26 @@ if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
 	exec.test.abort()
 }
 
-const body = {
-    id: myEnv.FISCAL_CODE_EXISTING
+
+function randomFiscalCode() {
+	"^([A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST]{1}[0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z]{1}[0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]{1})$"
+  
+	const name = randomString(6);
+	const birth_y = (40 + (Math.floor(Math.random() * 50))).toString();
+	const birth_m = "M"
+	const birth_d = Math.floor(Math.random() * 30).toString()
+	const final = [randomString(1), (100 + Math.floor(Math.random() * 899)).toString(), randomString(1)].join("");
+	return [name, birth_y, birth_m, birth_d, final].join("");
 }
+
 
 export default () => {
 	group('FA HB Customer API', () => {
+
+		const body = {
+			id: randomFiscalCode()
+		}
+
 		group('Should create an FA CUSTOMER', () =>
 			assert(putFaCustomer(baseUrl, params, body), [
 				statusOk(),
