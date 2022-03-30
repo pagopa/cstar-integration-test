@@ -11,10 +11,10 @@ export function getFaPICustomer(baseUrl, params, id, fiscalCode) {
     return res
 }
 
-export function putFaPICustomer(baseUrl, params, body) {
+export function putFaPICustomerByCard(baseUrl, params, body) {
     const myParams = Object.assign({}, params)
     const res = http.put(
-        `${baseUrl}${API_PREFIX}`,
+        `${baseUrl}${API_PREFIX}/card`,
         JSON.stringify(body),
         myParams
     )
