@@ -38,11 +38,7 @@ export function putFaCustomerInternal(baseUrl, params, body) {
     const myParams = Object.assign({}, params)
     const apiPrefix = '/famsenrollment/fa/enrollment/customer'
     const url = `${baseUrl}${apiPrefix}/${body.id}`
-    const res = http.put(
-        url,
-        JSON.stringify(body),
-        myParams
-    )
+    const res = http.put(url, JSON.stringify(body), myParams)
     __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
     return res
 }
