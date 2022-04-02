@@ -32,16 +32,6 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
 	myEnv = dotenv.parse(open(`../../../.env.${__ENV.TARGET_ENV}.local`))
 	baseUrl = services[`${__ENV.TARGET_ENV}_issuer_internal`].baseUrl
 
-	/*
-	options.tlsAuth = [
-		{
-			domains: [baseUrl],
-			cert: open(`../../../certs/${myEnv.MAUTH_CERT_NAME}`),
-			key: open(`../../../certs/${myEnv.MAUTH_PRIVATE_KEY_NAME}`),
-		},
-	]
-	*/
-
 	params.headers = {
 		'Ocp-Apim-Subscription-Key': myEnv.APIM_SK,
 		'Ocp-Apim-Trace': 'true',
