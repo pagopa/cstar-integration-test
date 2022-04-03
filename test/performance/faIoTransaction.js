@@ -1,6 +1,6 @@
 import { group } from 'k6'
 import exec from 'k6/execution'
-import { getFaCustomer, putFaCustomer } from '../common/api/faHbCustomer.js'
+import { getTransactionList } from '../common/api/faIoTransaction'
 import { assert, statusOk } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
@@ -14,7 +14,7 @@ export let options = {
     scenarios: {
         constant_request_rate: {
             executor: 'constant-arrival-rate',
-            rate: 100,
+            rate: 1,
             timeUnit: '1s',
             duration: '1m',
             preAllocatedVUs: 100,
@@ -74,11 +74,8 @@ export default () => {
             id: randomFiscalCode(),
         }
 
-        group('Should create an FA CUSTOMER', () =>
-            assert(putFaCustomer(baseUrl, params, body), [statusOk()])
-        )
         group('Should get an FA CUSTOMER', () =>
-            assert(getFaCustomer(baseUrl, params, body.id), [statusOk()])
+            assert(getTransactionList(baseUrl, params, body.id), [statusOk()])
         )
     })
 }
