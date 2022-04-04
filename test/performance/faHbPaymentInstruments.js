@@ -95,7 +95,7 @@ iG3WCNvjXR2Wuq0=
     channel: '36024',
     vatNumber: '15376371009',
 }
-
+//console.log(JSON.stringify(body))
 export default () => {
     group('FA Payment Instruments API', () => {
         group('Should put a FA CUSTOMER', () =>
