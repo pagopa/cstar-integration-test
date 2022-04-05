@@ -1,9 +1,8 @@
 import { group } from 'k6'
 import exec from 'k6/execution'
 import {
-    getFaPICustomer,
-    putFaPICustomerByCard,
-    patchFaPICustomer,
+    getFAPaymentInstrument,
+    putFAPaymentInstrumentCard,
 } from '../common/api/faHbPaymentInstruments.js'
 import { assert, statusOk } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
@@ -98,10 +97,12 @@ G1XX5Aw3TIJ4xpJvuRhwfU4ajnSCrdOuYoYvF9844w==
 export default () => {
     group('FA Payment Instruments API', () => {
         group('Should create an FA PI CUSTOMER', () =>
-            assert(putFaPICustomerByCard(baseUrl, params, body), [statusOk()])
+            assert(putFAPaymentInstrumentCard(baseUrl, params, body), [
+                statusOk(),
+            ])
         )
         /* group('Should get an FA PI CUSTOMER', () =>
-			assert(getFaPICustomer(baseUrl, params, body.id, body.fiscalCode), [
+			assert(getFAPaymentInstrument(baseUrl, params, body.id, body.fiscalCode), [
 				statusOk(),
 			])
 		) */
