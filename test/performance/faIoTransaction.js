@@ -59,7 +59,9 @@ export function setup() {
     return {
         headers: {
             Authorization: `Bearer ${authToken}`,
-            'Ocp-Apim-Subscription-Key': `${myEnv.APIM_SK};product=app-io-product`,
+            'Ocp-Apim-Subscription-Key': `${
+                myEnv.APIM_IO_SK || myEnv.APIM_SK
+            };product=app-io-product`,
             'Ocp-Apim-Trace': 'true',
             'Content-Type': 'application/json',
         },
