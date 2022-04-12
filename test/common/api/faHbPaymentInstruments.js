@@ -2,7 +2,7 @@ import http from 'k6/http'
 
 const API_PREFIX = '/fa/hb/payment-instruments'
 
-export function getFaPICustomer(baseUrl, params, id, fiscalCode) {
+export function getFAPaymentInstrument(baseUrl, params, id, fiscalCode) {
     const myParams = Object.assign({}, params)
     myParams.headers.id = id
     myParams.headers.fiscalCode = fiscalCode
@@ -11,7 +11,7 @@ export function getFaPICustomer(baseUrl, params, id, fiscalCode) {
     return res
 }
 
-export function putFaPICustomerByCard(baseUrl, params, body) {
+export function putFAPaymentInstrumentCard(baseUrl, params, body) {
     const myParams = Object.assign({}, params)
     const res = http.put(
         `${baseUrl}${API_PREFIX}/card`,
@@ -22,7 +22,7 @@ export function putFaPICustomerByCard(baseUrl, params, body) {
     return res
 }
 
-export function patchFaPICustomer(baseUrl, params, body) {
+export function patchFAPaymentInstrument(baseUrl, params, body) {
     const myParams = Object.assign({}, params)
     const res = http.patch(
         `${baseUrl}${API_PREFIX}`,
