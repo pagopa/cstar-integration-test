@@ -4,6 +4,7 @@ import {
     getFAPaymentInstrument,
     putFAPaymentInstrumentCard,
 } from '../common/api/faHbPaymentInstruments.js'
+import { putFaCustomer } from '../common/api/faHbCustomer.js'
 import { assert, statusOk } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
@@ -85,7 +86,7 @@ PW8s7wZetE9gExRTed36C0lSG9syxomCoEingcLKd9ohuUR6+TEGQHsDLRWrdc9H
 iG3WCNvjXR2Wuq0=
 =c+K4
 -----END PGP MESSAGE-----`,
-    fiscalCode: myEnv.FISCAL_CODE_EXISTING,
+    fiscalCode: myEnv.FISCAL_CODE_PM_EXISTING,
     expireYear: '2025',
     exprireMonth: '05',
     issuerAbiCode: '07601',
@@ -95,18 +96,29 @@ iG3WCNvjXR2Wuq0=
     channel: '36024',
     vatNumber: '15376371009',
 }
-//console.log(JSON.stringify(body))
+
 export default () => {
     group('FA Payment Instruments API', () => {
-        group('Should create an FA PI CUSTOMER', () =>
+        group('Should put a FA CUSTOMER', () =>
+            assert(putFaCustomer(baseUrl, params, { id: body.fiscalCode }), [
+                statusOk(),
+            ])
+        )
+        group('Should create a FA Payment Instrument', () =>
             assert(putFAPaymentInstrumentCard(baseUrl, params, body), [
                 statusOk(),
             ])
         )
-        /* group('Should get an FA PI CUSTOMER', () =>
-			assert(getFAPaymentInstrument(baseUrl, params, body.id, body.fiscalCode), [
-				statusOk(),
-			])
-		) */
+        group('Should get an FA Payment Instrument', () =>
+            assert(
+                getFAPaymentInstrument(
+                    baseUrl,
+                    params,
+                    body.id,
+                    body.fiscalCode
+                ),
+                [statusOk()]
+            )
+        )
     })
 }
