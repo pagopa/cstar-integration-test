@@ -74,24 +74,26 @@ if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
 
 const body = {
     id: `-----BEGIN PGP MESSAGE-----
-hQEMA+NENQPn0iNJAQf/YZsCVPWggIu4kQjENH2aenp80tTH+rCAMComNfIZMmUQ
-FXRil34Lx0Z4+GHd2Ws1Fx4c+2lh1VeKzrmKljeihMCVO9ItQws2MaWp12Y+eBLu
-TPXYsRDIx5yWXx7DUDBK+O9OxBQI5U37iQcAfq1qdpZ3GJFiAFud5cizJeIkdyzA
-pTO7sYzvcsU8xNTkIukrEErOIYtIpyBgq/ZbANCELRJmEeL4sVvRKn9k1YS2ib+B
-fRtWBpRcCWp51lDO1I3Agdwwuy0sYflipjz+Ng0bkxjHKoai3631B+bE0FKn5Sym
-VE72yCD2yWFRlg9DRp4kOUy8BaK46594ieXgYGaU8dJeAYPpXt0zUxKnmiX9iPXB
-we6cwDw4Y4gTmB1CUlS0EoRUlA52GZi8XbLutH+y9gHNEVaT1see9u77jUTnQ0ZI
-G1XX5Aw3TIJ4xpJvuRhwfU4ajnSCrdOuYoYvF9844w==
-=u0dg
+Version: BCPG v1.58
+
+hQEMA5iQxLoVRSHvAQf+NRxLrbsjt/nag5EU/c2XUO8/NRCkY/xqEThAn68ykvWM
+cftQaPdf7JIQzXwTbcvYnJXx+lskOsa/lAi4HS2FlyI6H0a5T6WHHVDWmrRyx/cj
+UFQ4UgFqAU40gb/95+Zppg6/5C+WqmuDxq3/2cmbUnjggqUMwVZONzKQpFzQZhsa
+Bla+5mw3ko+5fsbDiiM2c8raayrco2Ryd1xPqamrYmykpmKwEkZMw9S7RxS20kIc
+o7Ne0FuxxG4dRkTk4dvvOwnP1yJvlcgK+idXbdP3QCUVZb8QCWyLf5GFqzTWHkuz
+wqSckqBwrSB3XXK1rdLONz6bRqFCsWyS+Ai8566II9JKAYsefrkiCTa4wXV0VlvB
+PW8s7wZetE9gExRTed36C0lSG9syxomCoEingcLKd9ohuUR6+TEGQHsDLRWrdc9H
+iG3WCNvjXR2Wuq0=
+=c+K4
 -----END PGP MESSAGE-----`,
     fiscalCode: myEnv.FISCAL_CODE_EXISTING,
-    expireYear: '2023',
-    exprireMonth: '08',
+    expireYear: '2025',
+    exprireMonth: '05',
     issuerAbiCode: '07601',
     brand: 'VISA',
-    holder: 'Pinco Pallino',
+    holder: 'ATM COLLAUDO',
     type: 'CRD',
-    channel: '65406',
+    channel: '36024',
     vatNumber: '15376371009',
 }
 //console.log(JSON.stringify(body))
