@@ -23,3 +23,22 @@ export function putFaCustomer(baseUrl, params, body) {
     __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
     return res
 }
+
+export function getFaCustomerInternal(baseUrl, params, id) {
+    const myParams = Object.assign({}, params)
+    const apiPrefix = '/famscustomer/fa/customer'
+    const url = `${baseUrl}${apiPrefix}/${id}`
+    myParams.headers.id = id
+    const res = http.get(url, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
+    return res
+}
+
+export function putFaCustomerInternal(baseUrl, params, body) {
+    const myParams = Object.assign({}, params)
+    const apiPrefix = '/famsenrollment/fa/enrollment/customer'
+    const url = `${baseUrl}${apiPrefix}/${body.id}`
+    const res = http.put(url, JSON.stringify(body), myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
+    return res
+}

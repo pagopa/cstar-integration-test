@@ -16,7 +16,6 @@ export function getTransactionListInternal(baseUrl, params, hpan) {
     const myParams = Object.assign({}, params)
     const apiPrefix = '/famstransaction/fa/transaction'
     const url = new URL(`${baseUrl}${apiPrefix}/list/${hpan}`)
-    // url.searchParams.append('hpan', hpan)
     const res = http.get(url.toString(), myParams)
     __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
     return res
