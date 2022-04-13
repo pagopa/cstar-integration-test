@@ -16,5 +16,11 @@
   },
   "prod_issuer": {
     "baseUrl": "https://api.cstar.pagopa.it"
+  },
+  "uat_issuer_internal": {
+    "baseUrl": "http://10.1.0.250"
+  },
+  "dev_issuer_internal": {
+    "baseUrl": "http://10.1.0.250"
   }
 }
