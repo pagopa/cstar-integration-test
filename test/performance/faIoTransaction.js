@@ -70,12 +70,10 @@ export function setup() {
 
 export default (params) => {
     group('FA IO Transaction API', () => {
-        const body = {
-            id: randomFiscalCode(),
-        }
+        const vat = randomFiscalCode()
 
         group('Should get a Transaction', () =>
-            assert(getTransactionList(baseUrl, params, body.id), [statusOk()])
+            assert(getTransactionList(baseUrl, params, vat), [statusOk()])
         )
     })
 }

@@ -7,8 +7,7 @@ import {
 import { assert, statusOk } from '../../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../../common/envs.js'
 import dotenv from 'k6/x/dotenv'
-import { randomFiscalCode } from '../../common/utils.js'
-import { login } from '../../common/api/bpdIoLogin.js'
+import { randomString } from 'https://jslib.k6.io/k6-utils/1.1.0/index.js'
 
 const REGISTERED_ENVS = [DEV, UAT]
 
@@ -58,7 +57,6 @@ if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
 }
 
 export function setup() {
-    const authToken = login(baseUrl, myEnv.FISCAL_CODE_EXISTING)
     return {
         headers: {
             'Content-Type': 'application/json',
@@ -69,9 +67,9 @@ export function setup() {
 export default (params) => {
     group('FA IO Transaction API', () => {
         const body = {
-            amount: 42,
+            amount: 43,
             binCard: '11223344',
-            authCode: '11111122222',
+            authCode: randomString(11),
             vatNumber: '04533641009',
             posType: 'ASSERVED_POS',
             terminalId: '11111111',
@@ -79,9 +77,12 @@ export default (params) => {
             contractId: '3',
         }
 
-        /* group('Should get a Transaction', () =>
-            assert(getTransactionListInternal(baseUrl, params, body.vatNumber), [statusOk()])
-        ) */
+        group('Should get a Transaction', () =>
+            assert(
+                getTransactionListInternal(baseUrl, params, body.vatNumber),
+                [statusOk()]
+            )
+        )
 
         group('Should create a Transaction', () =>
             assert(createTransactionInternal(baseUrl, params, body), [
