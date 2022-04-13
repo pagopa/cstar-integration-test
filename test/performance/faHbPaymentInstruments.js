@@ -8,7 +8,6 @@ import { putFaCustomer } from '../common/api/faHbCustomer.js'
 import { assert, statusOk } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
-// import { randomFiscalCode } from '../common/utils.js'
 
 const REGISTERED_ENVS = [DEV, UAT]
 
@@ -18,7 +17,7 @@ export let options = {
     scenarios: {
         constant_request_rate: {
             executor: 'constant-arrival-rate',
-            rate: 1,
+            rate: 50,
             timeUnit: '1s',
             duration: '1m',
             preAllocatedVUs: 100,
@@ -104,17 +103,21 @@ export default () => {
                 statusOk(),
             ])
         )
-        group('Should create a FA Payment Instrument', () =>
-            assert(putFAPaymentInstrumentCard(baseUrl, params, body), [
-                statusOk(),
-            ])
-        )
+        let responseHpan = ''
+        group('Should create a FA Payment Instrument', () => {
+            const putRes = putFAPaymentInstrumentCard(baseUrl, params, body)
+            assert(putRes, [statusOk()])
+            if (putRes.status === 200) {
+                const resBody = JSON.parse(putRes.body)
+                responseHpan = resBody.hpan
+            }
+        })
         group('Should get an FA Payment Instrument', () =>
             assert(
                 getFAPaymentInstrument(
                     baseUrl,
                     params,
-                    body.id,
+                    responseHpan,
                     body.fiscalCode
                 ),
                 [statusOk()]
