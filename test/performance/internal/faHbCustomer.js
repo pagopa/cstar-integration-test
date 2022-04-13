@@ -1,20 +1,23 @@
 import { group } from 'k6'
 import exec from 'k6/execution'
-import { getFaCustomer, putFaCustomer } from '../common/api/faHbCustomer.js'
-import { assert, statusOk } from '../common/assertions.js'
-import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
+import {
+    getFaCustomerInternal,
+    putFaCustomerInternal,
+} from '../../common/api/faHbCustomer.js'
+import { assert, statusOk } from '../../common/assertions.js'
+import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../../common/envs.js'
 import dotenv from 'k6/x/dotenv'
-import { randomFiscalCode } from '../common/utils.js'
+import { randomFiscalCode } from '../../common/utils.js'
 
 const REGISTERED_ENVS = [DEV, UAT]
 
-const services = JSON.parse(open('../../services/environments.json'))
+const services = JSON.parse(open('../../../services/environments.json'))
 
 export let options = {
     scenarios: {
         constant_request_rate: {
             executor: 'constant-arrival-rate',
-            rate: 100,
+            rate: 1,
             timeUnit: '1s',
             duration: '1m',
             preAllocatedVUs: 100,
@@ -43,16 +46,8 @@ let baseUrl
 let myEnv
 
 if (isEnvValid(__ENV.TARGET_ENV)) {
-    myEnv = dotenv.parse(open(`../../.env.${__ENV.TARGET_ENV}.local`))
-    baseUrl = services[`${__ENV.TARGET_ENV}_issuer`].baseUrl
-
-    options.tlsAuth = [
-        {
-            domains: [baseUrl],
-            cert: open(`../../certs/${myEnv.MAUTH_CERT_NAME}`),
-            key: open(`../../certs/${myEnv.MAUTH_PRIVATE_KEY_NAME}`),
-        },
-    ]
+    myEnv = dotenv.parse(open(`../../../.env.${__ENV.TARGET_ENV}.local`))
+    baseUrl = services[`${__ENV.TARGET_ENV}_issuer_internal`].baseUrl
 
     params.headers = {
         'Ocp-Apim-Subscription-Key': myEnv.APIM_SK,
@@ -69,16 +64,18 @@ if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
 }
 
 export default () => {
-    group('FA HB Customer API', () => {
+    group('FA HB Customer API (internal)', () => {
         const body = {
             id: randomFiscalCode(),
         }
 
         group('Should create an FA CUSTOMER', () =>
-            assert(putFaCustomer(baseUrl, params, body), [statusOk()])
+            assert(putFaCustomerInternal(baseUrl, params, body), [statusOk()])
         )
         group('Should get an FA CUSTOMER', () =>
-            assert(getFaCustomer(baseUrl, params, body.id), [statusOk()])
+            assert(getFaCustomerInternal(baseUrl, params, body.id), [
+                statusOk(),
+            ])
         )
     })
 }
