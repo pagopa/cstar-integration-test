@@ -3,9 +3,10 @@ import exec from 'k6/execution'
 import {
     getFAPaymentInstrument,
     putFAPaymentInstrumentCard,
+    deleteFAPaymentInstrument,
 } from '../common/api/faHbPaymentInstruments.js'
 import { putFaCustomer } from '../common/api/faHbCustomer.js'
-import { assert, statusOk } from '../common/assertions.js'
+import { assert, statusOk, statusNoContent } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
 
@@ -118,5 +119,15 @@ export default () => {
                 [statusOk()]
             )
         )
+        group('Should delete a FA Payment Instrument', () => {
+            assert(
+                deleteFAPaymentInstrument(
+                    baseUrl,
+                    params,
+                    body.id.replace(/\n/g, '\\n')
+                ),
+                [statusNoContent()]
+            )
+        })
     })
 }

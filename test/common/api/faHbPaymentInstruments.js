@@ -32,3 +32,11 @@ export function patchFAPaymentInstrument(baseUrl, params, body) {
     __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
     return res
 }
+
+export function deleteFAPaymentInstrument(baseUrl, params, id) {
+    const myParams = Object.assign({}, params)
+    myParams.headers.id = id
+    const res = http.del(`${baseUrl}${API_PREFIX}`, {}, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
+    return res
+}
