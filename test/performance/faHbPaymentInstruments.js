@@ -10,7 +10,6 @@ import { putFaCustomer } from '../common/api/faHbCustomer.js'
 import { assert, statusOk, statusNoContent } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
-import { randomFiscalCode } from '../common/utils.js'
 
 const REGISTERED_ENVS = [DEV, UAT]
 
@@ -20,7 +19,7 @@ export let options = {
     scenarios: {
         constant_request_rate: {
             executor: 'constant-arrival-rate',
-            rate: 2,
+            rate: 50,
             timeUnit: '1s',
             duration: '1m',
             preAllocatedVUs: 100,
