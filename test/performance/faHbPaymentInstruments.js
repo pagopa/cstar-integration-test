@@ -1,11 +1,13 @@
 import { group } from 'k6'
 import exec from 'k6/execution'
+import { randomIntBetween } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js'
 import {
     getFAPaymentInstrument,
     putFAPaymentInstrumentCard,
+    deleteFAPaymentInstrument,
 } from '../common/api/faHbPaymentInstruments.js'
 import { putFaCustomer } from '../common/api/faHbCustomer.js'
-import { assert, statusOk } from '../common/assertions.js'
+import { assert, statusOk, statusNoContent } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
 
@@ -44,10 +46,12 @@ export let options = {
 let params = {}
 let baseUrl
 let myEnv
+let panList = []
 
 if (isEnvValid(__ENV.TARGET_ENV)) {
     myEnv = dotenv.parse(open(`../../.env.${__ENV.TARGET_ENV}.local`))
     baseUrl = services[`${__ENV.TARGET_ENV}_issuer`].baseUrl
+    panList = JSON.parse(open('../../assets/encrypted_pan_list.json'))
 
     options.tlsAuth = [
         {
@@ -71,32 +75,31 @@ if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
     exec.test.abort()
 }
 
-const body = {
-    id: `-----BEGIN PGP MESSAGE-----
-Version: BCPG v1.58
-
-hQEMA+NENQPn0iNJAQgAtG1e8X+7Pt+IHGKLwJmbD3a6trsLr2NgDIYcHAyIUwL2
-utBGOyxEGpSsloLSGL5yBVaMC+vvDDrw+9bHbT2SVi4AiL8L9VzH0wC5MejErWAI
-DCNAYcDReb7NnnoEOhoL7ZO8Vz0QPl7QMAuKFveDIXcjZVTJSdNSaQF1bq/TURLd
-0JgJ/wnejeIz5xjJxNEnUYrZIsDCDOkuEias8K6tKC7WV5GMVgsCWvrBpkzYHRgd
-uNQFIm5aYn8J7omOKjKHqtfrR4xp31tUNN7wj5fku7z0Xc1RZ2HPFoyvxEQZV0ic
-ZMCTfPbMPqKyEczCniI4SzQ7uy4dMavU7FThNo2c/dJhAagE4nzbr+tA6O+jJPh0
-UV9qLvisdohdAQUtPXLliwkKFyuXahFLsaXh3S2JFoIjdpCxUP/DYa2mAvae3Mwp
-Ihfqlg+Fq+Q2kREfj51ocp3QCGEWjUyjlAIXCiyZF7YeeA==
-=VimB
------END PGP MESSAGE-----`,
-    fiscalCode: myEnv.FISCAL_CODE_PM_EXISTING,
-    expireYear: '2025',
-    exprireMonth: '05',
-    issuerAbiCode: '07601',
-    brand: 'VISA',
-    holder: 'ATM COLLAUDO',
-    type: 'CRD',
-    channel: '36024',
-    vatNumber: '15376371009',
+function chooseRandomPanFromList() {
+    const index = randomIntBetween(0, panList.list.length - 1)
+    return panList.list[index]
 }
+
+function createBody(encrPan, fiscalCode) {
+    return {
+        id: encrPan,
+        fiscalCode: fiscalCode,
+        expireYear: '2025',
+        exprireMonth: '05',
+        issuerAbiCode: '07601',
+        brand: 'VISA',
+        holder: 'ATM COLLAUDO',
+        type: 'CRD',
+        channel: '36024',
+        vatNumber: '15376371009',
+    }
+}
+
 export default () => {
     group('FA Payment Instruments API', () => {
+        const pan = chooseRandomPanFromList()
+        const fiscalCode = myEnv.FISCAL_CODE_PM_EXISTING
+        const body = createBody(pan, fiscalCode)
         group('Should put a FA CUSTOMER', () =>
             assert(putFaCustomer(baseUrl, params, { id: body.fiscalCode }), [
                 statusOk(),
@@ -112,11 +115,21 @@ export default () => {
                 getFAPaymentInstrument(
                     baseUrl,
                     params,
-                    body.id.replace(/\n/g, '\\n'),
+                    pan.replace(/\n/g, '\\n'),
                     body.fiscalCode
                 ),
                 [statusOk()]
             )
         )
+        group('Should delete a FA Payment Instrument', () => {
+            assert(
+                deleteFAPaymentInstrument(
+                    baseUrl,
+                    params,
+                    pan.replace(/\n/g, '\\n')
+                ),
+                [statusNoContent()]
+            )
+        })
     })
 }
