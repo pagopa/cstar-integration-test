@@ -19,7 +19,7 @@ export let options = {
     scenarios: {
         constant_request_rate: {
             executor: 'constant-arrival-rate',
-            rate: 50,
+            rate: 2,
             timeUnit: '1s',
             duration: '1m',
             preAllocatedVUs: 100,
@@ -80,10 +80,10 @@ function chooseRandomPanFromList() {
     return panList.list[index]
 }
 
-function createBody() {
+function createBody(encrPan, fiscalCode) {
     return {
-        id: chooseRandomPanFromList(),
-        fiscalCode: myEnv.FISCAL_CODE_PM_EXISTING,
+        id: encrPan,
+        fiscalCode: fiscalCode,
         expireYear: '2025',
         exprireMonth: '05',
         issuerAbiCode: '07601',
@@ -97,7 +97,9 @@ function createBody() {
 
 export default () => {
     group('FA Payment Instruments API', () => {
-        let body = createBody()
+        const pan = chooseRandomPanFromList()
+        const fiscalCode = myEnv.FISCAL_CODE_PM_EXISTING
+        const body = createBody(pan, fiscalCode)
         group('Should put a FA CUSTOMER', () =>
             assert(putFaCustomer(baseUrl, params, { id: body.fiscalCode }), [
                 statusOk(),
@@ -113,7 +115,7 @@ export default () => {
                 getFAPaymentInstrument(
                     baseUrl,
                     params,
-                    body.id.replace(/\n/g, '\\n'),
+                    pan.replace(/\n/g, '\\n'),
                     body.fiscalCode
                 ),
                 [statusOk()]
@@ -124,7 +126,7 @@ export default () => {
                 deleteFAPaymentInstrument(
                     baseUrl,
                     params,
-                    body.id.replace(/\n/g, '\\n')
+                    pan.replace(/\n/g, '\\n')
                 ),
                 [statusNoContent()]
             )
