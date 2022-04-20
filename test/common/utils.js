@@ -6,7 +6,10 @@ export function randomFiscalCode() {
     const name = randomString(6)
     const birth_y = (40 + Math.floor(Math.random() * 50)).toString()
     const birth_m = 'M'
-    const birth_d = Math.floor(Math.random() * 30).toString()
+    let birth_d = Math.floor(Math.random() * 30).toString()
+    if (birth_d.length == 1) {
+        birth_d = `0${birth_d}`
+    }
     const final = [
         randomString(1),
         (100 + Math.floor(Math.random() * 899)).toString(),
