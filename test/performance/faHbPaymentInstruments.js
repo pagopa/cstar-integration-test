@@ -10,6 +10,7 @@ import { putFaCustomer } from '../common/api/faHbCustomer.js'
 import { assert, statusOk, statusNoContent } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
+import { randomFiscalCode } from '../common/utils.js'
 
 const REGISTERED_ENVS = [DEV, UAT]
 
@@ -98,10 +99,10 @@ function createBody(encrPan, fiscalCode) {
 export default () => {
     group('FA Payment Instruments API', () => {
         const pan = chooseRandomPanFromList()
-        const fiscalCode = myEnv.FISCAL_CODE_PM_EXISTING
+        const fiscalCode = randomFiscalCode().toUpperCase()
         const body = createBody(pan, fiscalCode)
         group('Should put a FA CUSTOMER', () =>
-            assert(putFaCustomer(baseUrl, params, { id: body.fiscalCode }), [
+            assert(putFaCustomer(baseUrl, params, { id: fiscalCode }), [
                 statusOk(),
             ])
         )
@@ -116,7 +117,7 @@ export default () => {
                     baseUrl,
                     params,
                     pan.replace(/\n/g, '\\n'),
-                    body.fiscalCode
+                    fiscalCode
                 ),
                 [statusOk()]
             )
