@@ -41,7 +41,7 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
     ]
 
     params.headers = {
-        'Ocp-Apim-Subscription-Key': myEnv.APIM_SK,
+        'Ocp-Apim-Subscription-Key': myEnv.APIM_RTDPRODUCT_SK,
     }
 }
 
@@ -55,14 +55,10 @@ if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
 export default () => {
     group('CSV Transaction API', () => {
         group('Should create RTD SAS', () =>
-            assert(createRtdSas(services.dev_issuer.baseUrl, params), [
-                statusCreated(),
-            ])
+            assert(createRtdSas(baseUrl, params), [statusCreated()])
         )
         group('Should create AdE SAS', () =>
-            assert(createAdeSas(services.dev_issuer.baseUrl, params), [
-                statusCreated(),
-            ])
+            assert(createAdeSas(baseUrl, params), [statusCreated()])
         )
     })
 }
