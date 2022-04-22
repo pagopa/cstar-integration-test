@@ -13,11 +13,11 @@ export let options = {
     scenarios: {
         constant_request_rate: {
             executor: 'constant-arrival-rate',
-            rate: 1000,
+            rate: 10,
             timeUnit: '1s',
-            duration: '1m',
-            preAllocatedVUs: 100,
-            maxVUs: 10000,
+            duration: '30s',
+            preAllocatedVUs: 1,
+            maxVUs: 100,
         },
     },
     summaryTrendStats: [
@@ -54,7 +54,7 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
     ]
 
     params.headers = {
-        'Ocp-Apim-Subscription-Key': myEnv.APIM_SK,
+        'Ocp-Apim-Subscription-Key': `${myEnv.APIM_SK};product=cdc-api-product`,
         'Ocp-Apim-Trace': 'true',
         'Content-Type': 'application/json',
     }
