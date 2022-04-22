@@ -1,11 +1,15 @@
 import { group } from 'k6'
 import exec from 'k6/execution'
-import { sogeiHealthCheck } from '../common/api/cdcSogeiHealthCheck.js'
+import {
+    getPosTransaction,
+    createPosTransaction,
+} from '../common/api/faRegisterTransaction.js'
 import { assert, statusOk } from '../common/assertions.js'
-import { isEnvValid, isTestEnabledOnEnv, UAT } from '../common/envs.js'
+import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
+import { randomString } from 'https://jslib.k6.io/k6-utils/1.1.0/index.js'
 
-const REGISTERED_ENVS = [UAT]
+const REGISTERED_ENVS = [DEV, UAT]
 
 const services = JSON.parse(open('../../services/environments.json'))
 
@@ -13,11 +17,11 @@ export let options = {
     scenarios: {
         constant_request_rate: {
             executor: 'constant-arrival-rate',
-            rate: 10,
+            rate: 100,
             timeUnit: '1s',
-            duration: '30s',
-            preAllocatedVUs: 1,
-            maxVUs: 100,
+            duration: '1m',
+            preAllocatedVUs: 100,
+            maxVUs: 10000,
         },
     },
     summaryTrendStats: [
@@ -54,7 +58,7 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
     ]
 
     params.headers = {
-        'Ocp-Apim-Subscription-Key': `${myEnv.APIM_SK};product=cdc-api-product`,
+        'Ocp-Apim-Subscription-Key': myEnv.APIM_SK,
         'Ocp-Apim-Trace': 'true',
         'Content-Type': 'application/json',
     }
@@ -67,10 +71,36 @@ if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
     exec.test.abort()
 }
 
+function extractTransactionId(response) {
+    if (response.status === 200 && response.body) {
+        const respBody = JSON.parse(response.body)
+        return respBody.id
+    }
+    return ''
+}
+
 export default () => {
-    group('SOGEI CdC', () => {
-        group('Should GET HealthCheck', () =>
-            assert(sogeiHealthCheck(baseUrl, params), [statusOk()])
+    group('FA REGISTER Transaction API', () => {
+        let transactionId = ''
+        const body = {
+            amount: 43,
+            binCard: '11223344',
+            authCode: randomString(11),
+            vatNumber: '04533641009',
+            posType: 'ASSERVED_POS',
+            terminalId: '11111111',
+            trxDate: '1983-05-02T00:00:00.000Z',
+            contractId: '3',
+        }
+        group('Should create a Transaction', () => {
+            const res = createPosTransaction(baseUrl, params, body)
+            assert(res, [statusOk()])
+            transactionId = extractTransactionId(res)
+        })
+        group('Should get a Transaction', () =>
+            assert(getPosTransaction(baseUrl, params, transactionId), [
+                statusOk(),
+            ])
         )
     })
 }

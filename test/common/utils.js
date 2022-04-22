@@ -1,4 +1,7 @@
-import { randomString } from 'https://jslib.k6.io/k6-utils/1.1.0/index.js'
+import {
+    randomString,
+    randomIntBetween,
+} from 'https://jslib.k6.io/k6-utils/1.1.0/index.js'
 
 export function randomFiscalCode() {
     '^([A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST]{1}[0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z]{1}[0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]{1})$'
@@ -22,6 +25,10 @@ export function randomDate(start, end) {
     return new Date(
         start.getTime() + Math.random() * (end.getTime() - start.getTime())
     )
+}
+
+export function randomVatNumber() {
+    return randomIntBetween(10000000000, 99999999999)
 }
 
 function getFiscalCodeMonth(month) {
