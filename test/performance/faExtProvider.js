@@ -9,33 +9,7 @@ const REGISTERED_ENVS = [DEV, UAT]
 
 const services = JSON.parse(open('../../services/environments.json'))
 
-export let options = {
-    scenarios: {
-        constant_request_rate: {
-            executor: 'constant-arrival-rate',
-            rate: 100,
-            timeUnit: '1s',
-            duration: '1m',
-            preAllocatedVUs: 100,
-            maxVUs: 10000,
-        },
-    },
-    summaryTrendStats: [
-        'med',
-        'avg',
-        'min',
-        'max',
-        'p(10)',
-        'p(20)',
-        'p(30)',
-        'p(40)',
-        'p(50)',
-        'p(60)',
-        'p(70)',
-        'p(80)',
-        'p(90)',
-    ],
-}
+export let options = JSON.parse(open('../../options/constant_load.json'))
 
 let params = {}
 let baseUrl
