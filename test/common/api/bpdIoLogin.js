@@ -10,3 +10,11 @@ export function login(baseUrl, fiscalCode) {
     __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
     return res.body
 }
+
+export function loginFullUrl(url, fiscalCode) {
+    const myUrl = new URL(url)
+    myUrl.searchParams.append('fiscalCode', fiscalCode)
+    const res = http.post(myUrl.toString(), {})
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
+    return res.body
+}
