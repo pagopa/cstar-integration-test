@@ -48,6 +48,13 @@ function createBody(encrPan, fiscalCode) {
     }
 }
 
+function printHashPan(response) {
+    if (response && response.status === 200 && response.body !== '') {
+        const bodyObj = JSON.parse(response.body)
+        console.log('HASHED PAN: ', bodyObj.hpan)
+    }
+}
+
 export default () => {
     if (
         !isEnvValid(__ENV.TARGET_ENV) ||
@@ -62,9 +69,9 @@ export default () => {
             assert(putFaCustomer(baseUrl, params, { id: body.fiscalCode }), [
                 statusOk(),
             ])
-            assert(putFAPaymentInstrumentCard(baseUrl, params, body), [
-                statusOk(),
-            ])
+            const res = putFAPaymentInstrumentCard(baseUrl, params, body)
+            printHashPan(res)
+            assert(res, [statusOk()])
         })
     })
 }
