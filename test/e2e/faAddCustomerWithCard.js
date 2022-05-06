@@ -37,9 +37,9 @@ function createBody(encrPan, fiscalCode) {
     return {
         id: encrPan,
         fiscalCode: fiscalCode,
-        expireYear: '2025',
-        exprireMonth: '05',
-        issuerAbiCode: '07601',
+        expireYear: '2024',
+        exprireMonth: '12',
+        issuerAbiCode: '03268',
         brand: 'VISA',
         holder: 'ATM COLLAUDO',
         type: 'CRD',
