@@ -2,12 +2,13 @@ import { group } from 'k6'
 import {
     happyCase,
     happyCaseWithoutIseeDate,
-    happyCaseWithIseeFullDate,
     partialHappyCase,
     twoStepHappyCase,
     postIdempotence,
     getIdempotence,
-    failureCaseWithEmptyYearList
+    failureCaseWithEmptyYearList,
+    failureWithWrongYear,
+    failureWithYearListTooLong
 } from '../common/api/cdcIoRequest.js'
 import { loginFullUrl } from '../common/api/bpdIoLogin.js'
 import {
@@ -123,6 +124,7 @@ export default () => {
                 ])
             }
         )
+       
         group(
             'When the customer requests different years in different steps',
             () => {
@@ -174,5 +176,23 @@ export default () => {
                 bodyJsonSelectorValue("status", "LISTA_ANNI_VUOTA"),
             ])
         })
+        group(
+            'When the customer selects only a subset of admissible years plus a wrong year',
+            () => {
+                assert(failureWithWrongYear(baseUrl, auth(randomFiscalCode())), [
+                    statusBadFormat(),
+                    bodyJsonSelectorValue("status", "FORMATO_ANNI_ERRATO"),
+                ])
+            }
+        )
+        group(
+            'When the customer selects a list of years which is longer than expected',
+            () => {
+                assert(failureWithYearListTooLong(baseUrl, auth(randomFiscalCode())), [
+                    statusBadFormat(),
+                    bodyJsonSelectorValue("status", "INPUT_SUPERIORE_AL_CONSENTITO"),
+                ])
+            }
+        )
     })
 }

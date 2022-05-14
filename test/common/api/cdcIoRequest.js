@@ -173,13 +173,55 @@ export function getIdempotence(baseUrl, params) {
 
 // PRECONDITIONS: Fiscal Code has never requested any cards
 // TEST PROCEDURE: A post is performed with an empty list of years
-// ASSERTION: a 200 OK status must be returned with OK for all years 
+// ASSERTION: a 400 BAD REQUEST status must be returned with LISTA_ANNI_VUOTA
 export function failureCaseWithEmptyYearList(baseUrl, params) {
     const myParams = Object.assign({}, params)
   
     const payload = JSON.stringify({  
         anniRif: []
     });
+    const postRes = http.post(`${baseUrl}${API_PREFIX}/beneficiario/registrazione`, payload, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(postRes, null, 2))
+    return postRes
+}
+
+// PRECONDITIONS: Fiscal Code has never requested any cards
+// TEST PROCEDURE: A GET is performed, then a POST which requests cdc for a 
+//  subset of years returned by get plus a wrong year. 
+// ASSERTION: a 400 BAD REQUEST  status must be returned with FORMATO_ANNI_ERRATO
+export function failureWithWrongYear(baseUrl, params) {
+    const myParams = Object.assign({}, params)
+    const firstGetRes = http.get(`${baseUrl}${API_PREFIX}/beneficiario/stato`, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(firstGetRes, null, 2))
+
+    let myArray = firstGetRes.json().listaStatoPerAnno.map(e => { return { anno: e.annoRiferimento, dataIsee: null } }).splice(0, 1);
+    myArray.push({ anno: "2023", dataIsee: null })
+
+    const payload = JSON.stringify({  
+        anniRif: myArray
+    });
+    const postRes = http.post(`${baseUrl}${API_PREFIX}/beneficiario/registrazione`, payload, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(postRes, null, 2))
+
+    return postRes
+}
+
+// PRECONDITIONS: Fiscal Code has never requested any cards
+// TEST PROCEDURE: A GET is performed then a post which requests cdc for all 
+//  years returned by get plus another year
+// ASSERTION: a 400 BAD REQUEST status must be returned with INPUT_SUPERIORE_AL_CONSENTITO
+export function failureWithYearListTooLong(baseUrl, params) {
+    const myParams = Object.assign({}, params)
+    const getRes = http.get(`${baseUrl}${API_PREFIX}/beneficiario/stato`, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(getRes, null, 2))
+
+    let myArray = getRes.json().listaStatoPerAnno.map(e => { return { anno: e.annoRiferimento, dataIsee: e.annoRiferimento } })
+
+    myArray.push({ anno: "2023", dataIsee: null })
+    const payload = JSON.stringify({  
+        anniRif: myArray
+    });
+    
     const postRes = http.post(`${baseUrl}${API_PREFIX}/beneficiario/registrazione`, payload, myParams)
     __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(postRes, null, 2))
     return postRes
