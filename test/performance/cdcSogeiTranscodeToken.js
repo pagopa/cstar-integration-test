@@ -8,14 +8,60 @@ import dotenv from 'k6/x/dotenv'
 
 const REGISTERED_ENVS = [UAT]
 
+// export let options = {
+//     scenarios: {
+//         // ramp: {
+//         //     executor: 'ramping-arrival-rate',
+//         //     // rate: 5,
+//         //     // timeUnit: '1s',
+//         //     // duration: '30s',
+//         //     // preAllocatedVUs: 1,
+//         //     // maxVUs: 5,
+//         //     startRate: 50,
+//         //     timeUnit: '1s',
+//         //     preAllocatedVUs: 10,
+//         //     stages: [
+//         //         { duration: "2m", target: 500 },
+//         //         { duration: "4m", target: 1000 },
+//         //         { duration: "1m",target: 0 }
+//         //     ],
+//         // },
+//         // },
+//         constant_request_rate: {
+//             executor: 'constant-arrival-rate',
+//             rate: 1000,
+//             timeUnit: '1s',
+//             duration: '30s',
+//             preAllocatedVUs: 10,
+//             maxVUs: 100,
+//         },
+    
+
+//         summaryTrendStats: [
+//             'med',
+//             'avg',
+//             'min',
+//             'max',
+//             'p(10)',
+//             'p(20)',
+//             'p(30)',
+//             'p(40)',
+//             'p(50)',
+//             'p(60)',
+//             'p(70)',
+//             'p(80)',
+//             'p(90)',
+//         ],
+//     }
+
 export let options = {
     scenarios: {
         constant_request_rate: {
             executor: 'constant-arrival-rate',
-            rate: 100,
+            rate: 1000,
             timeUnit: '1s',
             duration: '30s',
-            preAllocatedVUs: 1,
+            preAllocatedVUs: 10,
             maxVUs: 100,
         },
     },
@@ -35,7 +81,6 @@ export let options = {
         'p(90)',
     ],
 }
-
 
 const services = JSON.parse(open('../../services/environments.json'))
 let baseUrl
