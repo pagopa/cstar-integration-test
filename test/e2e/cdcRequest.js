@@ -1,11 +1,10 @@
 import { group } from 'k6'
 import { happyCase, partialHappyCase } from '../common/api/cdcIoRequest.js'
 import { loginFullUrl } from '../common/api/bpdIoLogin.js'
-import { assert, bodyJsonReduceArray } from '../common/assertions.js'
+import { assert, bodyJsonReduceArray, statusOk } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, UAT } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
 import { randomFiscalCode } from '../common/utils.js'
-
 
 const REGISTERED_ENVS = [UAT]
 
@@ -19,7 +18,10 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
 }
 
 function auth(fiscalCode) {
-    const authToken = loginFullUrl(`${baseUrl}/bpd/pagopa/api/v1/login`, fiscalCode)
+    const authToken = loginFullUrl(
+        `${baseUrl}/bpd/pagopa/api/v1/login`,
+        fiscalCode
+    )
     return {
         headers: {
             Authorization: `Bearer ${authToken}`,
@@ -38,20 +40,46 @@ export default () => {
     }
     group('Should request CdC', () => {
         group('When the post contains all years returned by get', () => {
-            const params = auth(randomFiscalCode());
-            const esitoOkReducer = (prv, cur) => prv && cur.esitoRichiesta === "OK";
-            assert(happyCase(baseUrl, params), [bodyJsonReduceArray('listaEsitoRichiestaPerAnno', esitoOkReducer, true, true)])
-            // assert(partialHappyCase(baseUrl, params), [bodyJsonReduceArray('listaStatoPerAnno', esitoOkReducer, true, true)])
-
-        }
-    )
+            const esitoOkReducer = (prv, cur) =>
+                prv && cur.esitoRichiesta === 'OK'
+            assert(happyCase(baseUrl, auth(randomFiscalCode())), [
+                statusOk(),
+                bodyJsonReduceArray(
+                    'listaEsitoRichiestaPerAnno',
+                    esitoOkReducer,
+                    true,
+                    true
+                ),
+            ])
+        })
+        group(
+            'When the customer selects only a subset of admissible years',
+            () => {
+                // This test case ends with a GET
+                const valutazioneCounter = (prv, cur) =>
+                    cur.statoBeneficiario === 'VALUTAZIONE' ? (prv += 1) : prv
+                const admissibleStateCounter = (prv, cur) =>
+                    ['VALUTAZIONE', 'ATTIVABILE'].includes(
+                        cur.statoBeneficiario
+                    )
+                        ? prv += 1
+                        : prv
+                assert(partialHappyCase(baseUrl, auth(randomFiscalCode())), [
+                    statusOk(),
+                    bodyJsonReduceArray(
+                        'listaStatoPerAnno',
+                        valutazioneCounter,
+                        0,
+                        1
+                    ),
+                    bodyJsonReduceArray(
+                        'listaStatoPerAnno',
+                        admissibleStateCounter,
+                        0,
+                        3
+                    ),
+                ])
+            }
+        )
     })
-    // group('Should request CdC', () => {
-    //     group('When the post contains all years returned by get', () => {
-    //         const esitoOkReducer = (prv, cur) => prv && cur.esito === "CIT_REGISTRATO" || cur.esito === "OK";
-    //         assert(partialHappyCase(baseUrl, params), [bodyJsonReduceArray('listaStatoPerAnno', esitoOkReducer, true, true)])
-
-    //     }
-    // )
-    // })
 }
