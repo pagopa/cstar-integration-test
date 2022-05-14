@@ -8,7 +8,9 @@ import {
     getIdempotence,
     failureCaseWithEmptyYearList,
     failureWithWrongYear,
-    failureWithYearListTooLong
+    failureWithYearListTooLong,
+    failureWithGoodYearInWrongFormat,
+    failureCaseWithNoInput
 } from '../common/api/cdcIoRequest.js'
 import { loginFullUrl } from '../common/api/bpdIoLogin.js'
 import {
@@ -191,6 +193,24 @@ export default () => {
                 assert(failureWithYearListTooLong(baseUrl, auth(randomFiscalCode())), [
                     statusBadFormat(),
                     bodyJsonSelectorValue("status", "INPUT_SUPERIORE_AL_CONSENTITO"),
+                ])
+            }
+        )
+        group(
+            'When the customer send a year in a wrong format (e.g. as a date 2021/01/01)',
+            () => {
+                assert(failureWithGoodYearInWrongFormat(baseUrl, auth(randomFiscalCode())), [
+                    statusBadFormat(),
+                    bodyJsonSelectorValue("status", "FORMATO_ANNI_ERRATO"),
+                ])
+            }
+        )
+        group(
+            'When the customer send a year in a wrong format (e.g. as a date 2021/01/01)',
+            () => {
+                assert(failureCaseWithNoInput(baseUrl, auth(randomFiscalCode())), [
+                    statusBadFormat(),
+                    bodyJsonSelectorValue("status", "NO_INPUT"),
                 ])
             }
         )

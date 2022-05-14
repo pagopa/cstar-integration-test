@@ -186,6 +186,18 @@ export function failureCaseWithEmptyYearList(baseUrl, params) {
 }
 
 // PRECONDITIONS: Fiscal Code has never requested any cards
+// TEST PROCEDURE: A post is performed without payload
+// ASSERTION: a 400 BAD REQUEST status must be returned with NO_INPUT
+export function failureCaseWithNoInput(baseUrl, params) {
+    const myParams = Object.assign({}, params)
+  
+    const payload = null
+    const postRes = http.post(`${baseUrl}${API_PREFIX}/beneficiario/registrazione`, payload, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(postRes, null, 2))
+    return postRes
+}
+
+// PRECONDITIONS: Fiscal Code has never requested any cards
 // TEST PROCEDURE: A GET is performed, then a POST which requests cdc for a 
 //  subset of years returned by get plus a wrong year. 
 // ASSERTION: a 400 BAD REQUEST  status must be returned with FORMATO_ANNI_ERRATO
@@ -218,6 +230,27 @@ export function failureWithYearListTooLong(baseUrl, params) {
     let myArray = getRes.json().listaStatoPerAnno.map(e => { return { anno: e.annoRiferimento, dataIsee: e.annoRiferimento } })
 
     myArray.push({ anno: "2023", dataIsee: null })
+    const payload = JSON.stringify({  
+        anniRif: myArray
+    });
+
+    const postRes = http.post(`${baseUrl}${API_PREFIX}/beneficiario/registrazione`, payload, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(postRes, null, 2))
+    return postRes
+}
+
+// PRECONDITIONS: Fiscal Code has never requested any cards
+// TEST PROCEDURE: A GET is performed then a post which requests cdc for all 
+//  years returned by get. One year is modified to have a wrong format
+// ASSERTION: a 400 BAD REQUEST status must be returned with FORMATO_ANNI_ERRATO
+export function failureWithGoodYearInWrongFormat(baseUrl, params) {
+    const myParams = Object.assign({}, params)
+    const getRes = http.get(`${baseUrl}${API_PREFIX}/beneficiario/stato`, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(getRes, null, 2))
+
+    let myArray = getRes.json().listaStatoPerAnno.map(e => { return { anno: e.annoRiferimento, dataIsee: e.annoRiferimento } })
+    myArray[0] = { anno: myArray[0].anno + "/01/01", dataIsee: myArray[0].dataIsee }
+
     const payload = JSON.stringify({  
         anniRif: myArray
     });
