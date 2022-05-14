@@ -1,5 +1,9 @@
 import { group } from 'k6'
-import { happyCase, partialHappyCase } from '../common/api/cdcIoRequest.js'
+import {
+    happyCase,
+    partialHappyCase,
+    twoStepHappyCase,
+} from '../common/api/cdcIoRequest.js'
 import { loginFullUrl } from '../common/api/bpdIoLogin.js'
 import { assert, bodyJsonReduceArray, statusOk } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, UAT } from '../common/envs.js'
@@ -58,12 +62,12 @@ export default () => {
                 // This test case ends with a GET
                 const valutazioneCounter = (prv, cur) =>
                     cur.statoBeneficiario === 'VALUTAZIONE' ? (prv += 1) : prv
-                const admissibleStateCounter = (prv, cur) =>
+                const allAdmissibleStates = (prv, cur) =>
+                    prv &&
                     ['VALUTAZIONE', 'ATTIVABILE'].includes(
                         cur.statoBeneficiario
                     )
-                        ? prv += 1
-                        : prv
+
                 assert(partialHappyCase(baseUrl, auth(randomFiscalCode())), [
                     statusOk(),
                     bodyJsonReduceArray(
@@ -74,9 +78,36 @@ export default () => {
                     ),
                     bodyJsonReduceArray(
                         'listaStatoPerAnno',
-                        admissibleStateCounter,
+                        allAdmissibleStates,
+                        true,
+                        true
+                    ),
+                ])
+            }
+        )
+        group(
+            'When the customer requests different years in different steps',
+            () => {
+                const allAdmissibleStates = (prv, cur) =>
+                    prv &&
+                    ['CIT_REGISTRATO', 'OK'].includes(cur.esitoRichiesta)
+                
+                const registratoCounter = (prv, cur) =>
+                    cur.esitoRichiesta === 'CIT_REGISTRATO' ? prv += 1 : prv
+
+                assert(twoStepHappyCase(baseUrl, auth(randomFiscalCode())), [
+                    statusOk(),
+                    bodyJsonReduceArray(
+                        'listaEsitoRichiestaPerAnno',
+                        allAdmissibleStates,
+                        true,
+                        true
+                    ),
+                    bodyJsonReduceArray(
+                        'listaEsitoRichiestaPerAnno',
+                        registratoCounter,
                         0,
-                        3
+                        1
                     ),
                 ])
             }

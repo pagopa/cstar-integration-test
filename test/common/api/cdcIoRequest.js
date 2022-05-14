@@ -54,3 +54,34 @@ export function partialHappyCase(baseUrl, params) {
     __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(secondGetRes, null, 2))
     return secondGetRes
 }
+
+// PRECONDITIONS: Fiscal Code has never requested any cards
+// TEST PROCEDURE: As a first step the GET is performed, then a POST which 
+//  requests cdc for a subset of years returned by get. The subset is a 
+//  singleton, so it has exactly one element. 
+//  As a second step, a new GET is performed and the card is requested 
+//  via POST for all admissible years.
+// ASSERTION: a 200 OK status must be returned, with CIT_REGISTRATO for one year
+//  and OK for remaining years
+export function twoStepHappyCase(baseUrl, params) {
+    const myParams = Object.assign({}, params)
+    const firstGetRes = http.get(`${baseUrl}${API_PREFIX}/beneficiario/stato`, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(firstGetRes, null, 2))
+
+    const firstPayload = JSON.stringify({  
+        anniRif: firstGetRes.json().listaStatoPerAnno.map(e => { return { anno: e.annoRiferimento, dataIsee: null } }).splice(0,1)
+    });
+    const firstPostRes = http.post(`${baseUrl}${API_PREFIX}/beneficiario/registrazione`, firstPayload, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(firstPostRes, null, 2))
+
+    const secondGetRes = http.get(`${baseUrl}${API_PREFIX}/beneficiario/stato`, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(secondGetRes, null, 2))
+
+    const secondPayload = JSON.stringify({  
+        anniRif: secondGetRes.json().listaStatoPerAnno.map(e => { return { anno: e.annoRiferimento, dataIsee: null } })
+    });
+    const secondPostRes = http.post(`${baseUrl}${API_PREFIX}/beneficiario/registrazione`, secondPayload, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(secondPostRes, null, 2))
+
+    return secondPostRes
+}
