@@ -18,8 +18,8 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
     baseUrl = services[`${__ENV.TARGET_ENV}_io`].baseUrl
 }
 
-export function setup() {
-    const authToken = loginFullUrl(`${baseUrl}/bpd/pagopa/api/v1/login`, randomFiscalCode())
+function auth(fiscalCode) {
+    const authToken = loginFullUrl(`${baseUrl}/bpd/pagopa/api/v1/login`, fiscalCode)
     return {
         headers: {
             Authorization: `Bearer ${authToken}`,
@@ -29,7 +29,7 @@ export function setup() {
     }
 }
 
-export default (params) => {
+export default () => {
     if (
         !isEnvValid(__ENV.TARGET_ENV) ||
         !isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)
@@ -38,7 +38,8 @@ export default (params) => {
     }
     group('Should request CdC', () => {
         group('When the post contains all years returned by get', () => {
-            const esitoOkReducer = (prv, cur) => prv && cur.esitoRichiesta === "CIT_REGISTRATO" || cur.esitoRichiesta === "OK";
+            const params = auth(randomFiscalCode());
+            const esitoOkReducer = (prv, cur) => prv && cur.esitoRichiesta === "OK";
             assert(happyCase(baseUrl, params), [bodyJsonReduceArray('listaEsitoRichiestaPerAnno', esitoOkReducer, true, true)])
             // assert(partialHappyCase(baseUrl, params), [bodyJsonReduceArray('listaStatoPerAnno', esitoOkReducer, true, true)])
 
