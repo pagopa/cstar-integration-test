@@ -72,3 +72,12 @@ export function bodyJsonSelectorValue(selector, expectedValue) {
         })
     }
 }
+
+export function bodyJsonReduceArray(selector, reducer, initialState, expectedValue) {
+    return function doCheck(res) {
+        check(res, {
+            'Response JSON contains an array which reduces to expected value ': (r) =>
+                r.json(selector).reduce( reducer, initialState ) === expectedValue,
+        })
+    }
+}
