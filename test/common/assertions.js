@@ -38,6 +38,12 @@ export function statusConflict() {
     }
 }
 
+export function statusBadFormat() {
+    return function doCheck(res) {
+        check(res, { 'HTTP status is 400': (r) => r.status === 400 })
+    }
+}
+
 export function bodyLengthBetween(minLength, maxLength) {
     return function doCheck(res) {
         if (minLength > 0) {
@@ -73,11 +79,30 @@ export function bodyJsonSelectorValue(selector, expectedValue) {
     }
 }
 
-export function bodyJsonReduceArray(selector, reducer, initialState, expectedValue) {
+export function bodyJsonReduceArray(
+    selector,
+    reducer,
+    initialState,
+    expectedValue
+) {
     return function doCheck(res) {
         check(res, {
-            'Response JSON contains an array which reduces to expected value ': (r) =>
-                r.json(selector).reduce( reducer, initialState ) === expectedValue,
+            'Response JSON contains an array which reduces to expected value ':
+                (r) =>
+                    r.json(selector).reduce(reducer, initialState) ===
+                    expectedValue,
+        })
+    }
+}
+
+export function idempotence() {
+    return function doCheck(resArray) {
+        const reducer = (prv, cur) => prv && cur
+        const mapper = (r) =>
+            r.status === resArray[0].status && r.body === resArray[0].body
+        check(resArray, {
+            'All Responses are equal ': (r) =>
+                resArray.map(mapper).reduce(reducer, true) === true,
         })
     }
 }

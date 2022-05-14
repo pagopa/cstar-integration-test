@@ -25,7 +25,44 @@ export function happyCase(baseUrl, params) {
     __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(getRes, null, 2))
 
     const payload = JSON.stringify({  
-        anniRif: getRes.json().listaStatoPerAnno.map(e => { return { anno: e.annoRiferimento, dataIsee: null } })
+        anniRif: getRes.json().listaStatoPerAnno.map(e => { return { anno: e.annoRiferimento, dataIsee: e.annoRiferimento } })
+    
+    });
+    const postRes = http.post(`${baseUrl}${API_PREFIX}/beneficiario/registrazione`, payload, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(postRes, null, 2))
+    return postRes
+}
+
+
+// PRECONDITIONS: Fiscal Code has never requested any cards
+// TEST PROCEDURE: A GET is performed then a post which requests cdc for 
+//  all years returned by get. dataIsee date isn't included in the paylod
+// ASSERTION: a 200 OK status must be returned with OK for all years 
+export function happyCaseWithoutIseeDate(baseUrl, params) {
+    const myParams = Object.assign({}, params)
+    const getRes = http.get(`${baseUrl}${API_PREFIX}/beneficiario/stato`, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(getRes, null, 2))
+
+    const payload = JSON.stringify({  
+        anniRif: getRes.json().listaStatoPerAnno.map(e => { return { anno: e.annoRiferimento } })
+    
+    });
+    const postRes = http.post(`${baseUrl}${API_PREFIX}/beneficiario/registrazione`, payload, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(postRes, null, 2))
+    return postRes
+}
+
+// PRECONDITIONS: Fiscal Code has never requested any cards
+// TEST PROCEDURE: A GET is performed then a post which requests cdc for 
+//  all years returned by get. dataIsee is sent as a full date
+// ASSERTION: a 200 OK status must be returned with OK for all years 
+export function happyCaseWithIseeFullDate(baseUrl, params) {
+    const myParams = Object.assign({}, params)
+    const getRes = http.get(`${baseUrl}${API_PREFIX}/beneficiario/stato`, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(getRes, null, 2))
+
+    const payload = JSON.stringify({  
+        anniRif: getRes.json().listaStatoPerAnno.map(e => { return { anno: e.annoRiferimento, dataIsee: new Date(e.annoRiferimento, 11, 31) } })
     
     });
     const postRes = http.post(`${baseUrl}${API_PREFIX}/beneficiario/registrazione`, payload, myParams)
@@ -84,4 +121,66 @@ export function twoStepHappyCase(baseUrl, params) {
     __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(secondPostRes, null, 2))
 
     return secondPostRes
+}
+
+// PRECONDITIONS: Fiscal Code has never requested any cards
+// TEST PROCEDURE: A GET is performed, then a POST which requests cdc for a 
+//  subset of years returned by get. The subset is a singleton, so it has
+//  exactly one element. At the end a couple of new POSTs are performed
+// ASSERTION: responses to the two POSTs must be the same
+export function postIdempotence(baseUrl, params) {
+    const myParams = Object.assign({}, params)
+    const firstGetRes = http.get(`${baseUrl}${API_PREFIX}/beneficiario/stato`, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(firstGetRes, null, 2))
+
+    const payload = JSON.stringify({  
+        anniRif: firstGetRes.json().listaStatoPerAnno.map(e => { return { anno: e.annoRiferimento, dataIsee: null } }).splice(0,1)
+    });
+    const tmpPostRes = http.post(`${baseUrl}${API_PREFIX}/beneficiario/registrazione`, payload, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(tmpPostRes, null, 2))
+
+    const postRes = http.post(`${baseUrl}${API_PREFIX}/beneficiario/registrazione`, payload, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(postRes, null, 2))
+
+    const secondPostRes = http.post(`${baseUrl}${API_PREFIX}/beneficiario/registrazione`, payload, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(secondPostRes, null, 2))
+    return [postRes, secondPostRes]
+}
+
+// PRECONDITIONS: Fiscal Code has never requested any cards
+// TEST PROCEDURE: A GET is performed, then a POST which requests cdc for a 
+//  subset of years returned by get. The subset is a singleton, so it has
+//  exactly one element. At the end a couple of new GETs are performed
+// ASSERTION: responses to the two GETs must be the same
+export function getIdempotence(baseUrl, params) {
+    const myParams = Object.assign({}, params)
+    const firstGetRes = http.get(`${baseUrl}${API_PREFIX}/beneficiario/stato`, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(firstGetRes, null, 2))
+
+    const payload = JSON.stringify({  
+        anniRif: firstGetRes.json().listaStatoPerAnno.map(e => { return { anno: e.annoRiferimento, dataIsee: null } }).splice(0,1)
+    });
+    const tmpPostRes = http.post(`${baseUrl}${API_PREFIX}/beneficiario/registrazione`, payload, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(tmpPostRes, null, 2))
+
+    const getRes = http.get(`${baseUrl}${API_PREFIX}/beneficiario/stato`, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(getRes, null, 2))
+
+    const secondGetRes = http.get(`${baseUrl}${API_PREFIX}/beneficiario/stato`, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(secondGetRes, null, 2))
+    return [getRes, secondGetRes]
+}
+
+// PRECONDITIONS: Fiscal Code has never requested any cards
+// TEST PROCEDURE: A post is performed with an empty list of years
+// ASSERTION: a 200 OK status must be returned with OK for all years 
+export function failureCaseWithEmptyYearList(baseUrl, params) {
+    const myParams = Object.assign({}, params)
+  
+    const payload = JSON.stringify({  
+        anniRif: []
+    });
+    const postRes = http.post(`${baseUrl}${API_PREFIX}/beneficiario/registrazione`, payload, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(postRes, null, 2))
+    return postRes
 }

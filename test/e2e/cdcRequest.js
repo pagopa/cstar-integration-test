@@ -1,11 +1,23 @@
 import { group } from 'k6'
 import {
     happyCase,
+    happyCaseWithoutIseeDate,
+    happyCaseWithIseeFullDate,
     partialHappyCase,
     twoStepHappyCase,
+    postIdempotence,
+    getIdempotence,
+    failureCaseWithEmptyYearList
 } from '../common/api/cdcIoRequest.js'
 import { loginFullUrl } from '../common/api/bpdIoLogin.js'
-import { assert, bodyJsonReduceArray, statusOk } from '../common/assertions.js'
+import {
+    assert,
+    bodyJsonReduceArray,
+    statusOk,
+    statusBadFormat,
+    bodyJsonSelectorValue,
+    idempotence,
+} from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, UAT } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
 import { randomFiscalCode } from '../common/utils.js'
@@ -56,6 +68,32 @@ export default () => {
                 ),
             ])
         })
+        group('When the post contains all years returned by get, without dataIsee', () => {
+            const esitoOkReducer = (prv, cur) =>
+                prv && cur.esitoRichiesta === 'OK'
+            assert(happyCaseWithoutIseeDate(baseUrl, auth(randomFiscalCode())), [
+                statusOk(),
+                bodyJsonReduceArray(
+                    'listaEsitoRichiestaPerAnno',
+                    esitoOkReducer,
+                    true,
+                    true
+                ),
+            ])
+        })
+        // group('When the post contains all years returned by get, with a full dataIsee', () => {
+        //     const esitoOkReducer = (prv, cur) =>
+        //         prv && cur.esitoRichiesta === 'OK'
+        //     assert(happyCaseWithIseeFullDate(baseUrl, auth(randomFiscalCode())), [
+        //         statusOk(),
+        //         bodyJsonReduceArray(
+        //             'listaEsitoRichiestaPerAnno',
+        //             esitoOkReducer,
+        //             true,
+        //             true
+        //         ),
+        //     ])
+        // })
         group(
             'When the customer selects only a subset of admissible years',
             () => {
@@ -89,11 +127,10 @@ export default () => {
             'When the customer requests different years in different steps',
             () => {
                 const allAdmissibleStates = (prv, cur) =>
-                    prv &&
-                    ['CIT_REGISTRATO', 'OK'].includes(cur.esitoRichiesta)
-                
+                    prv && ['CIT_REGISTRATO', 'OK'].includes(cur.esitoRichiesta)
+
                 const registratoCounter = (prv, cur) =>
-                    cur.esitoRichiesta === 'CIT_REGISTRATO' ? prv += 1 : prv
+                    cur.esitoRichiesta === 'CIT_REGISTRATO' ? (prv += 1) : prv
 
                 assert(twoStepHappyCase(baseUrl, auth(randomFiscalCode())), [
                     statusOk(),
@@ -112,5 +149,30 @@ export default () => {
                 ])
             }
         )
+    })
+
+    group('POST Request should be', () => {
+        group('Idempotent', () => {
+            assert(postIdempotence(baseUrl, auth(randomFiscalCode())), [
+                idempotence(),
+            ])
+        })
+    })
+
+    group('GET Request should be', () => {
+        group('Idempotent', () => {
+            assert(getIdempotence(baseUrl, auth(randomFiscalCode())), [
+                idempotence(),
+            ])
+        })
+    })
+
+    group('Should not Request CdC', () => {
+        group('When the list of years is empty', () => {
+            assert(failureCaseWithEmptyYearList(baseUrl, auth(randomFiscalCode())), [
+                statusBadFormat(),
+                bodyJsonSelectorValue("status", "LISTA_ANNI_VUOTA"),
+            ])
+        })
     })
 }
