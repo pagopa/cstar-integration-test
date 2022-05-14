@@ -1,9 +1,11 @@
 import { group } from 'k6'
-import { getCitizenStatus } from '../common/api/cdcIoRequest.js'
+import { happyCase, partialHappyCase } from '../common/api/cdcIoRequest.js'
 import { loginFullUrl } from '../common/api/bpdIoLogin.js'
-import { assert, statusOk } from '../common/assertions.js'
+import { assert, bodyJsonReduceArray } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, UAT } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
+import { randomFiscalCode } from '../common/utils.js'
+
 
 const REGISTERED_ENVS = [UAT]
 
@@ -17,7 +19,7 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
 }
 
 export function setup() {
-    const authToken = loginFullUrl(`${baseUrl}/bpd/pagopa/api/v1/login`, myEnv.FISCAL_CODE_EXISTING)
+    const authToken = loginFullUrl(`${baseUrl}/bpd/pagopa/api/v1/login`, randomFiscalCode())
     return {
         headers: {
             Authorization: `Bearer ${authToken}`,
@@ -34,9 +36,21 @@ export default (params) => {
     ) {
         return
     }
-    group('SOGEI CdC', () => {
-        group('Should GET HealthCheck', () =>
-            assert(getCitizenStatus(baseUrl, params), [statusOk()])
-        )
+    group('Should request CdC', () => {
+        group('When the post contains all years returned by get', () => {
+            const esitoOkReducer = (prv, cur) => prv && cur.esitoRichiesta === "CIT_REGISTRATO" || cur.esitoRichiesta === "OK";
+            assert(happyCase(baseUrl, params), [bodyJsonReduceArray('listaEsitoRichiestaPerAnno', esitoOkReducer, true, true)])
+            // assert(partialHappyCase(baseUrl, params), [bodyJsonReduceArray('listaStatoPerAnno', esitoOkReducer, true, true)])
+
+        }
+    )
     })
+    // group('Should request CdC', () => {
+    //     group('When the post contains all years returned by get', () => {
+    //         const esitoOkReducer = (prv, cur) => prv && cur.esito === "CIT_REGISTRATO" || cur.esito === "OK";
+    //         assert(partialHappyCase(baseUrl, params), [bodyJsonReduceArray('listaStatoPerAnno', esitoOkReducer, true, true)])
+
+    //     }
+    // )
+    // })
 }
