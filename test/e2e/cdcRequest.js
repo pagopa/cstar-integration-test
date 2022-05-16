@@ -37,6 +37,7 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
 }
 
 function auth(fiscalCode) {
+    console.log(fiscalCode)
     const authToken = loginFullUrl(
         `${baseUrl}/bpd/pagopa/api/v1/login`,
         fiscalCode
@@ -206,7 +207,7 @@ export default () => {
             }
         )
         group(
-            'When the customer send a year in a wrong format (e.g. as a date 2021/01/01)',
+            'When the customer sends no input',
             () => {
                 assert(failureCaseWithNoInput(baseUrl, auth(randomFiscalCode())), [
                     statusBadFormat(),
