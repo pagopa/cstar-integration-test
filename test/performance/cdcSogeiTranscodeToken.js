@@ -1,12 +1,11 @@
 import { group } from 'k6'
-import { happyCase } from '../common/api/cdcIoRequest.js'
+import { performanceHappyCase } from '../common/api/cdcIoRequest.js'
 import { loginFullUrl } from '../common/api/bpdIoLogin.js'
 import { assert, statusOk } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, UAT } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
 import { randomFiscalCode } from '../common/utils.js'
 import { bodyJsonReduceArray } from '../common/assertions.js'
-
 const REGISTERED_ENVS = [UAT]
 
 export let options = {
@@ -16,10 +15,10 @@ export let options = {
             startRate: 50,
             timeUnit: '1s',
             preAllocatedVUs: 500,
-            maxVUs: 500,
+            maxVUs: 10000,
             stages: [
-                { duration: "1m", target: 1000 },
-                { duration: "2m", target: 1000 },
+                { duration: "1m", target: 170 },
+                { duration: "2m", target: 170 },
             ],
         }
     },
@@ -105,7 +104,7 @@ export default () => {
         group('When the post contains all years returned by get', () => {
             const esitoOkReducer = (prv, cur) =>
                 prv && cur.esitoRichiesta === 'OK'
-            assert(happyCase(baseUrl, auth(randomFiscalCode())), [
+            assert(performanceHappyCase(baseUrl, auth(randomFiscalCode())), [
                 statusOk(),
                 bodyJsonReduceArray(
                     'listaEsitoRichiestaPerAnno',

@@ -259,3 +259,21 @@ export function failureWithGoodYearInWrongFormat(baseUrl, params) {
     __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(postRes, null, 2))
     return postRes
 }
+
+export function performanceHappyCase(baseUrl, params) {
+    const myParams = Object.assign({}, params)
+    http.get(`${baseUrl}${API_PREFIX}/beneficiario/stato`, myParams)
+    http.get(`${baseUrl}${API_PREFIX}/beneficiario/stato`, myParams)
+    const getRes = http.get(`${baseUrl}${API_PREFIX}/beneficiario/stato`, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(getRes, null, 2))
+
+    const payload = JSON.stringify({  
+        anniRif: getRes.json().listaStatoPerAnno.map(e => { return { anno: e.annoRiferimento, dataIsee: e.annoRiferimento } })
+    
+    });
+    http.post(`${baseUrl}${API_PREFIX}/beneficiario/registrazione`, payload, myParams)
+    http.post(`${baseUrl}${API_PREFIX}/beneficiario/registrazione`, payload, myParams)
+    const postRes = http.post(`${baseUrl}${API_PREFIX}/beneficiario/registrazione`, payload, myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(postRes, null, 2))
+    return postRes
+}
