@@ -42,17 +42,29 @@ if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
     exec.test.abort()
 }
 
+export function createCustomerBody() {
+    return {
+        id: randomFiscalCode(),
+    }
+}
+
+export function createCustomerTest(baseUrl, params, body) {
+    assert(putFaCustomer(baseUrl, params, body), [statusOk()])
+}
+
+export function getCustomerTest(baseUrl, params, id) {
+    assert(getFaCustomer(baseUrl, params, id), [statusOk()])
+}
+
 export default () => {
     group('FA HB Customer API', () => {
-        const body = {
-            id: randomFiscalCode(),
-        }
+        const body = createCustomerBody()
 
         group('Should create an FA CUSTOMER', () =>
-            assert(putFaCustomer(baseUrl, params, body), [statusOk()])
+            createCustomerTest(baseUrl, params, body)
         )
         group('Should get an FA CUSTOMER', () =>
-            assert(getFaCustomer(baseUrl, params, body.id), [statusOk()])
+            getCustomerTest(baseUrl, params, body.id)
         )
     })
 }
