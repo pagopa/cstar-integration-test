@@ -18,7 +18,10 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
 }
 
 export function setup() {
-    const authToken = loginFullUrl(`${baseUrl}/bpd/pagopa/api/v1/login`, myEnv.FISCAL_CODE_EXISTING)
+    const authToken = loginFullUrl(
+        `${baseUrl}/bpd/pagopa/api/v1/login`,
+        myEnv.FISCAL_CODE_EXISTING
+    )
     return {
         headers: {
             Authorization: `Bearer ${authToken}`,
