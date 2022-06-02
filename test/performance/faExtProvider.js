@@ -41,10 +41,14 @@ if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
     exec.test.abort()
 }
 
+export function getProviderListTest(baseUrl, params) {
+    assert(getProviderList(baseUrl, params), [statusOk()])
+}
+
 export default () => {
     group('FA EXT Provider API', () => {
         group('Should get provider list', () =>
-            assert(getProviderList(baseUrl, params), [statusOk()])
+            getProviderListTest(baseUrl, params)
         )
     })
 }

@@ -12,6 +12,8 @@ import {
     createPaymentInstrumentBody,
     chooseRandomPanFromList,
 } from './faHbPaymentInstruments.js'
+import { getTransactionListTest } from './faIoTransaction.js'
+import { getProviderListTest } from './faExtProvider.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
 import { login } from '../common/api/bpdIoLogin.js'
@@ -108,5 +110,15 @@ export default () => {
         group('Should delete a FA Payment Instrument', () => {
             deletePaymentInstrumentCardTest(baseUrl, params, pan)
         })
+
+        group('Should get provider list', () =>
+            getProviderListTest(baseUrl, params)
+        )
+
+        setIoParameters()
+
+        group('Should get Transaction List', () =>
+            getTransactionListTest(baseUrl, params, fiscalCode)
+        )
     })
 }
