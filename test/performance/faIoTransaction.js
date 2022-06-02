@@ -42,12 +42,16 @@ export function setup() {
     }
 }
 
+export function getTransactionListTest(baseUrl, params, vat) {
+    assert(getTransactionList(baseUrl, params, vat), [statusOk()])
+}
+
 export default (params) => {
     group('FA IO Transaction API', () => {
         const vat = randomFiscalCode()
 
-        group('Should get a Transaction', () =>
-            assert(getTransactionList(baseUrl, params, vat), [statusOk()])
+        group('Should get Transaction List', () =>
+            getTransactionListTest(baseUrl, params, vat)
         )
     })
 }
