@@ -12,6 +12,11 @@ import {
     createPaymentInstrumentBody,
     chooseRandomPanFromList,
 } from './faHbPaymentInstruments.js'
+import {
+    putMerchantTest,
+    getContractListByShopIdTest,
+    createMerchantBody,
+} from './faExtMerchant.js'
 import { getTransactionListTest } from './faIoTransaction.js'
 import { getProviderListTest } from './faExtProvider.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
@@ -113,6 +118,15 @@ export default () => {
 
         group('Should get provider list', () =>
             getProviderListTest(baseUrl, params)
+        )
+
+        const merchantBody = createMerchantBody()
+        let shopId = ''
+        group('Should put a merchant', () => {
+            shopId = putMerchantTest(baseUrl, params, merchantBody)
+        })
+        group('Should get merchant contract list', () =>
+            getContractListByShopIdTest(baseUrl, params, shopId)
         )
 
         setIoParameters()
