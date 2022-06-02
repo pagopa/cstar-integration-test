@@ -60,14 +60,6 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
 function setIssuerParameters() {
     baseUrl = baseUrlIssuer
 
-    /*options.tlsAuth = [
-        {
-            domains: [baseUrl],
-            cert: tlsCert,
-            key: tlsKey,
-        },
-    ]*/
-
     params.headers = {
         'Ocp-Apim-Subscription-Key': myEnv.APIM_SK,
         'Ocp-Apim-Trace': 'true',
@@ -85,7 +77,6 @@ function setRtdIssuerParameters() {
 function setIoParameters() {
     baseUrl = baseUrlIo
 
-    // options.tlsAuth = undefined
     const authToken = login(baseUrl, myEnv.FISCAL_CODE_EXISTING)
     params.headers = {
         Authorization: `Bearer ${authToken}`,
@@ -108,6 +99,7 @@ export default () => {
     group('FA RTD General load test', () => {
         setIssuerParameters()
 
+        // fa hb customer
         const customerBody = createCustomerBody()
         group('Should create a CUSTOMER', () =>
             createCustomerTest(baseUrl, params, customerBody)
@@ -116,6 +108,7 @@ export default () => {
             getCustomerTest(baseUrl, params, customerBody.id)
         )
 
+        // fa hb payment instruments
         const pan = chooseRandomPanFromList(panList)
         const fiscalCode = customerBody.id // to use the same fiscal code of a customer already registered
         const piBody = createPaymentInstrumentBody(pan, fiscalCode)
@@ -129,10 +122,12 @@ export default () => {
             deletePaymentInstrumentCardTest(baseUrl, params, pan)
         })
 
+        // fa ext provider
         group('Should get provider list', () =>
             getProviderListTest(baseUrl, params)
         )
 
+        // fa ext merchant
         const merchantBody = createMerchantBody()
         let shopId = ''
         group('Should put a merchant', () => {
@@ -142,6 +137,7 @@ export default () => {
             getContractListByShopIdTest(baseUrl, params, shopId)
         )
 
+        // fa register transaction
         let transactionId = ''
         const transactionBody = createTransactionBody()
         group('Should create a Transaction', () => {
@@ -157,10 +153,12 @@ export default () => {
 
         setRtdIssuerParameters()
 
+        // rtd get hashed pans
         group('Should get hashed pans', () => getHashedPanTest(baseUrl, params))
 
         setIoParameters()
 
+        // fa io transaction
         group('Should get Transaction List', () =>
             getTransactionListTest(baseUrl, params, fiscalCode)
         )
