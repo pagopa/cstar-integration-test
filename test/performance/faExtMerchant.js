@@ -45,7 +45,7 @@ if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
     exec.test.abort()
 }
 
-function createBody() {
+export function createMerchantBody() {
     return {
         vatNumber: randomVatNumber(),
         companyName: 'Company test',
@@ -76,19 +76,25 @@ function extractShopIdFromResponse(response) {
     return ''
 }
 
+export function putMerchantTest(baseUrl, params, body) {
+    const res = putMerchantByOther(baseUrl, params, body)
+    assert(res, [statusOk()])
+    return extractShopIdFromResponse(res)
+}
+
+export function getContractListByShopIdTest(baseUrl, params, shopId) {
+    assert(getContractListByShopId(baseUrl, params, shopId), [statusOk()])
+}
+
 export default () => {
     group('FA EXT Merchant API', () => {
-        const body = createBody()
+        const body = createMerchantBody()
         let shopId = ''
         group('Should put a merchant', () => {
-            const res = putMerchantByOther(baseUrl, params, body)
-            assert(res, [statusOk()])
-            shopId = extractShopIdFromResponse(res)
+            shopId = putMerchantTest(baseUrl, params, body)
         })
         group('Should get merchant contract list', () =>
-            assert(getContractListByShopId(baseUrl, params, shopId), [
-                statusOk(),
-            ])
+            getContractListByShopIdTest(baseUrl, params, shopId)
         )
     })
 }
