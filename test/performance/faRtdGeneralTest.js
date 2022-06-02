@@ -24,6 +24,7 @@ import {
     createTransactionTest,
     getTransactionTest,
 } from './faRegisterTransaction.js'
+import { getHashedPanTest } from './rtdGetHashedPans.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
 import { login } from '../common/api/bpdIoLogin.js'
@@ -71,6 +72,13 @@ function setIssuerParameters() {
         'Ocp-Apim-Subscription-Key': myEnv.APIM_SK,
         'Ocp-Apim-Trace': 'true',
         'Content-Type': 'application/json',
+    }
+}
+
+function setRtdIssuerParameters() {
+    baseUrl = baseUrlIssuer
+    params.headers = {
+        'Ocp-Apim-Subscription-Key': myEnv.APIM_RTDPRODUCT_SK,
     }
 }
 
@@ -146,6 +154,10 @@ export default () => {
         group('Should get a Transaction', () =>
             getTransactionTest(baseUrl, params, transactionId)
         )
+
+        setRtdIssuerParameters()
+
+        group('Should get hashed pans', () => getHashedPanTest(baseUrl, params))
 
         setIoParameters()
 

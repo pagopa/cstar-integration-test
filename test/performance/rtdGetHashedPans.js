@@ -52,14 +52,16 @@ if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
     exec.test.abort()
 }
 
+export function getHashedPanTest(baseUrl, params) {
+    assert(getHashedPan(baseUrl, params), [
+        statusOk(),
+        bodyLengthBetween(0, myEnv.RTD_HASHPAN_MAX_CONTENT_LENGTH),
+    ])
+}
+
 export default () => {
     group('Payment Instrument API', () => {
-        group('Should get hashed pans', () =>
-            assert(getHashedPan(baseUrl, params), [
-                statusOk(),
-                bodyLengthBetween(0, myEnv.RTD_HASHPAN_MAX_CONTENT_LENGTH),
-            ])
-        )
+        group('Should get hashed pans', () => getHashedPanTest(baseUrl, params))
     })
 
     sleep(1)
