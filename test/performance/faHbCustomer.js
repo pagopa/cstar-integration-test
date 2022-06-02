@@ -44,7 +44,7 @@ if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
 
 export function createCustomerBody() {
     return {
-        id: randomFiscalCode(),
+        id: randomFiscalCode().toUpperCase(),
     }
 }
 
