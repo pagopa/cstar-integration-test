@@ -50,12 +50,12 @@ if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
     exec.test.abort()
 }
 
-function chooseRandomPanFromList() {
+export function chooseRandomPanFromList(panList) {
     const index = randomIntBetween(0, panList.list.length - 1)
     return panList.list[index]
 }
 
-function createBody(encrPan, fiscalCode) {
+export function createPaymentInstrumentBody(encrPan, fiscalCode) {
     return {
         id: encrPan,
         fiscalCode: fiscalCode,
@@ -70,41 +70,47 @@ function createBody(encrPan, fiscalCode) {
     }
 }
 
+export function putPaymentInstrumentCardTest(baseUrl, params, body) {
+    assert(putFAPaymentInstrumentCard(baseUrl, params, body), [statusOk()])
+}
+
+export function getPaymentInstrumentCardTest(baseUrl, params, pan, fiscalCode) {
+    assert(
+        getFAPaymentInstrument(
+            baseUrl,
+            params,
+            pan.replace(/\n/g, '\\n'),
+            fiscalCode
+        ),
+        [statusOk()]
+    )
+}
+
+export function deletePaymentInstrumentCardTest(baseUrl, params, pan) {
+    assert(
+        deleteFAPaymentInstrument(baseUrl, params, pan.replace(/\n/g, '\\n')),
+        [statusNoContent()]
+    )
+}
+
 export default () => {
     group('FA Payment Instruments API', () => {
-        const pan = chooseRandomPanFromList()
+        const pan = chooseRandomPanFromList(panList)
         const fiscalCode = randomFiscalCode().toUpperCase()
-        const body = createBody(pan, fiscalCode)
+        const body = createPaymentInstrumentBody(pan, fiscalCode)
         group('Should put a FA CUSTOMER', () =>
             assert(putFaCustomer(baseUrl, params, { id: fiscalCode }), [
                 statusOk(),
             ])
         )
         group('Should create a FA Payment Instrument', () => {
-            assert(putFAPaymentInstrumentCard(baseUrl, params, body), [
-                statusOk(),
-            ])
+            putPaymentInstrumentCardTest(baseUrl, params, body)
         })
         group('Should get an FA Payment Instrument', () =>
-            assert(
-                getFAPaymentInstrument(
-                    baseUrl,
-                    params,
-                    pan.replace(/\n/g, '\\n'),
-                    fiscalCode
-                ),
-                [statusOk()]
-            )
+            getPaymentInstrumentCardTest(baseUrl, params, pan, fiscalCode)
         )
         group('Should delete a FA Payment Instrument', () => {
-            assert(
-                deleteFAPaymentInstrument(
-                    baseUrl,
-                    params,
-                    pan.replace(/\n/g, '\\n')
-                ),
-                [statusNoContent()]
-            )
+            deletePaymentInstrumentCardTest(baseUrl, params, pan)
         })
     })
 }
