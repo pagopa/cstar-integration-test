@@ -53,28 +53,38 @@ function extractTransactionId(response) {
     return ''
 }
 
+export function createTransactionBody() {
+    return {
+        amount: 43,
+        binCard: '11223344',
+        authCode: randomString(11),
+        vatNumber: '04533641009',
+        posType: 'ASSERVED_POS',
+        terminalId: '11111111',
+        trxDate: '1983-05-02T00:00:00.000Z',
+        contractId: '3',
+    }
+}
+
+export function createTransactionTest(baseUrl, params, body) {
+    const res = createPosTransaction(baseUrl, params, body)
+    assert(res, [statusOk()])
+    return extractTransactionId(res)
+}
+
+export function getTransactionTest(baseUrl, params, transactionId) {
+    assert(getPosTransaction(baseUrl, params, transactionId), [statusOk()])
+}
+
 export default () => {
     group('FA REGISTER Transaction API', () => {
         let transactionId = ''
-        const body = {
-            amount: 43,
-            binCard: '11223344',
-            authCode: randomString(11),
-            vatNumber: '04533641009',
-            posType: 'ASSERVED_POS',
-            terminalId: '11111111',
-            trxDate: '1983-05-02T00:00:00.000Z',
-            contractId: '3',
-        }
+        const body = createTransactionBody()
         group('Should create a Transaction', () => {
-            const res = createPosTransaction(baseUrl, params, body)
-            assert(res, [statusOk()])
-            transactionId = extractTransactionId(res)
+            transactionId = createTransactionTest(baseUrl, params, body)
         })
         group('Should get a Transaction', () =>
-            assert(getPosTransaction(baseUrl, params, transactionId), [
-                statusOk(),
-            ])
+            getTransactionTest(baseUrl, params, transactionId)
         )
     })
 }

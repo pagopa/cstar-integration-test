@@ -19,6 +19,11 @@ import {
 } from './faExtMerchant.js'
 import { getTransactionListTest } from './faIoTransaction.js'
 import { getProviderListTest } from './faExtProvider.js'
+import {
+    createTransactionBody,
+    createTransactionTest,
+    getTransactionTest,
+} from './faRegisterTransaction.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
 import { login } from '../common/api/bpdIoLogin.js'
@@ -127,6 +132,19 @@ export default () => {
         })
         group('Should get merchant contract list', () =>
             getContractListByShopIdTest(baseUrl, params, shopId)
+        )
+
+        let transactionId = ''
+        const transactionBody = createTransactionBody()
+        group('Should create a Transaction', () => {
+            transactionId = createTransactionTest(
+                baseUrl,
+                params,
+                transactionBody
+            )
+        })
+        group('Should get a Transaction', () =>
+            getTransactionTest(baseUrl, params, transactionId)
         )
 
         setIoParameters()
