@@ -3,10 +3,12 @@ import exec from 'k6/execution'
 import { sogeiHealthCheck } from '../common/api/cdcSogeiHealthCheck.js'
 import { loginFullUrl } from '../common/api/bpdIoLogin.js'
 import { assert, statusOk } from '../common/assertions.js'
-import { isEnvValid, isTestEnabledOnEnv, UAT } from '../common/envs.js'
+import { isEnvValid, isTestEnabledOnEnv, UAT, PROD } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
+import { randomFiscalCode } from '../common/utils.js'
 
-const REGISTERED_ENVS = [UAT]
+
+const REGISTERED_ENVS = [UAT, PROD]
 
 const services = JSON.parse(open('../../services/environments.json'))
 let baseUrl
@@ -18,7 +20,7 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
 }
 
 export function setup() {
-    const authToken = loginFullUrl(`${baseUrl}/bpd/pagopa/api/v1/login`, myEnv.FISCAL_CODE_EXISTING)
+    const authToken = loginFullUrl(`${services.uat_io.baseUrl}/bpd/pagopa/api/v1/login`, randomFiscalCode())
     return {
         headers: {
             Authorization: `Bearer ${authToken}`,
