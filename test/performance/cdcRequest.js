@@ -17,30 +17,29 @@ export let options = {
             preAllocatedVUs: 50,
             maxVUs: 1000,
             stages: [
-                { duration: "1m", target: 250 },
-                { duration: "1m", target: 250 },
+                { duration: '1m', target: 250 },
+                { duration: '1m', target: 250 },
             ],
-        }
+        },
     },
 
-        summaryTrendStats: [
-            'med',
-            'avg',
-            'min',
-            'max',
-            'count',
-            'p(10)',
-            'p(20)',
-            'p(30)',
-            'p(40)',
-            'p(50)',
-            'p(60)',
-            'p(70)',
-            'p(80)',
-            'p(90)',
-        ],  
-
-    }
+    summaryTrendStats: [
+        'med',
+        'avg',
+        'min',
+        'max',
+        'count',
+        'p(10)',
+        'p(20)',
+        'p(30)',
+        'p(40)',
+        'p(50)',
+        'p(60)',
+        'p(70)',
+        'p(80)',
+        'p(90)',
+    ],
+}
 
 // export let options = {
 //     scenarios: {

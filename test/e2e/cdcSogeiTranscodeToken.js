@@ -7,7 +7,6 @@ import { isEnvValid, isTestEnabledOnEnv, UAT, PROD } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
 import { randomFiscalCode } from '../common/utils.js'
 
-
 const REGISTERED_ENVS = [UAT, PROD]
 
 const services = JSON.parse(open('../../services/environments.json'))
@@ -20,7 +19,10 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
 }
 
 export function setup() {
-    const authToken = loginFullUrl(`${services.uat_io.baseUrl}/bpd/pagopa/api/v1/login`, randomFiscalCode())
+    const authToken = loginFullUrl(
+        `${services.uat_io.baseUrl}/bpd/pagopa/api/v1/login`,
+        randomFiscalCode()
+    )
     return {
         headers: {
             Authorization: `Bearer ${authToken}`,
