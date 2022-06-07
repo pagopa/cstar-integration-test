@@ -1,24 +1,21 @@
 import { group } from 'k6'
 import exec from 'k6/execution'
+import { assert, statusOk, statusNoContent } from '../common/assertions.js'
+import { createCustomerBody } from './faHbCustomer.js'
+import { getFaCustomer, putFaCustomer } from '../common/api/faHbCustomer.js'
+import { createPaymentInstrumentBody } from './faHbPaymentInstruments.js'
 import {
-    createCustomerTest,
-    getCustomerTest,
-    createCustomerBody,
-} from './faHbCustomer.js'
-import {
-    putPaymentInstrumentCardTest,
-    getPaymentInstrumentCardTest,
-    deletePaymentInstrumentCardTest,
-    createPaymentInstrumentBody,
-    chooseRandomPanFromList,
-} from './faHbPaymentInstruments.js'
+    getFAPaymentInstrument,
+    putFAPaymentInstrumentCard,
+    deleteFAPaymentInstrument,
+} from '../common/api/faHbPaymentInstruments.js'
 import {
     putMerchantTest,
     getContractListByShopIdTest,
     createMerchantBody,
 } from './faExtMerchant.js'
 import { getTransactionListTest } from './faIoTransaction.js'
-import { getProviderListTest } from './faExtProvider.js'
+import { getProviderList } from '../common/api/faExtProvider.js'
 import {
     createTransactionBody,
     createTransactionTest,
@@ -26,6 +23,7 @@ import {
 } from './faRegisterTransaction.js'
 import { getHashedPanTest } from './rtdGetHashedPans.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
+import { chooseRandomPanFromList } from '../common/utils.js'
 import dotenv from 'k6/x/dotenv'
 import { login } from '../common/api/bpdIoLogin.js'
 
@@ -102,10 +100,12 @@ export default () => {
         // fa hb customer
         const customerBody = createCustomerBody()
         group('Should create a CUSTOMER', () =>
-            createCustomerTest(baseUrl, params, customerBody)
+            assert(putFaCustomer(baseUrl, params, customerBody), [statusOk()])
         )
         group('Should get a CUSTOMER', () =>
-            getCustomerTest(baseUrl, params, customerBody.id)
+            assert(getFaCustomer(baseUrl, params, customerBody.id), [
+                statusOk(),
+            ])
         )
 
         // fa hb payment instruments
@@ -113,18 +113,35 @@ export default () => {
         const fiscalCode = customerBody.id // to use the same fiscal code of a customer already registered
         const piBody = createPaymentInstrumentBody(pan, fiscalCode)
         group('Should create a FA Payment Instrument', () => {
-            putPaymentInstrumentCardTest(baseUrl, params, piBody)
+            assert(putFAPaymentInstrumentCard(baseUrl, params, piBody), [
+                statusOk(),
+            ])
         })
         group('Should get an FA Payment Instrument', () =>
-            getPaymentInstrumentCardTest(baseUrl, params, pan, fiscalCode)
+            assert(
+                getFAPaymentInstrument(
+                    baseUrl,
+                    params,
+                    pan.replace(/\n/g, '\\n'),
+                    fiscalCode
+                ),
+                [statusOk()]
+            )
         )
         group('Should delete a FA Payment Instrument', () => {
-            deletePaymentInstrumentCardTest(baseUrl, params, pan)
+            assert(
+                deleteFAPaymentInstrument(
+                    baseUrl,
+                    params,
+                    pan.replace(/\n/g, '\\n')
+                ),
+                [statusNoContent()]
+            )
         })
 
         // fa ext provider
         group('Should get provider list', () =>
-            getProviderListTest(baseUrl, params)
+            assert(getProviderList(baseUrl, params), [statusOk()])
         )
 
         // fa ext merchant

@@ -48,23 +48,15 @@ export function createCustomerBody() {
     }
 }
 
-export function createCustomerTest(baseUrl, params, body) {
-    assert(putFaCustomer(baseUrl, params, body), [statusOk()])
-}
-
-export function getCustomerTest(baseUrl, params, id) {
-    assert(getFaCustomer(baseUrl, params, id), [statusOk()])
-}
-
 export default () => {
     group('FA HB Customer API', () => {
         const body = createCustomerBody()
 
         group('Should create an FA CUSTOMER', () =>
-            createCustomerTest(baseUrl, params, body)
+            assert(putFaCustomer(baseUrl, params, body), [statusOk()])
         )
         group('Should get an FA CUSTOMER', () =>
-            getCustomerTest(baseUrl, params, body.id)
+            assert(getFaCustomer(baseUrl, params, body.id), [statusOk()])
         )
     })
 }
