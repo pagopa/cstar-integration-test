@@ -66,7 +66,7 @@ export function createMerchantBody() {
     }
 }
 
-function extractShopIdFromResponse(response) {
+export function extractShopIdFromResponse(response) {
     if (response.status === 200 && response.body && response.body !== '') {
         const resBody = JSON.parse(response.body)
         if (resBody.shops && resBody.shops.length > 0) {
@@ -76,25 +76,19 @@ function extractShopIdFromResponse(response) {
     return ''
 }
 
-export function putMerchantTest(baseUrl, params, body) {
-    const res = putMerchantByOther(baseUrl, params, body)
-    assert(res, [statusOk()])
-    return extractShopIdFromResponse(res)
-}
-
-export function getContractListByShopIdTest(baseUrl, params, shopId) {
-    assert(getContractListByShopId(baseUrl, params, shopId), [statusOk()])
-}
-
 export default () => {
     group('FA EXT Merchant API', () => {
         const body = createMerchantBody()
         let shopId = ''
         group('Should put a merchant', () => {
-            shopId = putMerchantTest(baseUrl, params, body)
+            const res = putMerchantByOther(baseUrl, params, body)
+            assert(res, [statusOk()])
+            shopId = extractShopIdFromResponse(res)
         })
         group('Should get merchant contract list', () =>
-            getContractListByShopIdTest(baseUrl, params, shopId)
+            assert(getContractListByShopId(baseUrl, params, shopId), [
+                statusOk(),
+            ])
         )
     })
 }

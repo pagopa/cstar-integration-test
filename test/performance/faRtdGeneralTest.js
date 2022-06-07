@@ -1,6 +1,11 @@
 import { group } from 'k6'
 import exec from 'k6/execution'
-import { assert, statusOk, statusNoContent } from '../common/assertions.js'
+import {
+    assert,
+    statusOk,
+    statusNoContent,
+    bodyLengthBetween,
+} from '../common/assertions.js'
 import { createCustomerBody } from './faHbCustomer.js'
 import { getFaCustomer, putFaCustomer } from '../common/api/faHbCustomer.js'
 import { createPaymentInstrumentBody } from './faHbPaymentInstruments.js'
@@ -10,18 +15,24 @@ import {
     deleteFAPaymentInstrument,
 } from '../common/api/faHbPaymentInstruments.js'
 import {
-    putMerchantTest,
-    getContractListByShopIdTest,
     createMerchantBody,
+    extractShopIdFromResponse,
 } from './faExtMerchant.js'
-import { getTransactionListTest } from './faIoTransaction.js'
+import {
+    getContractListByShopId,
+    putMerchantByOther,
+} from '../common/api/faExtMerchant.js'
+import { getTransactionList } from '../common/api/faIoTransaction.js'
 import { getProviderList } from '../common/api/faExtProvider.js'
 import {
+    getPosTransaction,
+    createPosTransaction,
+} from '../common/api/faRegisterTransaction.js'
+import {
     createTransactionBody,
-    createTransactionTest,
-    getTransactionTest,
+    extractTransactionId,
 } from './faRegisterTransaction.js'
-import { getHashedPanTest } from './rtdGetHashedPans.js'
+import { getHashedPan } from '../common/api/rtdPaymentInstrumentManager.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
 import { chooseRandomPanFromList } from '../common/utils.js'
 import dotenv from 'k6/x/dotenv'
@@ -148,36 +159,55 @@ export default () => {
         const merchantBody = createMerchantBody()
         let shopId = ''
         group('Should put a merchant', () => {
-            shopId = putMerchantTest(baseUrl, params, merchantBody)
+            const putMerchantRes = putMerchantByOther(
+                baseUrl,
+                params,
+                merchantBody
+            )
+            assert(putMerchantRes, [statusOk()])
+            shopId = extractShopIdFromResponse(putMerchantRes)
         })
         group('Should get merchant contract list', () =>
-            getContractListByShopIdTest(baseUrl, params, shopId)
+            assert(getContractListByShopId(baseUrl, params, shopId), [
+                statusOk(),
+            ])
         )
 
         // fa register transaction
         let transactionId = ''
         const transactionBody = createTransactionBody()
         group('Should create a Transaction', () => {
-            transactionId = createTransactionTest(
+            const createPosTransactionRes = createPosTransaction(
                 baseUrl,
                 params,
                 transactionBody
             )
+            assert(createPosTransactionRes, [statusOk()])
+            transactionId = extractTransactionId(createPosTransactionRes)
         })
         group('Should get a Transaction', () =>
-            getTransactionTest(baseUrl, params, transactionId)
+            assert(getPosTransaction(baseUrl, params, transactionId), [
+                statusOk(),
+            ])
         )
 
         setRtdIssuerParameters()
 
         // rtd get hashed pans
-        group('Should get hashed pans', () => getHashedPanTest(baseUrl, params))
+        group('Should get hashed pans', () =>
+            assert(getHashedPan(baseUrl, params), [
+                statusOk(),
+                bodyLengthBetween(0, myEnv.RTD_HASHPAN_MAX_CONTENT_LENGTH),
+            ])
+        )
 
         setIoParameters()
 
         // fa io transaction
         group('Should get Transaction List', () =>
-            getTransactionListTest(baseUrl, params, fiscalCode)
+            assert(getTransactionList(baseUrl, params, fiscalCode), [
+                statusOk(),
+            ])
         )
     })
 }
