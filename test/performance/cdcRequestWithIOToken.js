@@ -171,11 +171,11 @@ export default () => {
                 )
             }
         )
-        group('When the customer sends no input', () => {
-            assert(failureCaseWithNoInput(baseUrl, auth()), [
-                statusBadFormat(),
-                bodyJsonSelectorValue('status', 'NO_INPUT'),
-            ])
-        })
+        // group('When the customer sends no input', () => {
+        //     assert(failureCaseWithNoInput(baseUrl, auth()), [
+        //         statusBadFormat(),
+        //         bodyJsonSelectorValue('status', 'NO_INPUT'),
+        //     ])
+        // })
     })
 }
