@@ -1,18 +1,13 @@
 import { group } from 'k6'
 import {
     happyCase,
-    happyCaseWithoutIseeDate,
-    partialHappyCase,
-    twoStepHappyCase,
     postIdempotence,
     getIdempotence,
     failureCaseWithEmptyYearList,
     failureWithWrongYear,
     failureWithYearListTooLong,
     failureWithGoodYearInWrongFormat,
-    failureCaseWithNoInput,
 } from '../common/api/cdcIoRequest.js'
-import { loginFullUrl } from '../common/api/bpdIoLogin.js'
 import {
     assert,
     bodyJsonReduceArray,
@@ -21,11 +16,10 @@ import {
     bodyJsonSelectorValue,
     idempotence,
 } from '../common/assertions.js'
-import { isEnvValid, isTestEnabledOnEnv, PROD } from '../common/envs.js'
+import { isEnvValid, isTestEnabledOnEnv, PROD, INTERNAL } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
-import { randomFiscalCode } from '../common/utils.js'
 
-const REGISTERED_ENVS = [PROD]
+const REGISTERED_ENVS = [PROD, INTERNAL]
 
 export let options = {
     scenarios: {

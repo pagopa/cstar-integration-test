@@ -23,7 +23,7 @@
   "dev_issuer_internal": {
     "baseUrl": "http://10.1.0.250"
   },
-  "prod_internal" : {
+  "internal_io" : {
     "baseUrl": "http://10.1.0.250"
   }
 }
