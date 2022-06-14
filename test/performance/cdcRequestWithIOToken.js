@@ -77,6 +77,13 @@ export default () => {
     }
     group('Should request CdC', () => {
         group('When the post contains all years returned by get', () => {
+
+            console.log("\n\n********\n\n")
+            console.log(baseUrl)
+            console.log(myEnv)
+            console.log("\n\n********\n\n")
+
+
             const esitoOkReducer = (prv, cur) =>
                 prv && ( ['OK', 'CIT_REGISTRATO'].includes(
                   cur.esitoRichiesta)
