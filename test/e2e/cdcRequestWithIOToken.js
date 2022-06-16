@@ -56,9 +56,7 @@ export default () => {
     group('Should request CdC', () => {
         group('When the post contains all years returned by get', () => {
             const esitoOkReducer = (prv, cur) =>
-                prv && ( ['OK', 'CIT_REGISTRATO'].includes(
-                  cur.esitoRichiesta)
-              )
+                prv && ['OK', 'CIT_REGISTRATO'].includes(cur.esitoRichiesta)
             assert(happyCase(baseUrl, auth()), [
                 statusOk(),
                 bodyJsonReduceArray(
@@ -69,78 +67,55 @@ export default () => {
                 ),
             ])
         })
-        
     })
 
     group('POST Request should be', () => {
         group('Idempotent', () => {
-            assert(postIdempotence(baseUrl, auth()), [
-                idempotence(),
-            ])
+            assert(postIdempotence(baseUrl, auth()), [idempotence()])
         })
     })
 
     group('GET Request should be', () => {
         group('Idempotent', () => {
-            assert(getIdempotence(baseUrl, auth()), [
-                idempotence(),
-            ])
+            assert(getIdempotence(baseUrl, auth()), [idempotence()])
         })
     })
 
     group('Should not Request CdC', () => {
         group('When the list of years is empty', () => {
-            assert(
-                failureCaseWithEmptyYearList(baseUrl, auth()),
-                [
-                    statusBadFormat(),
-                    bodyJsonSelectorValue('status', 'LISTA_ANNI_VUOTA'),
-                ]
-            )
+            assert(failureCaseWithEmptyYearList(baseUrl, auth()), [
+                statusBadFormat(),
+                bodyJsonSelectorValue('status', 'LISTA_ANNI_VUOTA'),
+            ])
         })
         group(
             'When the customer selects only a subset of admissible years plus a wrong year',
             () => {
-                assert(
-                    failureWithWrongYear(baseUrl, auth()),
-                    [
-                        statusBadFormat(),
-                        bodyJsonSelectorValue('status', 'FORMATO_ANNI_ERRATO'),
-                    ]
-                )
+                assert(failureWithWrongYear(baseUrl, auth()), [
+                    statusBadFormat(),
+                    bodyJsonSelectorValue('status', 'FORMATO_ANNI_ERRATO'),
+                ])
             }
         )
         group(
             'When the customer selects a list of years which is longer than expected',
             () => {
-                assert(
-                    failureWithYearListTooLong(
-                        baseUrl,
-                        auth()
+                assert(failureWithYearListTooLong(baseUrl, auth()), [
+                    statusBadFormat(),
+                    bodyJsonSelectorValue(
+                        'status',
+                        'INPUT_SUPERIORE_AL_CONSENTITO'
                     ),
-                    [
-                        statusBadFormat(),
-                        bodyJsonSelectorValue(
-                            'status',
-                            'INPUT_SUPERIORE_AL_CONSENTITO'
-                        ),
-                    ]
-                )
+                ])
             }
         )
         group(
             'When the customer send a year in a wrong format (e.g. as a date 2021/01/01)',
             () => {
-                assert(
-                    failureWithGoodYearInWrongFormat(
-                        baseUrl,
-                        auth()
-                    ),
-                    [
-                        statusBadFormat(),
-                        bodyJsonSelectorValue('status', 'FORMATO_ANNI_ERRATO'),
-                    ]
-                )
+                assert(failureWithGoodYearInWrongFormat(baseUrl, auth()), [
+                    statusBadFormat(),
+                    bodyJsonSelectorValue('status', 'FORMATO_ANNI_ERRATO'),
+                ])
             }
         )
         group('When the customer sends no input', () => {

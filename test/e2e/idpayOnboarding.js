@@ -1,14 +1,7 @@
 import { group } from 'k6'
 import { putOnboardingCitizen } from '../common/api/idpayOnbardingCitizen.js'
 import { loginFullUrl } from '../common/api/bpdIoLogin.js'
-import {
-    assert,
-    bodyJsonReduceArray,
-    statusOk,
-    statusBadFormat,
-    bodyJsonSelectorValue,
-    idempotence,
-} from '../common/assertions.js'
+import { assert, statusNoContent } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
 import { randomFiscalCode } from '../common/utils.js'
@@ -32,6 +25,7 @@ function auth(fiscalCode) {
     return {
         headers: {
             Authorization: `Bearer ${authToken}`,
+            'Content-Type': 'application/json',
             'Ocp-Apim-Subscription-Key': `${myEnv.APIM_SK};product=app-io-product`,
             'Ocp-Apim-Trace': 'true',
         },
@@ -48,12 +42,16 @@ export default () => {
     group('Should ondoard Citizen', () => {
         group('When the inititive exists', () => {
             const body = {
-                initiativeId : "123"
+                initiativeId: '123',
             }
-            assert(putOnboardingCitizen(baseUrl, body, auth(randomFiscalCode()) ), [
-                statusOk()
-            ])
+            assert(
+                putOnboardingCitizen(
+                    baseUrl,
+                    JSON.stringify(body),
+                    auth(randomFiscalCode())
+                ),
+                [statusNoContent()]
+            )
         })
     })
-
 }
