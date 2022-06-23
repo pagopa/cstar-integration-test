@@ -45,7 +45,7 @@ if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
     exec.test.abort()
 }
 
-function createBody() {
+export function createMerchantBody() {
     return {
         vatNumber: randomVatNumber(),
         companyName: 'Company test',
@@ -66,7 +66,7 @@ function createBody() {
     }
 }
 
-function extractShopIdFromResponse(response) {
+export function extractShopIdFromResponse(response) {
     if (response.status === 200 && response.body && response.body !== '') {
         const resBody = JSON.parse(response.body)
         if (resBody.shops && resBody.shops.length > 0) {
@@ -78,7 +78,7 @@ function extractShopIdFromResponse(response) {
 
 export default () => {
     group('FA EXT Merchant API', () => {
-        const body = createBody()
+        const body = createMerchantBody()
         let shopId = ''
         group('Should put a merchant', () => {
             const res = putMerchantByOther(baseUrl, params, body)

@@ -46,7 +46,7 @@ export default (params) => {
     group('FA IO Transaction API', () => {
         const vat = randomFiscalCode()
 
-        group('Should get a Transaction', () =>
+        group('Should get Transaction List', () =>
             assert(getTransactionList(baseUrl, params, vat), [statusOk()])
         )
     })
