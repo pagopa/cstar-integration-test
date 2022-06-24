@@ -63,9 +63,7 @@ function auth() {
         headers: {
             Authorization: `Bearer ${myEnv.BPD_TOKEN}`,
             'Ocp-Apim-Subscription-Key': `${myEnv.APIM_SK};product=app-io-product`,
-            'Ocp-Apim-Trace': 'true',
-            'Host': 'api.cstar.pagopa.it'
-        }
+            'Ocp-Apim-Trace': 'true'        }
     }
 }
 
