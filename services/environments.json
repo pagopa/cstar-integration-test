@@ -6,7 +6,7 @@
     "baseUrl": "https://api-io.uat.cstar.pagopa.it"
   },
   "prod_io": {
-    "baseUrl": "https://api-io.cstar.pagopa.it"
+    "baseUrl": "http://10.230.6.6"
   },
   "dev_issuer": {
     "baseUrl": "https://api.dev.cstar.pagopa.it"
