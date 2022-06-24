@@ -65,6 +65,7 @@ function auth() {
             'Ocp-Apim-Subscription-Key': `${myEnv.APIM_SK};product=app-io-product`,
             'Ocp-Apim-Trace': 'true',
             'Host': 'api.cstar.pagopa.it'
+        }
     }
 }
 
@@ -120,7 +121,8 @@ export default () => {
                 assert(
                     failureWithWrongYear(baseUrl, auth()),
                     [
-                        statusBadFormat()                    ]
+                        statusBadFormat()
+                    ]
                 )
             }
         )
