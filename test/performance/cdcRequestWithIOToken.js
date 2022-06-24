@@ -79,10 +79,6 @@ export default () => {
     group('Should request CdC', () => {
         group('When the post contains all years returned by get', () => {
 
-            const esitoOkReducer = (prv, cur) =>
-                prv && ( ['OK', 'CIT_REGISTRATO'].includes(
-                  cur.esitoRichiesta)
-              )
             assert(happyCase(baseUrl, auth()), [
                 statusOk()
             ])
