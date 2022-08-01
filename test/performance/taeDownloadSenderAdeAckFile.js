@@ -10,7 +10,7 @@ import {
 } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
 import { getSenderAdeAckFileNameList } from '../common/api/rtdFileRegister.js'
-import { downloadSenderAdeAckFile } from '../common/api/adeApi.js'
+import { downloadSenderAdeAckFile } from '../common/api/adeDownloadSenderAdeAck.js'
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
