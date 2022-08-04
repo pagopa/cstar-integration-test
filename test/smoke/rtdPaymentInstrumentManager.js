@@ -57,4 +57,16 @@ export default () => {
             assert(getSalt(baseUrl, params), [statusOk()])
         )
     })
+
+    group('Payment Instrument API v2', () => {
+        group('Should get hashed pans', () =>
+            assert(getHashedPan(baseUrl, params, 'v2'), [
+                statusOk(),
+                bodyLengthBetween(0, myEnv.RTD_HASHPAN_MAX_CONTENT_LENGTH),
+            ])
+        )
+        group('Should get salt', () =>
+            assert(getSalt(baseUrl, params, 'v2'), [statusOk()])
+        )
+    })
 }
