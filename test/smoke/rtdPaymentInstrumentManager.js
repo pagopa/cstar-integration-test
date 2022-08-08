@@ -1,4 +1,4 @@
-import { group } from 'k6'
+import { group, check} from 'k6'
 import {
     getHashedPan,
     getSalt,
@@ -60,11 +60,17 @@ export default () => {
 
     group('Payment Instrument API v2', () => {
         group('Should get hashed pans', () =>
-            assert(getHashedPan(baseUrl, params, 'v2'), [
+            assert(getHashedPan(baseUrl, params, { version: 'v2' }), [
                 statusOk(),
                 bodyLengthBetween(0, myEnv.RTD_HASHPAN_MAX_CONTENT_LENGTH),
             ])
         )
+        group('Should get 404 when no hashed pans file found', () => {
+            const queryParams = "filePart=1000"
+            check(getHashedPan(baseUrl, params, { version: 'v2', queryParams: queryParams }), {
+                'Not existing file: is 404': (r) => r.status === 404,
+            })
+        });
         group('Should get salt', () =>
             assert(getSalt(baseUrl, params, 'v2'), [statusOk()])
         )
