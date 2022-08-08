@@ -63,6 +63,7 @@ export default () => {
             assert(getHashedPan(baseUrl, params, { version: 'v2' }), [
                 statusOk(),
                 bodyLengthBetween(0, myEnv.RTD_HASHPAN_MAX_CONTENT_LENGTH),
+                (res) => 'Last-Modified' in res.headers
             ])
         )
         group('Should get 404 when no hashed pans file found', () => {
