@@ -51,8 +51,7 @@ export default () => {
     }
     group('TAE API', () => {
         group('Should retrieve conversion map', () =>
-            assert(getAbiToFiscalCodesMap(baseUrl, params), [statusOk(),
-            bodyJsonSelectorValue('STPAY', 'LU30726739')])
+            assert(getAbiToFiscalCodesMap(baseUrl, params), [statusOk()])
         )
         group('Should retrieve filename list', () => {
             assert(getSenderAdeAckFileNameList(baseUrl, params), [statusOk()])

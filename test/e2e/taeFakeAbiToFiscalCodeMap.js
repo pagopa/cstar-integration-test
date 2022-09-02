@@ -35,7 +35,10 @@ export default () => {
     group('TAE AbiToFiscalCode API', () => {
         group('Should retrieve conversion map', () =>
             assert(getAbiToFiscalCodesMap(baseUrl, params), [statusOk(),
-            bodyJsonSelectorValue('STPAY', 'LU30726739')])
+            bodyJsonSelectorValue('STPAY', 'LU30726739'),
+            bodyJsonSelectorValue('BPAY1', '04949971008'),
+            bodyJsonSelectorValue('SUMUP', 'IE9813461A'),
+            bodyJsonSelectorValue('ICARD', 'BG175325806')])
         )
     })
 }
