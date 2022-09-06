@@ -45,7 +45,7 @@ if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
     exec.test.abort()
 }
 
-function extractTransactionId(response) {
+export function extractTransactionId(response) {
     if (response.status === 200 && response.body) {
         const respBody = JSON.parse(response.body)
         return respBody.id
@@ -53,19 +53,23 @@ function extractTransactionId(response) {
     return ''
 }
 
+export function createTransactionBody() {
+    return {
+        amount: 43,
+        binCard: '11223344',
+        authCode: randomString(11),
+        vatNumber: '04533641009',
+        posType: 'ASSERVED_POS',
+        terminalId: '11111111',
+        trxDate: '1983-05-02T00:00:00.000Z',
+        contractId: '3',
+    }
+}
+
 export default () => {
     group('FA REGISTER Transaction API', () => {
         let transactionId = ''
-        const body = {
-            amount: 43,
-            binCard: '11223344',
-            authCode: randomString(11),
-            vatNumber: '04533641009',
-            posType: 'ASSERVED_POS',
-            terminalId: '11111111',
-            trxDate: '1983-05-02T00:00:00.000Z',
-            contractId: '3',
-        }
+        const body = createTransactionBody()
         group('Should create a Transaction', () => {
             const res = createPosTransaction(baseUrl, params, body)
             assert(res, [statusOk()])

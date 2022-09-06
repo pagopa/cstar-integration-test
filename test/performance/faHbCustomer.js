@@ -42,11 +42,15 @@ if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
     exec.test.abort()
 }
 
+export function createCustomerBody() {
+    return {
+        id: randomFiscalCode().toUpperCase(),
+    }
+}
+
 export default () => {
     group('FA HB Customer API', () => {
-        const body = {
-            id: randomFiscalCode(),
-        }
+        const body = createCustomerBody()
 
         group('Should create an FA CUSTOMER', () =>
             assert(putFaCustomer(baseUrl, params, body), [statusOk()])

@@ -10,7 +10,7 @@ import { putFaCustomer } from '../common/api/faHbCustomer.js'
 import { assert, statusOk, statusNoContent } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
-import { randomFiscalCode } from '../common/utils.js'
+import { randomFiscalCode, chooseRandomPanFromList } from '../common/utils.js'
 
 const REGISTERED_ENVS = [DEV, UAT]
 
@@ -50,12 +50,7 @@ if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
     exec.test.abort()
 }
 
-function chooseRandomPanFromList() {
-    const index = randomIntBetween(0, panList.list.length - 1)
-    return panList.list[index]
-}
-
-function createBody(encrPan, fiscalCode) {
+export function createPaymentInstrumentBody(encrPan, fiscalCode) {
     return {
         id: encrPan,
         fiscalCode: fiscalCode,
@@ -72,9 +67,9 @@ function createBody(encrPan, fiscalCode) {
 
 export default () => {
     group('FA Payment Instruments API', () => {
-        const pan = chooseRandomPanFromList()
+        const pan = chooseRandomPanFromList(panList)
         const fiscalCode = randomFiscalCode().toUpperCase()
-        const body = createBody(pan, fiscalCode)
+        const body = createPaymentInstrumentBody(pan, fiscalCode)
         group('Should put a FA CUSTOMER', () =>
             assert(putFaCustomer(baseUrl, params, { id: fiscalCode }), [
                 statusOk(),

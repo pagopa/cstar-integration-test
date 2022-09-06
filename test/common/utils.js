@@ -31,6 +31,11 @@ export function randomVatNumber() {
     return randomIntBetween(10000000000, 99999999999)
 }
 
+export function chooseRandomPanFromList(panList) {
+    const index = randomIntBetween(0, panList.list.length - 1)
+    return panList.list[index]
+}
+
 function getFiscalCodeMonth(month) {
     const monthDict = {
         1: 'A',
