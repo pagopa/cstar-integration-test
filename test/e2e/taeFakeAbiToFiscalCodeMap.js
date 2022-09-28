@@ -38,7 +38,8 @@ export default () => {
             bodyJsonSelectorValue('STPAY', 'LU30726739'),
             bodyJsonSelectorValue('BPAY1', '04949971008'),
             bodyJsonSelectorValue('SUMUP', 'IE9813461A'),
-            bodyJsonSelectorValue('ICARD', 'BG175325806')])
+            bodyJsonSelectorValue('ICARD', 'BG175325806'),
+            bodyJsonSelectorValue('TPAY1', '09771701001')])
         )
     })
 }
