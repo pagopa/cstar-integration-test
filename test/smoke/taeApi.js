@@ -1,8 +1,8 @@
 import { group } from 'k6'
 import {
     assert,
-    statusOk, 
-    bodyJsonSelectorValue
+    statusOk,
+    bodyJsonSelectorValue,
 } from '../common/assertions.js'
 import {
     isEnvValid,
@@ -58,10 +58,11 @@ export default () => {
         })
         group('Should retrieve sender ade ack file', () => {
             let res = getSenderAdeAckFileNameList(baseUrl, params)
-            res.json('fileNameList').forEach(element => {
-                assert(downloadSenderAdeAckFile(baseUrl, element, params), [statusOk()])
-            });
-            
+            res.json('fileNameList').forEach((element) => {
+                assert(downloadSenderAdeAckFile(baseUrl, element, params), [
+                    statusOk(),
+                ])
+            })
         })
     })
 }

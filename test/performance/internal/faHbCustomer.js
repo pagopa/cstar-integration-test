@@ -3,6 +3,7 @@ import exec from 'k6/execution'
 import {
     getFaCustomerInternal,
     putFaCustomerInternal,
+    deleteFaCustomerInternal,
 } from '../../common/api/faHbCustomer.js'
 import { assert, statusOk } from '../../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../../common/envs.js'
@@ -43,13 +44,24 @@ export default () => {
             id: randomFiscalCode(),
         }
 
-        group('Should create an FA CUSTOMER', () =>
+        group('Should create a FA CUSTOMER', () =>
             assert(putFaCustomerInternal(baseUrl, params, body), [statusOk()])
         )
-        group('Should get an FA CUSTOMER', () =>
+        group('Should get a FA CUSTOMER', () =>
             assert(getFaCustomerInternal(baseUrl, params, body.id), [
                 statusOk(),
             ])
+        )
+        group('Should delete a FA CUSTOMER', () =>
+            assert(
+                deleteFaCustomerInternal(
+                    baseUrl,
+                    params,
+                    body.id,
+                    'test_channel'
+                ),
+                [statusOk()]
+            )
         )
     })
 }
