@@ -1,0 +1,139 @@
+{
+	"info": {
+		"_postman_id": "ffdca4ed-493b-44a9-96ae-b48d9d469ca4",
+		"name": "Payment Instrument APIs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Acquirer",
+			"item": [
+				{
+					"name": "001 - Get existing hashpan-par file (v3)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('001 - Get existing hashpan-par file', () => {",
+									"    pm.response.to.have.status(200);",
+									"    pm.expect(parseInt(pm.response.headers.get('Content-Length'))).to.be.above(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{test_api_key}}",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/rtd/payment-instrument-manager/v3/hashed-pans",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"rtd",
+								"payment-instrument-manager",
+								"v3",
+								"hashed-pans"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "001 - Fail over non existing hashpan-par file (v3)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('001 - Fail over non existing hashpan-par file', () => {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{test_api_key}}",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/rtd/payment-instrument-manager/v3/hashed-pans?filePart=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"rtd",
+								"payment-instrument-manager",
+								"v3",
+								"hashed-pans"
+							],
+							"query": [
+								{
+									"key": "filePart",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "001 - Get Hash Salt",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('001 - Get Hash Salt', () => {",
+									"    pm.response.to.have.status(200);",
+									"    pm.expect(parseInt(pm.response.headers.get('Content-Length'))).to.be.above(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{test_api_key}}",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/rtd/payment-instrument-manager/v3/salt",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"rtd",
+								"payment-instrument-manager",
+								"v3",
+								"salt"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
