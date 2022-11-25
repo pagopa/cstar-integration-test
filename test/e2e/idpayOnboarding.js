@@ -7,7 +7,7 @@ import {
      putSaveConsent
     } from '../common/api/idpayOnboardingCitizen.js'
 import { loginFullUrl } from '../common/api/bpdIoLogin.js'
-import { assert, statusNoContent, statusAccepted, statusOk } from '../common/assertions.js'
+import { assert, statusNoContent, statusAccepted, statusOk, bodyJsonSelectorValue } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
 import { randomFiscalCode } from '../common/utils.js'
@@ -17,11 +17,13 @@ const REGISTERED_ENVS = [DEV]
 const services = JSON.parse(open('../../services/environments.json'))
 let baseUrl
 let myEnv
+const fiscalCodeRandom = randomFiscalCode()
 
-if (isEnvValid(true)) {
+if (isEnvValid(DEV)) {
     myEnv = dotenv.parse(open(`../../env.dev.local`))
     baseUrl = services[`dev_io`].baseUrl
 }
+
 
 function auth(fiscalCode) {
     const authToken = loginFullUrl(
@@ -33,8 +35,7 @@ function auth(fiscalCode) {
             Authorization: `Bearer ${authToken}`,
             'Content-Type': 'application/json',
             'Ocp-Apim-Subscription-Key': `${myEnv.APIM_SK}`,
-            'Ocp-Apim-Trace': 'true',
-            'Accept-Language': 'it_IT',
+            'Ocp-Apim-Trace': 'true'
         },
     }
 }
@@ -42,71 +43,55 @@ function auth(fiscalCode) {
 export default () => {
 
     if (
-        !isEnvValid(true) ||
-        !isTestEnabledOnEnv(true, REGISTERED_ENVS)
+        !isEnvValid(DEV) ||
+        !isTestEnabledOnEnv(DEV, REGISTERED_ENVS)
     ) {
+
         return
     }
+
+    group('Should inititive be', () => {
+        group('When the service exists', () => {
+            const params = "01GJPZACZ4E5P69S4RY1E0EMMD"
+            
+            assert(
+                getInitiative(
+                    baseUrl,
+                    auth(fiscalCodeRandom),
+                    params
+                ),
+                [statusOk(),
+                bodyJsonSelectorValue('initiativeId', '63807d3c4d9d7e68e35e79b3'),
+                bodyJsonSelectorValue('description', 'italiano')]
+            )
+        })
+    })
+
+
     group('Should onboard Citizen', () => {
         group('When the inititive exists', () => {
             const body = {
-                initiativeId: '123',
+                initiativeId: '63807d3c4d9d7e68e35e79b3'
             }
             assert(
                 putOnboardingCitizen(
                     baseUrl,
                     JSON.stringify(body),
-                    auth(randomFiscalCode())
+                    auth(fiscalCodeRandom)
                 ),
                 [statusNoContent()]
             )
         })
     })
 
-    group('Should Citizen pre-requisites', () => {
-        group('When the inititive exists', () => {
-            const body = {
-                initiativeId: '123',
-            }
-            assert(
-                putCheckPrerequisites(
-                    baseUrl,
-                    JSON.stringify(body),
-                    auth(randomFiscalCode())
-                ),
-                [statusOk()]
-            )
-        })
-    })
-
-    group('Should inititive', () => {
-        group('When the service exists', () => {
-            const params = {
-                serviceId: '12345',
-            }
-            assert(
-                getInitiative(
-                    baseUrl,
-                    auth(randomFiscalCode()),
-                    JSON.stringify(params)
-                ),
-                [statusOk(),
-                bodyJsonSelectorValue('initiativeId', '123'),
-                bodyJsonSelectorValue('description', 'string')]
-            )
-        })
-    })
-
     group('Should onboard status be', () => {
-        group('When the inititive exists', () => {
-            const params = {
-                initiativeId: '123',
-            }
+        group('When inititive exists', () => {
+            const params = '63807d3c4d9d7e68e35e79b3'
             assert(
                 getStatus(
                     baseUrl,
-                    auth(randomFiscalCode()),
-                    JSON.stringify(params)
+                    auth(fiscalCodeRandom),
+                    params
                 ),
                 [statusOk(),
                 bodyJsonSelectorValue('status', 'ACCEPTED_TC')]
@@ -114,24 +99,35 @@ export default () => {
         })
     })
 
+    group('Should Citizen pre-requisites', () => {
+        group('When the TC consent exists', () => {
+            const body = {
+                initiativeId: '63807d3c4d9d7e68e35e79b3'
+            }
+            assert(
+                putCheckPrerequisites(
+                    baseUrl,
+                    JSON.stringify(body),
+                    auth(fiscalCodeRandom)
+                ),
+                [statusOk()]
+            )
+        })
+    })
+
+
     group('Save consent should be ok', () => {
         group('When the inititive and consents exist', () => {
             const body = {
-                initiativeId: '123',
+                initiativeId: '63807d3c4d9d7e68e35e79b3',
                 pdndAccept: true,
-                selfDeclarationList: [
-                    {
-                      _type: "boolean",
-                      code: "string",
-                      accepted: true
-                    }
-                  ]
+                selfDeclarationList: []
             }
             assert(
                 putSaveConsent(
                     baseUrl,
                     JSON.stringify(body),
-                    auth(randomFiscalCode())
+                    auth(fiscalCodeRandom)
                 ),
                 [statusAccepted()]
             )

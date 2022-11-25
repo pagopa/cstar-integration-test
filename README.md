@@ -27,6 +27,7 @@ test
 4. Customize env variables in `./.env.dev.local` [`./.env.uat.local` | `./.env.prod.local`]
 5. Run a test with `TARGET_ENV=<ENV> ./k6 run test/smoke/rtdCsvTransaction.js`
 
+
 ### Perform the whole suite of smoke tests on a target environment
 
 ```
