@@ -1,7 +1,11 @@
 import { group } from 'k6'
 import exec from 'k6/execution'
 import { getAbiToFiscalCodesMap } from '../common/api/taeAbiToFiscalCodes.js'
-import { assert, bodyJsonSelectorValue, statusOk } from '../common/assertions.js'
+import {
+    assert,
+    bodyJsonSelectorValue,
+    statusOk,
+} from '../common/assertions.js'
 import {
     isEnvValid,
     isTestEnabledOnEnv,
@@ -55,8 +59,10 @@ if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
 export default () => {
     group('TAE AbiToFiscalCode API', () => {
         group('Should retrieve conversion map', () =>
-            assert(getAbiToFiscalCodesMap(baseUrl, params), [statusOk(),
-            bodyJsonSelectorValue('STPAY', 'LU30726739')])
+            assert(getAbiToFiscalCodesMap(baseUrl, params), [
+                statusOk(),
+                bodyJsonSelectorValue('STPAY', 'LU30726739'),
+            ])
         )
     })
 }

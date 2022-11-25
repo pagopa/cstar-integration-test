@@ -57,10 +57,11 @@ export default () => {
     group('TAE SenderAdeAck API', () => {
         group('Should retrieve sender ade ack file', () => {
             let res = getSenderAdeAckFileNameList(baseUrl, params)
-            res.json('fileNameList').forEach(element => {
-                assert(downloadSenderAdeAckFile(baseUrl, element, params), [statusOk()])
-            });
-            
+            res.json('fileNameList').forEach((element) => {
+                assert(downloadSenderAdeAckFile(baseUrl, element, params), [
+                    statusOk(),
+                ])
+            })
         })
     })
 }
