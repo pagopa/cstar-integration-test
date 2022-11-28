@@ -82,4 +82,29 @@ export default () => {
             assert(getSalt(baseUrl, params, 'v2'), [statusOk()])
         )
     })
+
+    group('Payment Instrument API v3', () => {
+        group('Should get hashed pans', () =>
+            assert(getHashedPan(baseUrl, params, { version: 'v3' }), [
+                statusOk(),
+                bodyLengthBetween(0, myEnv.RTD_HASHPAN_MAX_CONTENT_LENGTH),
+                (res) => 'Last-Modified' in res.headers,
+            ])
+        )
+        group('Should get 404 when no hashed pans file found', () => {
+            const queryParams = 'filePart=1000'
+            check(
+                getHashedPan(baseUrl, params, {
+                    version: 'v3',
+                    queryParams: queryParams,
+                }),
+                {
+                    'Not existing file: is 404': (r) => r.status === 404,
+                }
+            )
+        })
+        group('Should get salt', () =>
+            assert(getSalt(baseUrl, params, 'v3'), [statusOk()])
+        )
+    })
 }

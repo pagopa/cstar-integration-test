@@ -1,0 +1,212 @@
+{
+	"info": {
+		"_postman_id": "331e36d2-ee3b-4a15-9aa8-a798c08ab4c8",
+		"name": "Ade ACK Authorization",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "001 - Authorized Sender can download his file",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// 1. create sender auth association",
+							"pm.sendRequest({",
+							"    url: `${pm.environment.get('ingress_base_url')}/rtdmssenderauth/${pm.collectionVariables.get('ade_ack_sender_code')}/${pm.collectionVariables.get('test_api_key_hash')}`,",
+							"    method: 'PUT'",
+							"});",
+							"",
+							"// 2. notify file-register",
+							"_.notifyFileRegister(",
+							"    pm,",
+							"    pm.collectionVariables.get('ade_ack_blob_example_file'), ",
+							"    pm.collectionVariables.get('ade_ack_sender_code'),",
+							"    pm.collectionVariables.get('test_api_key_hash')",
+							");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('001 - Authorized sender can download his file', () => {",
+							"    pm.response.to.have.status(200);",
+							"    pm.expect(parseInt(pm.response.headers.get('Content-Length'))).to.be.above(0);",
+							"});",
+							"",
+							"// clean file register",
+							"_.deleteFromFileRegister(pm, pm.collectionVariables.get('ade_ack_blob_example_file'));",
+							"",
+							"// clean association",
+							"pm.sendRequest({",
+							"    url: `${pm.environment.get('ingress_base_url')}/rtdmssenderauth/${pm.collectionVariables.get('ade_ack_sender_code')}`,",
+							"    header: {",
+							"        'internal-id': pm.collectionVariables.get('test_api_key_hash'),",
+							"    },",
+							"    method: 'DELETE'",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "{{test_api_key}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/ade/{{ade_ack_blob_example_file}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"ade",
+						"{{ade_ack_blob_example_file}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "001 - Uauthorized sender cant download others file",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// 1. create sender auth association",
+							"pm.sendRequest({",
+							"    url: `${pm.environment.get('ingress_base_url')}/rtdmssenderauth/${pm.collectionVariables.get('unauthorized_ade_ack_sender_code')}/${pm.collectionVariables.get('test_api_key_hash')}`,",
+							"    method: 'PUT'",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('001 - Uauthorized sender cant download others file', () => {",
+							"    pm.response.to.have.status(400);",
+							"    pm.expect(parseInt(pm.response.headers.get('Content-Length'))).to.eql(0);",
+							"});",
+							"",
+							"// clean association",
+							"pm.sendRequest({",
+							"    url: `${pm.environment.get('ingress_base_url')}/rtdmssenderauth/${pm.collectionVariables.get('unauthorized_ade_ack_sender_code')}`,",
+							"    header: {",
+							"        'internal-id': pm.collectionVariables.get('test_api_key_hash'),",
+							"    },",
+							"    method: 'DELETE'",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "{{test_api_key}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/ade/{{ade_ack_blob_example_file}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"ade",
+						"{{ade_ack_blob_example_file}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"var sha256Hash =  CryptoJS.SHA256(pm.environment.get('test_api_key')).toString();",
+					"pm.collectionVariables.set('test_api_key_hash', sha256Hash);",
+					"",
+					"Object.prototype.notifyFileRegister = function(pm, fileName, senderCode, apiKeyHash) {",
+					"    pm.sendRequest({",
+					"        url: pm.environment.get(\"ingress_base_url\") + '/rtdmsfileregister/file-status',",
+					"        method: \"POST\",",
+					"        header: {",
+					"            \"Content-Type\": \"application/json\"",
+					"        },",
+					"        body: {",
+					"            mode: \"raw\",",
+					"            raw: JSON.stringify({",
+					"                \"name\": fileName,",
+					"                \"status\": \"0\", // SUCCESS",
+					"                \"type\": \"2\",  // AGGREGATE",
+					"                \"sender\": senderCode,",
+					"                \"application\": \"1\", // TAE app",
+					"                \"hash\": apiKeyHash",
+					"            }),",
+					"        }",
+					"    });",
+					"};",
+					"",
+					"// Delete the created entry",
+					"Object.prototype.deleteFromFileRegister = function(pm, filename) {",
+					"    return pm.sendRequest({",
+					"        url: pm.environment.get(\"ingress_base_url\") + '/rtdmsfileregister/file-status?filename=' + filename,",
+					"        method: \"DELETE\"",
+					"    });",
+					"};"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "ade_ack_blob_example_file",
+			"value": "ADEACK.TEST1.434743.2022-09-29.36e8ae41-42b3-038a-8b8e-4da0a2f854a8.csv",
+			"type": "default"
+		},
+		{
+			"key": "ade_ack_sender_code",
+			"value": "TEST1",
+			"type": "default"
+		},
+		{
+			"key": "unauthorized_ade_ack_sender_code",
+			"value": "TEST2",
+			"type": "default"
+		},
+		{
+			"key": "test_api_key_hash",
+			"value": ""
+		}
+	]
+}

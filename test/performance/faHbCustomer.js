@@ -1,6 +1,10 @@
 import { group } from 'k6'
 import exec from 'k6/execution'
-import { getFaCustomer, putFaCustomer } from '../common/api/faHbCustomer.js'
+import {
+    getFaCustomer,
+    putFaCustomer,
+    deleteFaCustomer,
+} from '../common/api/faHbCustomer.js'
 import { assert, statusOk } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
@@ -52,11 +56,16 @@ export default () => {
     group('FA HB Customer API', () => {
         const body = createCustomerBody()
 
-        group('Should create an FA CUSTOMER', () =>
+        group('Should create a FA CUSTOMER', () =>
             assert(putFaCustomer(baseUrl, params, body), [statusOk()])
         )
-        group('Should get an FA CUSTOMER', () =>
+        group('Should get a FA CUSTOMER', () =>
             assert(getFaCustomer(baseUrl, params, body.id), [statusOk()])
+        )
+        group('Should delete a FA CUSTOMER', () =>
+            assert(deleteFaCustomer(baseUrl, params, body.id, 'test_channel'), [
+                statusOk(),
+            ])
         )
     })
 }
