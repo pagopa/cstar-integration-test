@@ -1,11 +1,20 @@
 import { group } from 'k6'
-import { putFAPaymentInstrumentCard } from '../common/api/faHbPaymentInstruments.js'
-import { putFaCustomer } from '../common/api/faHbCustomer.js'
+import {
+    putFAPaymentInstrumentCard,
+    deleteFAPaymentInstrument,
+} from '../common/api/faHbPaymentInstruments.js'
+import { putFaCustomer, deleteFaCustomer } from '../common/api/faHbCustomer.js'
 import { assert, statusOk, statusNoContent } from '../common/assertions.js'
-import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../common/envs.js'
+import {
+    isEnvValid,
+    isTestEnabledOnEnv,
+    DEV,
+    UAT,
+    PROD,
+} from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
 
-const REGISTERED_ENVS = [DEV, UAT]
+const REGISTERED_ENVS = [DEV, UAT, PROD]
 
 const services = JSON.parse(open('../../services/environments.json'))
 
@@ -72,6 +81,21 @@ export default () => {
             const res = putFAPaymentInstrumentCard(baseUrl, params, body)
             printHashPan(res)
             assert(res, [statusOk()])
+        })
+        group('Delete card', () => {
+            assert(
+                deleteFAPaymentInstrument(
+                    baseUrl,
+                    params,
+                    body.id.replace(/\n/g, '\\n')
+                ),
+                [statusNoContent()]
+            )
+        })
+        group('Delete customer', () => {
+            assert(deleteFaCustomer(baseUrl, params, body.fiscalCode), [
+                statusNoContent(),
+            ])
         })
     })
 }
