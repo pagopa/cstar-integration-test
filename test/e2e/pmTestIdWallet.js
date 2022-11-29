@@ -1,7 +1,13 @@
 import { group } from 'k6'
 import { getPaymentInstrumentList } from '../common/api/pmWalletExt.js'
-import { assert, statusOk,  } from '../common/assertions.js'
-import { isEnvValid, isTestEnabledOnEnv, DEV, UAT, PROD } from '../common/envs.js'
+import { assert, statusOk } from '../common/assertions.js'
+import {
+    isEnvValid,
+    isTestEnabledOnEnv,
+    DEV,
+    UAT,
+    PROD,
+} from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
@@ -26,7 +32,8 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
     ]
 
     params.headers = {
-        'Ocp-Apim-Subscription-Key': myEnv.APIM_PM_PRODUCT_SK + ';product=pm-api-product',
+        'Ocp-Apim-Subscription-Key':
+            myEnv.APIM_PM_PRODUCT_SK + ';product=pm-api-product',
         'Ocp-Apim-Trace': 'true',
         'Content-Type': 'application/json',
     }
@@ -39,11 +46,16 @@ export default () => {
     ) {
         return
     }
-    group("PM wallet-ext API", () => {
+    group('PM wallet-ext API', () => {
         group("Should get a list of user's wallets", () => {
-            assert(getPaymentInstrumentList(baseUrl, params, myEnv.FISCAL_CODE_EXISTING), [
-                statusOk(),
-            ])
+            assert(
+                getPaymentInstrumentList(
+                    baseUrl,
+                    params,
+                    myEnv.FISCAL_CODE_EXISTING
+                ),
+                [statusOk()]
+            )
         })
     })
 }
