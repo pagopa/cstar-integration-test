@@ -1,9 +1,10 @@
-import { group } from 'k6'
+import { group, check } from 'k6'
 import { assert, statusOk } from '../common/assertions.js'
 import RtdTokenManagerApi from "../common/api/rtdTokenManagerApi.js";
 import {setupEnvironment} from "./setupenv.js";
 
 const {env, baseUrl} = setupEnvironment('../../services/environments.json');
+const stubTokenFile = open("stub-files/tokenFile.csv");
 export const options = {
     tlsAuth: [
         {
@@ -20,6 +21,15 @@ export default () => {
         group('Should get public key', () =>
             assert(api.getPublicKey(), [
                 statusOk()
+            ])
+        )
+
+        group('Should upload a token file', () =>
+            assert(api.uploadTokenFile(stubTokenFile, 'tokenFile.csv'), [
+                statusOk(),
+                (res) => check(res, {
+                    "response include filename": res.json()["filename"].includes('tokenFile')
+                })
             ])
         )
     })
