@@ -1,5 +1,5 @@
 import { group, check } from 'k6'
-import { assert, statusOk } from '../common/assertions.js'
+import {assert, bodyJsonReduceArray, bodyPgpPublicKey, statusOk} from '../common/assertions.js'
 import RtdTokenManagerApi from "../common/api/rtdTokenManagerApi.js";
 import {setupEnvironment} from "./setupenv.js";
 
@@ -20,7 +20,8 @@ export default () => {
         const api = new RtdTokenManagerApi(baseUrl, env.APIM_RTDPRODUCT_SK);
         group('Should get public key', () =>
             assert(api.getPublicKey(), [
-                statusOk()
+                statusOk(),
+                bodyPgpPublicKey()
             ])
         )
 
@@ -30,6 +31,12 @@ export default () => {
                 (res) => check(res, {
                     "response include filename": res.json()["filename"].includes('tokenFile')
                 })
+            ])
+        )
+
+        group("Should get known hashes", () =>
+            assert(api.getKnownHashes(), [
+                statusOk()
             ])
         )
     })

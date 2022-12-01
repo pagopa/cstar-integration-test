@@ -3,6 +3,7 @@ import http from 'k6/http'
 const API_PREFIX = "/rtd/token";
 const PUBLIC_KEY_PATH = "/token-list/public-key";
 const UPLOAD_TOKEN_FILE_PATH = "/token-list";
+const KNOWN_HASHES_PATH = "/known-hashes/links";
 
 export default class RtdTokenManagerApi {
 
@@ -27,6 +28,12 @@ export default class RtdTokenManagerApi {
         return http.post(this.createUrl(UPLOAD_TOKEN_FILE_PATH), multipart, {
             headers: this.headers
         });
+    }
+
+    getKnownHashes() {
+        return http.get(this.createUrl(KNOWN_HASHES_PATH), {
+            headers: this.headers
+        })
     }
 
     createUrl(path) {
