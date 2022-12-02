@@ -2,6 +2,7 @@ import { group } from 'k6'
 import {
     assert,
     statusOk,
+    statusForbidden,
     bodyJsonSelectorValue,
 } from '../common/assertions.js'
 import {
@@ -15,6 +16,7 @@ import dotenv from 'k6/x/dotenv'
 import { getSenderAdeAckFileNameList } from '../common/api/rtdFileRegister.js'
 import { downloadSenderAdeAckFile } from '../common/api/adeDownloadSenderAdeAck.js'
 import { getAbiToFiscalCodesMap } from '../common/api/taeAbiToFiscalCodes.js'
+import { getFileReport } from '../common/api/rtdFileReporter.js'
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
@@ -63,6 +65,15 @@ export default () => {
                     statusOk(),
                 ])
             })
+        })
+        group('Should retrieve file report', () => {
+            console.log(params.headers['Ocp-Apim-Subscription-Key'])
+            assert(getFileReport(baseUrl, params), [statusOk()])
+        })
+        group('Should not retrieve file report, missing API key association on Sender Auth', () => {
+            params.headers['Ocp-Apim-Subscription-Key'] = myEnv.APIM_RTDPRODUCT_SK_UNREGISTERED_ON_SENDER_AUTH
+            let res = getFileReport(baseUrl, params)
+            assert(res, [statusForbidden()])
         })
     })
 }
