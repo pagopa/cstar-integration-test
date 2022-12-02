@@ -4,6 +4,7 @@ const API_PREFIX = "/rtd/token";
 const PUBLIC_KEY_PATH = "/token-list/public-key";
 const UPLOAD_TOKEN_FILE_PATH = "/token-list";
 const KNOWN_HASHES_PATH = "/known-hashes/links";
+const BIN_RANGES_PATH = "/bin-ranges/links";
 
 export default class RtdTokenManagerApi {
 
@@ -34,6 +35,12 @@ export default class RtdTokenManagerApi {
         return http.get(this.createUrl(KNOWN_HASHES_PATH), {
             headers: this.headers
         })
+    }
+
+    getBinRanges() {
+        return http.get(this.createUrl(BIN_RANGES_PATH), {
+            headers: this.headers
+        });
     }
 
     createUrl(path) {

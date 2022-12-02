@@ -39,5 +39,11 @@ export default () => {
                 statusOk()
             ])
         )
+
+        group("Should get bin ranges", () =>
+            assert(api.getBinRanges(), [
+                statusOk()
+            ])
+        )
     })
 }
