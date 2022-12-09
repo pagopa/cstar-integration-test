@@ -1,9 +1,9 @@
-import { group, check } from 'k6'
+import {group, check} from 'k6'
 import {
     getHashedPan,
     getSalt,
 } from '../common/api/rtdPaymentInstrumentManager.js'
-import { assert, statusOk, bodyLengthBetween } from '../common/assertions.js'
+import {assert, statusOk, bodyLengthBetween, isNotFakeSalt} from '../common/assertions.js'
 import {
     isEnvValid,
     isTestEnabledOnEnv,
@@ -54,13 +54,13 @@ export default () => {
             ])
         )
         group('Should get salt', () =>
-            assert(getSalt(baseUrl, params), [statusOk()])
+            assert(getSalt(baseUrl, params), [statusOk(), isNotFakeSalt()])
         )
     })
 
     group('Payment Instrument API v2', () => {
         group('Should get hashed pans', () =>
-            assert(getHashedPan(baseUrl, params, { version: 'v2' }), [
+            assert(getHashedPan(baseUrl, params, {version: 'v2'}), [
                 statusOk(),
                 bodyLengthBetween(0, myEnv.RTD_HASHPAN_MAX_CONTENT_LENGTH),
                 (res) => 'Last-Modified' in res.headers,
@@ -79,13 +79,13 @@ export default () => {
             )
         })
         group('Should get salt', () =>
-            assert(getSalt(baseUrl, params, 'v2'), [statusOk()])
+            assert(getSalt(baseUrl, params, 'v2'), [statusOk(), isNotFakeSalt(),])
         )
     })
 
     group('Payment Instrument API v3', () => {
         group('Should get hashed pans', () =>
-            assert(getHashedPan(baseUrl, params, { version: 'v3' }), [
+            assert(getHashedPan(baseUrl, params, {version: 'v3'}), [
                 statusOk(),
                 bodyLengthBetween(0, myEnv.RTD_HASHPAN_MAX_CONTENT_LENGTH),
                 (res) => 'Last-Modified' in res.headers,
@@ -104,7 +104,10 @@ export default () => {
             )
         })
         group('Should get salt', () =>
-            assert(getSalt(baseUrl, params, 'v3'), [statusOk()])
+            assert(getSalt(baseUrl, params, 'v3'), [
+                statusOk(),
+                isNotFakeSalt(),
+            ])
         )
     })
 }
