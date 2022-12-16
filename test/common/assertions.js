@@ -106,3 +106,11 @@ export function idempotence() {
         })
     }
 }
+
+export function isNotFakeSalt() {
+    return (res) => {
+        check(res, {
+            'Is not a fake salt': (r) => r.body !== 'FAKE_SALT'
+        })
+    }
+}
