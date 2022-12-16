@@ -39,6 +39,9 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
     }
 }
 
+const isProd = __ENV.TARGET_ENV === PROD;
+const isUat = __ENV.TARGET_ENV === UAT;
+
 export default () => {
     if (
         !isEnvValid(__ENV.TARGET_ENV) ||
@@ -54,7 +57,10 @@ export default () => {
             ])
         )
         group('Should get salt', () =>
-            assert(getSalt(baseUrl, params), [statusOk(), isNotFakeSalt()])
+            assert(getSalt(baseUrl, params), [
+                statusOk(),
+                ...(isUat ? [isNotFakeSalt] : []),
+            ])
         )
     })
 
@@ -79,7 +85,10 @@ export default () => {
             )
         })
         group('Should get salt', () =>
-            assert(getSalt(baseUrl, params, 'v2'), [statusOk(), isNotFakeSalt(),])
+            assert(getSalt(baseUrl, params, 'v2'), [
+                statusOk(),
+                ...(isUat ? [isNotFakeSalt()] : []),
+            ])
         )
     })
 
@@ -106,7 +115,7 @@ export default () => {
         group('Should get salt', () =>
             assert(getSalt(baseUrl, params, 'v3'), [
                 statusOk(),
-                isNotFakeSalt(),
+                ...(isProd ? [isNotFakeSalt] : []),
             ])
         )
     })
