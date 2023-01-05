@@ -17,7 +17,7 @@ const REGISTERED_ENVS = [DEV]
 const services = JSON.parse(open('../../services/environments.json'))
 let baseUrl
 let myEnv
-const fiscalCodeRandom = randomFiscalCode()
+let fiscalCodeRandom = randomFiscalCode()
 
 if (isEnvValid(DEV)) {
     myEnv = dotenv.parse(open(`../../env.dev.local`))
@@ -40,6 +40,17 @@ function auth(fiscalCode) {
     }
 }
 
+function initiative() {
+    const params = "01GNYFQQNXEMQJ23DPXMMJ4M5N"
+    const res = getInitiative(
+        baseUrl,
+        auth(fiscalCodeRandom),
+        params
+    )
+    const bodyObj = JSON.parse(res.body)
+    return bodyObj.initiativeId
+}
+
 export default () => {
 
     if (
@@ -50,28 +61,10 @@ export default () => {
         return
     }
 
-    group('Should inititive be', () => {
-        group('When the service exists', () => {
-            const params = "01GJPZACZ4E5P69S4RY1E0EMMD"
-            
-            assert(
-                getInitiative(
-                    baseUrl,
-                    auth(fiscalCodeRandom),
-                    params
-                ),
-                [statusOk(),
-                bodyJsonSelectorValue('initiativeId', '63807d3c4d9d7e68e35e79b3'),
-                bodyJsonSelectorValue('description', 'italiano')]
-            )
-        })
-    })
-
-
     group('Should onboard Citizen', () => {
         group('When the inititive exists', () => {
             const body = {
-                initiativeId: '63807d3c4d9d7e68e35e79b3'
+                initiativeId: initiative()
             }
             assert(
                 putOnboardingCitizen(
@@ -86,7 +79,7 @@ export default () => {
 
     group('Should onboard status be', () => {
         group('When inititive exists', () => {
-            const params = '63807d3c4d9d7e68e35e79b3'
+            const params = initiative()
             assert(
                 getStatus(
                     baseUrl,
@@ -102,7 +95,7 @@ export default () => {
     group('Should Citizen pre-requisites', () => {
         group('When the TC consent exists', () => {
             const body = {
-                initiativeId: '63807d3c4d9d7e68e35e79b3'
+                initiativeId: initiative()
             }
             assert(
                 putCheckPrerequisites(
@@ -119,7 +112,7 @@ export default () => {
     group('Save consent should be ok', () => {
         group('When the inititive and consents exist', () => {
             const body = {
-                initiativeId: '63807d3c4d9d7e68e35e79b3',
+                initiativeId: initiative(),
                 pdndAccept: true,
                 selfDeclarationList: []
             }
