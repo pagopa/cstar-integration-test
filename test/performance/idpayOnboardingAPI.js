@@ -1,4 +1,4 @@
-import { group } from 'k6'
+import { group, sleep } from 'k6'
 import {
      putOnboardingCitizen,
      putCheckPrerequisites,
@@ -11,6 +11,7 @@ import { assert, statusNoContent, statusAccepted, statusOk, bodyJsonSelectorValu
 import { isEnvValid, isTestEnabledOnEnv, DEV } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
 import { randomFiscalCode } from '../common/utils.js'
+import exec from 'k6/execution'
 
 const REGISTERED_ENVS = [DEV]
 
@@ -19,6 +20,23 @@ let baseUrl
 let myEnv
 let fiscalCodeRandom = randomFiscalCode()
 let init
+
+export let options = {
+    stages: [
+        { duration: '2m', target: 10 }, // below normal load
+    { duration: '5m', target: 10 },
+    { duration: '2m', target: 20 }, // normal load
+    { duration: '5m', target: 20 },
+    { duration: '2m', target: 30 }, // around the breaking point
+    { duration: '5m', target: 30 },
+    { duration: '2m', target: 40 }, // beyond the breaking point
+    { duration: '5m', target: 40 },
+    { duration: '10m', target: 0 }, // scale down. Recovery stage.
+    ],
+    thresholds: {
+        http_req_duration: ['p(95)<500'],
+    },
+}
 
 if (isEnvValid(DEV)) {
     myEnv = dotenv.parse(open(`../../env.dev.local`))
@@ -60,9 +78,8 @@ export default () => {
             params
         )
         if(res.status != 200){
-            console.error('ERROR-> '+JSON.stringify(res))
+            console.error('GetInitiative -> '+JSON.stringify(res))
             checked = false
-            console.log("Bloccati getInitiative: ")
             return
         }
     
@@ -86,9 +103,8 @@ export default () => {
                 )
 
                 if(res.status != 204){
-                    console.log('ERROR-> '+JSON.stringify(res))
+                    console.error('PutOnboardingCitizen -> '+JSON.stringify(res))
                     checked = false
-                    console.log("Bloccati putOnboardingCitizen: ")
                 }
                 
                 assert(res,
@@ -98,9 +114,6 @@ export default () => {
             return
             
         })
-    })
-
-    group('Should onboard status be', () => {
         group('When inititive exists', () => {
             if(checked){
             const params = init
@@ -111,9 +124,8 @@ export default () => {
                 )
 
             if(res.status != 200){
-                console.log('ERROR-> '+JSON.stringify(res))
+                console.error('GetStatus -> '+JSON.stringify(res))
                 checked = false
-                console.log("Bloccati getStatus: ")
             }
             
             assert(res,
@@ -122,9 +134,7 @@ export default () => {
         }
         return
         })
-    })
 
-    group('Should Citizen pre-requisites', () => {
         group('When the TC consent exists', () => {
             if(checked){
             const body = {
@@ -136,9 +146,8 @@ export default () => {
                     auth(fiscalCodeRandom)
                 )
             if(res.status != 200){
-                console.log('ERROR-> '+JSON.stringify(res))
+                console.error('PutCheckPrerequisites -> '+JSON.stringify(res))
                 checked = false
-                console.log("Bloccati putCheckPrerequisites: ")
             }
             
             assert(res,
@@ -146,10 +155,7 @@ export default () => {
             }
             return
         })
-    })
 
-
-    group('Save consent should be ok', () => {
         group('When the inititive and consents exist', () => {
             if(checked){
             const body = {
@@ -163,14 +169,16 @@ export default () => {
                     auth(fiscalCodeRandom)
                 )
             if(res.status != 202){
-                console.log('ERROR-> '+JSON.stringify(res))
+                console.error('PutSaveConsent -> '+JSON.stringify(res))
                 checked = false
-                console.log("Bloccati putSaveConsent: ")
             }
             
             assert(res,
             [statusAccepted()])
             }
         })
+
+
     })
+    sleep(1)
 }
