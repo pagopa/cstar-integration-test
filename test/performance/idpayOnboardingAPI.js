@@ -10,37 +10,51 @@ import { loginFullUrl } from '../common/api/bpdIoLogin.js'
 import { assert, statusNoContent, statusAccepted, statusOk, bodyJsonSelectorValue } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
-import { randomFiscalCode } from '../common/utils.js'
+import { randomFiscalCode, chooseRandomPanFromList } from '../common/utils.js'
 import exec from 'k6/execution'
+
 
 const REGISTERED_ENVS = [DEV]
 
 const services = JSON.parse(open('../../services/environments.json'))
 let baseUrl
 let myEnv
-let fiscalCodeRandom = randomFiscalCode()
+let fiscalCodeRandom = randomFiscalCode().toUpperCase()
 let init
+let cfList = []
 
 export let options = {
-    stages: [
-        { duration: '2m', target: 10 }, // below normal load
-    { duration: '5m', target: 10 },
-    { duration: '2m', target: 20 }, // normal load
-    { duration: '5m', target: 20 },
-    { duration: '2m', target: 30 }, // around the breaking point
-    { duration: '5m', target: 30 },
-    { duration: '2m', target: 40 }, // beyond the breaking point
-    { duration: '5m', target: 40 },
-    { duration: '10m', target: 0 }, // scale down. Recovery stage.
+    scenarios: {
+        per_vu_iterations: {
+            executor: 'per-vu-iterations',
+            vus: 100,
+            iterations: 1,
+            startTime: '0s',
+            maxDuration: '300s',
+        }, 
+        per_vu_iterations_carico: {
+            executor: 'per-vu-iterations',
+            vus: 1000,
+            iterations: 1,
+            startTime: '60s',
+            maxDuration: '600s',
+        }, 
+    },
+    
+    /* stages: [
+        { duration: '1m', target: 3 },
+        { duration: '3m', target: 6 },
+        { duration: '1m', target: 3 },
     ],
     thresholds: {
         http_req_duration: ['p(95)<500'],
-    },
+    }, */
 }
 
 if (isEnvValid(DEV)) {
     myEnv = dotenv.parse(open(`../../env.dev.local`))
     baseUrl = services[`dev_io`].baseUrl
+    //cfList = JSON.parse(open('../../assets/cf_onemb.csv'))
 }
 
 
@@ -61,20 +75,21 @@ function auth(fiscalCode) {
 
 export default () => {
     let checked = true
+    const cf = auth(fiscalCodeRandom)
+    //const cf = chooseRandomPanFromList(cfList)
 
     if (
         !isEnvValid(DEV) ||
         !isTestEnabledOnEnv(DEV, REGISTERED_ENVS)
     ) {
-
-        return
+        exec.test.abort()
     }
 
     const params = "01GNYFQQNXEMQJ23DPXMMJ4M5N"
     if (checked){
         const res = getInitiative(
             baseUrl,
-            auth(fiscalCodeRandom),
+            cf,
             params
         )
         if(res.status != 200){
@@ -89,6 +104,7 @@ export default () => {
             
 
     group('Should onboard Citizen', () => {
+
         group('When the inititive exists', () => {
             if(checked){
             
@@ -99,40 +115,40 @@ export default () => {
                 let res = putOnboardingCitizen(
                     baseUrl,
                     JSON.stringify(body),
-                    auth(fiscalCodeRandom)
+                    cf
                 )
 
                 if(res.status != 204){
                     console.error('PutOnboardingCitizen -> '+JSON.stringify(res))
                     checked = false
+                    return
                 }
                 
                 assert(res,
                 [statusNoContent()])
             }
-
-            return
-            
+  
         })
         group('When inititive exists', () => {
             if(checked){
             const params = init
             let res = getStatus(
                     baseUrl,
-                    auth(fiscalCodeRandom),
+                    cf,
                     params
                 )
 
             if(res.status != 200){
                 console.error('GetStatus -> '+JSON.stringify(res))
                 checked = false
+                return
             }
             
             assert(res,
             [statusOk(),
             bodyJsonSelectorValue('status', 'ACCEPTED_TC')])
         }
-        return
+        
         })
 
         group('When the TC consent exists', () => {
@@ -143,17 +159,18 @@ export default () => {
                 let res = putCheckPrerequisites(
                     baseUrl,
                     JSON.stringify(body),
-                    auth(fiscalCodeRandom)
+                    cf
                 )
             if(res.status != 200){
                 console.error('PutCheckPrerequisites -> '+JSON.stringify(res))
                 checked = false
+                return
             }
             
             assert(res,
             [statusOk()])
             }
-            return
+            
         })
 
         group('When the inititive and consents exist', () => {
@@ -166,7 +183,7 @@ export default () => {
                 let res = putSaveConsent(
                     baseUrl,
                     JSON.stringify(body),
-                    auth(fiscalCodeRandom)
+                    cf
                 )
             if(res.status != 202){
                 console.error('PutSaveConsent -> '+JSON.stringify(res))

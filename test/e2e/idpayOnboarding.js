@@ -17,7 +17,7 @@ const REGISTERED_ENVS = [DEV]
 const services = JSON.parse(open('../../services/environments.json'))
 let baseUrl
 let myEnv
-let fiscalCodeRandom = randomFiscalCode()
+let fiscalCodeRandom = randomFiscalCode().toUpperCase()
 let init
 
 if (isEnvValid(DEV)) {
@@ -60,9 +60,8 @@ export default () => {
             params
         )
         if(res.status != 200){
-            console.error('ERROR-> '+JSON.stringify(res))
+            console.error('GetInitiative -> '+JSON.stringify(res))
             checked = false
-            console.log("Bloccati getInitiative: ")
             return
         }
     
@@ -86,9 +85,8 @@ export default () => {
                 )
 
                 if(res.status != 204){
-                    console.log('ERROR-> '+JSON.stringify(res))
+                    console.error('PutOnboardingCitizen -> '+JSON.stringify(res))
                     checked = false
-                    console.log("Bloccati putOnboardingCitizen: ")
                 }
                 
                 assert(res,
@@ -111,9 +109,8 @@ export default () => {
                 )
 
             if(res.status != 200){
-                console.log('ERROR-> '+JSON.stringify(res))
+                console.error('GetStatus -> '+JSON.stringify(res))
                 checked = false
-                console.log("Bloccati getStatus: ")
             }
             
             assert(res,
@@ -136,9 +133,8 @@ export default () => {
                     auth(fiscalCodeRandom)
                 )
             if(res.status != 200){
-                console.log('ERROR-> '+JSON.stringify(res))
+                console.error('PutCheckPrerequisites -> '+JSON.stringify(res))
                 checked = false
-                console.log("Bloccati putCheckPrerequisites: ")
             }
             
             assert(res,
@@ -163,9 +159,8 @@ export default () => {
                     auth(fiscalCodeRandom)
                 )
             if(res.status != 202){
-                console.log('ERROR-> '+JSON.stringify(res))
+                console.error('PutSaveConsent -> '+JSON.stringify(res))
                 checked = false
-                console.log("Bloccati putSaveConsent: ")
             }
             
             assert(res,
