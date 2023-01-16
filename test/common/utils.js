@@ -36,6 +36,11 @@ export function chooseRandomPanFromList(panList) {
     return panList.list[index]
 }
 
+export function chooseCFFromList(panList) {
+    const index = randomIntBetween(0, panList.list.length - 1)
+    return panList.list[index]
+}
+
 function getFiscalCodeMonth(month) {
     const monthDict = {
         1: 'A',
