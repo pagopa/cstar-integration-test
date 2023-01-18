@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="779d22be-d733-40e4-a3b8-d233ebf1606c" name="Changes" comment="[IDP-66] Test di enrollment massivo caso non whitelist correzioni" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="IDP-66-test-di-onboarding-massivo-caso-non-whitelist" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2HsF0rGvgbKFuXyhkyWDLV6CKaG" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;Git.Branch.Popup.ShowAllRemotes&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SONARLINT_PRECOMMIT_ANALYSIS&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/dev/PagoPa/Workspaces/Git-PagoPa/cstar-integration-test/test/common/api&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\dev\PagoPa\Workspaces\Git-PagoPa\cstar-integration-test\test\common\api" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="onboarding" type="K6ConfigurationType" factoryName="k6" show_console_on_std_err="false" show_console_on_std_out="false">
+      <option name="allowRunningInParallel" value="false" />
+      <option name="data">
+        <K6RunData>
+          <option name="additionalParams" value="" />
+          <option name="envs">
+            <map />
+          </option>
+          <option name="pty" value="true" />
+          <option name="script" value="C:\dev\PagoPa\Workspaces\Git-PagoPa\cstar-integration-test\test\common\api\idpayOnbardingCitizen.js" />
+          <option name="thresholdsAsTests" value="true" />
+          <option name="type" value="local" />
+        </K6RunData>
+      </option>
+      <option name="projectPathOnTarget" />
+      <option name="selectedOptions">
+        <list />
+      </option>
+      <option name="additionalParams" value="" />
+      <option name="envs">
+        <map />
+      </option>
+      <option name="pty" value="true" />
+      <option name="script" value="C:\dev\PagoPa\Workspaces\Git-PagoPa\cstar-integration-test\test\common\api\idpayOnbardingCitizen.js" />
+      <option name="thresholdsAsTests" value="true" />
+      <option name="type" value="local" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="779d22be-d733-40e4-a3b8-d233ebf1606c" name="Changes" comment="" />
+      <created>1669065663814</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1669065663814</updated>
+    </task>
+    <task id="LOCAL-00001" summary="[ISB-576] Creazione script k6">
+      <created>1669202857619</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1669202857619</updated>
+    </task>
+    <task id="LOCAL-00002" summary="[ISB-576] Creazione script k6">
+      <created>1669278364249</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1669278364249</updated>
+    </task>
+    <task id="LOCAL-00003" summary="[ISB-576] Creazione script k6">
+      <created>1669377419214</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1669377419214</updated>
+    </task>
+    <task id="LOCAL-00004" summary="[IDP-66] Test di onboarding massivo caso Non Whitelist">
+      <created>1672908065729</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1672908065729</updated>
+    </task>
+    <task id="LOCAL-00005" summary="[IDP-66] Test di onboarding massivo caso Non Whitelist">
+      <created>1673342211705</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1673342211705</updated>
+    </task>
+    <task id="LOCAL-00006" summary="[IDP-65] Test di enrollment massivo">
+      <created>1673430665315</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1673430665315</updated>
+    </task>
+    <task id="LOCAL-00007" summary="[IDP-65] Test di enrollment massivo">
+      <created>1673542955721</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1673542955721</updated>
+    </task>
+    <task id="LOCAL-00008" summary="[IDP-66] Test di enrollment massivo caso non whitelist">
+      <created>1673868638380</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1673868638380</updated>
+    </task>
+    <task id="LOCAL-00009" summary="[IDP-66] Test di enrollment massivo caso non whitelist add file">
+      <created>1673868763201</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1673868763201</updated>
+    </task>
+    <task id="LOCAL-00010" summary="[IDP-66] Test di enrollment massivo caso non whitelist correzioni">
+      <created>1674042818846</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1674042818846</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <MESSAGE value="[ISB-576] Creazione script k6" />
+    <MESSAGE value="[IDP-66] Test di onboarding massivo caso Non Whitelist" />
+    <MESSAGE value="[IDP-65] Test di enrollment massivo" />
+    <MESSAGE value="[IDP-66] Test di enrollment massivo caso non whitelist" />
+    <MESSAGE value="[IDP-66] Test di enrollment massivo caso non whitelist add file" />
+    <MESSAGE value="[IDP-66] Test di enrollment massivo caso non whitelist correzioni" />
+    <option name="LAST_COMMIT_MESSAGE" value="[IDP-66] Test di enrollment massivo caso non whitelist correzioni" />
+  </component>
+</project>
