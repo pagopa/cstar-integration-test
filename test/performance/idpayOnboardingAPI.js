@@ -10,43 +10,76 @@ import { loginFullUrl } from '../common/api/bpdIoLogin.js'
 import { assert, statusNoContent, statusAccepted, statusOk, bodyJsonSelectorValue } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
-import { randomFiscalCode, chooseRandomPanFromList } from '../common/utils.js'
-import exec from 'k6/execution'
-
+import { randomFiscalCode, getFCList } from '../common/utils.js'
+import {exec, vu} from 'k6/execution'
+import { SharedArray } from 'k6/data'
 
 const REGISTERED_ENVS = [DEV]
 
 const services = JSON.parse(open('../../services/environments.json'))
 let baseUrl
 let myEnv
-let fiscalCodeRandom = randomFiscalCode().toUpperCase()
+//let fiscalCodeRandom = randomFiscalCode().toUpperCase()
 let init
-let cfList = []
+let cfList = new SharedArray('cfList', function() {
+    return getFCList()
+})
+
 
 export let options = {
     scenarios: {
-        per_vu_iterations: {
+        ramping_arrival_rate: {
+            executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
+            timeUnit: '1s', //period of time to apply the iteration
+            startRate: 100, //Number of iterations to execute each timeUnit period at test start.
+            preAllocatedVUs: 1000,
+            stages: [
+                { duration: '1s', target: 5 },
+                { duration: '3s', target: 300 },
+                { duration: '1s', target: 5 },
+            ]
+        },
+        /* contacts: {
+            executor: 'constant-arrival-rate',
+            duration: '30s',
+            rate: 50,
+            timeUnit: '1s',
+            preAllocatedVUs: 500,
+          }, */
+        /* scenario_uno: {
             executor: 'per-vu-iterations',
-            vus: 100,
+            vus: 500,
             iterations: 1,
-            startTime: '0s',
-            maxDuration: '300s',
-        }, 
-        per_vu_iterations_carico: {
+        },  */
+          /*scenario_due: {
             executor: 'per-vu-iterations',
-            vus: 1000,
+            vus: 500,
             iterations: 1,
             startTime: '60s',
             maxDuration: '600s',
         }, 
+        scenario_tre: {
+            executor: 'per-vu-iterations',
+            vus: 3000,
+            iterations: 1,
+            startTime: '60s',
+            maxDuration: '1000s',
+        }, */ 
     },
     
-    /* stages: [
-        { duration: '1m', target: 3 },
-        { duration: '3m', target: 6 },
-        { duration: '1m', target: 3 },
-    ],
-    thresholds: {
+     /* stages: [
+        { duration: '5m', target: 50 }, // below normal load
+        { duration: '8m', target: 50 },
+        { duration: '5m', target: 100 }, // normal load
+        { duration: '8m', target: 80 },
+        { duration: '5m', target: 150 }, // around the breaking point
+        { duration: '8m', target: 100 },
+        { duration: '5m', target: 500 }, // beyond the breaking point
+        { duration: '10m', target: 50 },
+        { duration: '15m', target: 0 }, // scale down. Recovery stage.
+        ], */
+
+    /* thresholds: {
         http_req_duration: ['p(95)<500'],
     }, */
 }
@@ -75,8 +108,8 @@ function auth(fiscalCode) {
 
 export default () => {
     let checked = true
-    const cf = auth(fiscalCodeRandom)
-    //const cf = chooseRandomPanFromList(cfList)
+    const cf = auth(cfList[vu.idInTest-1].cf)
+
 
     if (
         !isEnvValid(DEV) ||
@@ -85,7 +118,7 @@ export default () => {
         exec.test.abort()
     }
 
-    const params = "01GNYFQQNXEMQJ23DPXMMJ4M5N"
+    /* const params = "01GNYFQQNXEMQJ23DPXMMJ4M5N"
     if (checked){
         const res = getInitiative(
             baseUrl,
@@ -100,7 +133,7 @@ export default () => {
     
         const bodyObj = JSON.parse(res.body)
         init = bodyObj.initiativeId
-    }
+    } */
             
 
     group('Should onboard Citizen', () => {
@@ -109,7 +142,7 @@ export default () => {
             if(checked){
             
             const body = {
-                initiativeId: init
+                initiativeId: '63b57edff2572314380204e5'
             }
             
                 let res = putOnboardingCitizen(
@@ -131,7 +164,7 @@ export default () => {
         })
         group('When inititive exists', () => {
             if(checked){
-            const params = init
+            const params = '63b57edff2572314380204e5'
             let res = getStatus(
                     baseUrl,
                     cf,
@@ -154,7 +187,7 @@ export default () => {
         group('When the TC consent exists', () => {
             if(checked){
             const body = {
-                initiativeId: init
+                initiativeId: '63b57edff2572314380204e5'
             }
                 let res = putCheckPrerequisites(
                     baseUrl,
@@ -176,7 +209,7 @@ export default () => {
         group('When the inititive and consents exist', () => {
             if(checked){
             const body = {
-                initiativeId: init,
+                initiativeId: '63b57edff2572314380204e5',
                 pdndAccept: true,
                 selfDeclarationList: []
             }

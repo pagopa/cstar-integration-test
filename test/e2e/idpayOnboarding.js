@@ -10,15 +10,23 @@ import { loginFullUrl } from '../common/api/bpdIoLogin.js'
 import { assert, statusNoContent, statusAccepted, statusOk, bodyJsonSelectorValue } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
-import { randomFiscalCode } from '../common/utils.js'
+import { randomFiscalCode, getFCList } from '../common/utils.js'
+import { SharedArray } from 'k6/data'
+import {exec, vu} from 'k6/execution'
 
 const REGISTERED_ENVS = [DEV]
 
 const services = JSON.parse(open('../../services/environments.json'))
 let baseUrl
 let myEnv
-let fiscalCodeRandom = randomFiscalCode().toUpperCase()
+//let fiscalCodeRandom = randomFiscalCode().toUpperCase()
 let init
+let cfList = new SharedArray('cfList', function() {
+    return getFCList()
+})
+
+
+
 
 if (isEnvValid(DEV)) {
     myEnv = dotenv.parse(open(`../../env.dev.local`))
@@ -43,6 +51,8 @@ function auth(fiscalCode) {
 
 export default () => {
     let checked = true
+    const cf = auth(cfList[vu.idInTest-1].cf)
+    //const cf = auth(uniqueCF)
 
     if (
         !isEnvValid(DEV) ||
@@ -56,7 +66,7 @@ export default () => {
     if (checked){
         const res = getInitiative(
             baseUrl,
-            auth(fiscalCodeRandom),
+            cf,
             params
         )
         if(res.status != 200){
@@ -81,7 +91,7 @@ export default () => {
                 let res = putOnboardingCitizen(
                     baseUrl,
                     JSON.stringify(body),
-                    auth(fiscalCodeRandom)
+                    cf
                 )
 
                 if(res.status != 204){
@@ -104,7 +114,7 @@ export default () => {
             const params = init
             let res = getStatus(
                     baseUrl,
-                    auth(fiscalCodeRandom),
+                    cf,
                     params
                 )
 
@@ -130,7 +140,7 @@ export default () => {
                 let res = putCheckPrerequisites(
                     baseUrl,
                     JSON.stringify(body),
-                    auth(fiscalCodeRandom)
+                    cf
                 )
             if(res.status != 200){
                 console.error('PutCheckPrerequisites -> '+JSON.stringify(res))
@@ -156,7 +166,7 @@ export default () => {
                 let res = putSaveConsent(
                     baseUrl,
                     JSON.stringify(body),
-                    auth(fiscalCodeRandom)
+                    cf
                 )
             if(res.status != 202){
                 console.error('PutSaveConsent -> '+JSON.stringify(res))

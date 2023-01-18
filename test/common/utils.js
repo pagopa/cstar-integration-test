@@ -2,6 +2,7 @@ import {
     randomString,
     randomIntBetween,
 } from 'https://jslib.k6.io/k6-utils/1.1.0/index.js'
+import papaparse from 'https://jslib.k6.io/papaparse/5.1.1/index.js'
 
 export function randomFiscalCode() {
     '^([A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST]{1}[0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z]{1}[0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]{1})$'
@@ -36,9 +37,8 @@ export function chooseRandomPanFromList(panList) {
     return panList.list[index]
 }
 
-export function chooseCFFromList(panList) {
-    const index = randomIntBetween(0, panList.list.length - 1)
-    return panList.list[index]
+export function getFCList() {
+    return papaparse.parse(open('../../assets/PROVA_fiscal_code_OK.csv'), { header: true }).data;
 }
 
 function getFiscalCodeMonth(month) {
