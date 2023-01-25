@@ -1,11 +1,12 @@
 import { group, sleep } from 'k6'
 import {
-     upsertToken
+     upsertToken,
+     upsertMockToken
     } from '../common/api/pdv.js'
 import { assert, statusOk, } from '../common/assertions.js'
 import { isEnvValid, DEV } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
-import { getFCList } from '../common/utils.js'
+import { getFCList, randomFiscalCode } from '../common/utils.js'
 import {exec, vu} from 'k6/execution'
 import { SharedArray } from 'k6/data'
 
@@ -16,9 +17,11 @@ let myEnv
 let cfList = new SharedArray('cfList', function() {
     return getFCList()
 })
+//let fiscalCodeRandom = randomFiscalCode().toUpperCase()
+
 
 export let options = {
-    scenarios: {
+    /* scenarios: {
         per_vu_iterations: {
             executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
             timeUnit: '1m', //period of time to apply the iteration
@@ -30,16 +33,16 @@ export let options = {
                 { duration: '1m', target: 100 },
             ]
         } 
-    }
-    /* scenarios: {
+    } */
+     scenarios: {
         scenario_uno: {
             executor: 'per-vu-iterations',
-            vus: 332,
+            vus: 500,
             iterations: 1,
             startTime: '0s',
-            maxDuration: '300s',
+            maxDuration: '600s',
         },
-        scenario_due: {
+        /*scenario_due: {
             executor: 'per-vu-iterations',
             vus: 334,
             iterations: 1,
@@ -52,8 +55,8 @@ export let options = {
             iterations: 1,
             startTime: '2s',
             maxDuration: '300s',
-        },
-    } */
+        },*/
+    } 
     
     /*stages: [
     { duration: '1m', target: 30 }, // below normal load
@@ -76,13 +79,15 @@ if (isEnvValid(DEV)) {
 export default () => {
     const uniqueCF = cfList[vu.idInTest-1].cf
 
-         
-    group('Should onboard Citizen', () => {
+
+    //UPSERT TOKEN     
+    /* group('Should onboard Citizen', () => {
         group('When the inititive and consents exist', () => {
             
         const params= {
             headers:  { 
                 'Content-Type' : 'application/json',
+                'Ocp-Apim-Trace': 'true',
                 'x-api-key':`${myEnv.APIM_SK}`,
             },
             body: {
@@ -105,6 +110,36 @@ export default () => {
             [statusOk()])
          
         })
+    }) */
+
+    //MOCK TOKEN
+    group('Should pdv put a cf', () => {
+        group('Returns a token', () => {
+            
+        const params= {
+            headers:  { 
+                'Content-Type' : 'application/json',
+                'Ocp-Apim-Trace': 'true',
+            },
+            body: {
+                "pii": uniqueCF,
+            }
+        }
+
+        let res = upsertMockToken(
+            JSON.stringify(params.body),
+            params
+        )
+
+        if(res.status != 200){
+            console.error('ERROR-> '+JSON.stringify(res))
+            return
+        }
+
+        assert(res,
+            [statusOk()])
+         
+        })
     })
-    //sleep(1)
+    sleep(1)
 }

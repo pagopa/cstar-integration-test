@@ -28,42 +28,54 @@ let cfList = new SharedArray('cfList', function() {
 
 export let options = {
     scenarios: {
-        ramping_arrival_rate: {
-            executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
-            timeUnit: '1s', //period of time to apply the iteration
-            startRate: 100, //Number of iterations to execute each timeUnit period at test start.
-            preAllocatedVUs: 1000,
+            /* per_vu_iterations: {
+                executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
+                timeUnit: '1s', //period of time to apply the iteration
+                startRate: 100, //Number of iterations to execute each timeUnit period at test start.
+                preAllocatedVUs: 500,
+                stages: [
+                    { duration: '1s', target: 100 },
+                    { duration: '1s', target: 100 },
+                    { duration: '1s', target: 100 },
+                    
+                ]
+            
+        } */
+        /* contacts: {
+            executor: 'ramping-vus',
+            startVUs: 0,
             stages: [
-                { duration: '1s', target: 5 },
-                { duration: '3s', target: 300 },
-                { duration: '1s', target: 5 },
-            ]
-        },
+              { duration: '1s', target: 300 },
+              { duration: '1s', target: 0 },
+            ],
+          }, */
         /* contacts: {
             executor: 'constant-arrival-rate',
             duration: '30s',
-            rate: 50,
+            rate: 1,
             timeUnit: '1s',
-            preAllocatedVUs: 500,
+            preAllocatedVUs: 200,
           }, */
-        /* scenario_uno: {
+          scenario_uno: {
             executor: 'per-vu-iterations',
-            vus: 500,
+            vus: 300,
             iterations: 1,
-        },  */
-          /*scenario_due: {
+            startTime: '0s',
+            maxDuration: '1m',
+        }, 
+          /* scenario_due: {
             executor: 'per-vu-iterations',
-            vus: 500,
+            vus: 67,
             iterations: 1,
-            startTime: '60s',
-            maxDuration: '600s',
+            startTime: '1s',
+            maxDuration: '5s',
         }, 
         scenario_tre: {
             executor: 'per-vu-iterations',
-            vus: 3000,
+            vus: 66,
             iterations: 1,
-            startTime: '60s',
-            maxDuration: '1000s',
+            startTime: '2s',
+            maxDuration: '10s',
         }, */ 
     },
     
@@ -87,7 +99,6 @@ export let options = {
 if (isEnvValid(DEV)) {
     myEnv = dotenv.parse(open(`../../env.dev.local`))
     baseUrl = services[`dev_io`].baseUrl
-    //cfList = JSON.parse(open('../../assets/cf_onemb.csv'))
 }
 
 
@@ -118,22 +129,34 @@ export default () => {
         exec.test.abort()
     }
 
-    /* const params = "01GNYFQQNXEMQJ23DPXMMJ4M5N"
+    
     if (checked){
+        const serviceId = "01GNYFQQNXEMQJ23DPXMMJ4M5N"
+        const params = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Ocp-Apim-Trace': 'true'
+            } 
+        } 
         const res = getInitiative(
             baseUrl,
             cf,
+            serviceId,
             params
         )
+            
         if(res.status != 200){
             console.error('GetInitiative -> '+JSON.stringify(res))
             checked = false
             return
         }
+        assert(res,
+            [statusOk()])
     
         const bodyObj = JSON.parse(res.body)
         init = bodyObj.initiativeId
-    } */
+    }
+
             
 
     group('Should onboard Citizen', () => {
@@ -142,7 +165,7 @@ export default () => {
             if(checked){
             
             const body = {
-                initiativeId: '63b57edff2572314380204e5'
+                initiativeId: init
             }
             
                 let res = putOnboardingCitizen(
@@ -164,7 +187,7 @@ export default () => {
         })
         group('When inititive exists', () => {
             if(checked){
-            const params = '63b57edff2572314380204e5'
+            const params = init
             let res = getStatus(
                     baseUrl,
                     cf,
@@ -187,7 +210,7 @@ export default () => {
         group('When the TC consent exists', () => {
             if(checked){
             const body = {
-                initiativeId: '63b57edff2572314380204e5'
+                initiativeId: init
             }
                 let res = putCheckPrerequisites(
                     baseUrl,
@@ -209,7 +232,7 @@ export default () => {
         group('When the inititive and consents exist', () => {
             if(checked){
             const body = {
-                initiativeId: '63b57edff2572314380204e5',
+                initiativeId: init,
                 pdndAccept: true,
                 selfDeclarationList: []
             }
