@@ -38,7 +38,11 @@ export function chooseRandomPanFromList(panList) {
 }
 
 export function getFCList() {
-    return papaparse.parse(open('../../assets/PROVA_fiscal_code_OK.csv'), { header: true }).data;
+    return papaparse.parse(open('../../assets/50k_CF_FAKE_CLI.csv'), { header: true }).data;
+}
+
+export function getFCPanList() {
+    return papaparse.parse(open('../../assets/50kFC_1PAN_per_FC.csv'), { header: true }).data;
 }
 
 function getFiscalCodeMonth(month) {

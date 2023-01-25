@@ -6,7 +6,7 @@ export function putEnrollInstrumentIssuer(baseUrl, body, headers, initiativeId) 
     const res = http.put(
         `${baseUrl}${API_PREFIX}/hb/wallet/${initiativeId}/instruments`,
         body,
-        headers
+        {headers : headers}
     )  
     __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
     return res

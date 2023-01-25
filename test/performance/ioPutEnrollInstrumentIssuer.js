@@ -1,5 +1,4 @@
 import { group, sleep } from 'k6'
-import { getHashedPan } from '../common/api/rtdPaymentInstrumentManager.js'
 import { assert, statusOk} from '../common/assertions.js'
 import {
     isEnvValid,
@@ -9,24 +8,40 @@ import {
     PROD,
 } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
-import exec from 'k6/execution'
+import {exec, vu} from 'k6/execution'
 import {
     putEnrollInstrumentIssuer
    } from '../common/api/idpayWallet.js'
+import { randomFiscalCode, getFCPanList } from '../common/utils.js'
+import { SharedArray } from 'k6/data'
 
+
+
+   let cfPanList = new SharedArray('cfPanList', function() {
+    return getFCPanList()
+})
 
 
 const REGISTERED_ENVS = [DEV]
 
 const services = JSON.parse(open('../../services/environments.json'))
-/*export let options = {
-    stages: [
+export let options = {
+    scenarios: {
+        scenario_uno: {
+            executor: 'per-vu-iterations',
+            vus: 1,
+            iterations: 1,
+            startTime: '0s',
+            maxDuration: '1m',
+        },
+    }
+    /* stages: [
         { duration: '1m', target: 1 }
     ],
     thresholds: {
         http_req_duration: ['p(95)<500'],
-    },
-}*/
+    }, */
+}
 let baseUrl
 let myEnv
 
@@ -44,22 +59,24 @@ if (!isTestEnabledOnEnv(DEV, REGISTERED_ENVS)) {
 }
 
 export default () => {
+    const cf = cfPanList[vu.idInTest-1].cf
+    const pan = cfPanList[vu.idInTest-1].pan
+
     group('Payment Instrument API', () => {
         group('Should enroll pgpan', () =>{
         
         let initiativeId = '63b57edff2572314380204e5'
         const params= {
             headers:  { 
-                'Content-Type' : 'application/json',
                 'Ocp-Apim-Subscription-Key':`${myEnv.APIM_SK}`,
                 'Ocp-Apim-Trace':'true',
                 'Accept-Language':'it_IT',
-                'Fiscal-Code':'hljomj92C44a851z'
+                'Fiscal-Code': cf,
             },
             body: {
                 "brand": "VISA",
                 "type": "DEB",
-                "pgpPan": "-----BEGIN PGP MESSAGE-----\nVersion: Keybase OpenPGP v2.0.76\nComment: https://keybase.io/crypto\n\nwYwDKIChg0Ypf6cBA/wKADCsIXPFNhVwibTBL4+XxrMY8sxJiBcv59US8GHEqGSh\nGGMxR3cZWzj/3jbtaZigAHp327TsnOQ/nk65w9hvijO7JFQDwXI7KZEqTYrbCJNG\nLriIStYe8CQCEYdFtbKNwKR2BjC3h8BMpvY36pYaIKb4KWtVU/ISq0f93l4LjtJM\nAbyyDHyR6b4H4D7B7Gw1kN/XYPx3OsPZ5jZCLZBf/GeN8HKnJTneEMX11gureYKG\n0GKSzQSdEyPcAT0QBK0c4i149sLuAHXGb60nbQ==\n=yOAg\n-----END PGP MESSAGE-----\n",
+                "pgpPan": pan,
                 "expireMonth": "08",
                 "expireYear": "2023",
                 "issuerAbiCode": "03069",
@@ -70,11 +87,11 @@ export default () => {
         let res = putEnrollInstrumentIssuer(
             baseUrl,
             JSON.stringify(params.body),
-            params,
+            params.headers,
             initiativeId)
 
         if(res.status != 200){
-            console.error('ERROR-> '+JSON.stringify(res))
+            console.error('Enrollment Carte-> '+JSON.stringify(res))
             return
         }
 
@@ -83,5 +100,6 @@ export default () => {
             
     })
     })
+    sleep(1)
 
 }
