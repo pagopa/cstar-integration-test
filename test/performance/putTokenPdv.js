@@ -21,27 +21,31 @@ let cfList = new SharedArray('cfList', function() {
 
 
 export let options = {
-    /* scenarios: {
+    scenarios: {
         per_vu_iterations: {
             executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
-            timeUnit: '1m', //period of time to apply the iteration
-            startRate: 100, //Number of iterations to execute each timeUnit period at test start.
+            timeUnit: '1s', //period of time to apply the iteration
+            startRate: 10, //Number of iterations to execute each timeUnit period at test start.
             preAllocatedVUs: 500,
             stages: [
-                { duration: '1m', target: 100 },
-                { duration: '2m', target: 300 },
-                { duration: '1m', target: 100 },
+                { duration: '1s', target: 10 },
+                { duration: '1s', target: 50 },
+                { duration: '1s', target: 10 },
+                { duration: '1s', target: 100 },
+                { duration: '1s', target: 20 },
+                { duration: '1s', target: 300 },
+                { duration: '1s', target: 0 },
             ]
         } 
-    } */
-     scenarios: {
+    
+     /* scenarios: {
         scenario_uno: {
             executor: 'per-vu-iterations',
             vus: 500,
             iterations: 1,
             startTime: '0s',
             maxDuration: '600s',
-        },
+        }, */
         /*scenario_due: {
             executor: 'per-vu-iterations',
             vus: 334,
@@ -81,7 +85,7 @@ export default () => {
 
 
     //UPSERT TOKEN     
-    /* group('Should onboard Citizen', () => {
+    group('Should onboard Citizen', () => {
         group('When the inititive and consents exist', () => {
             
         const params= {
@@ -110,10 +114,10 @@ export default () => {
             [statusOk()])
          
         })
-    }) */
+    })
 
     //MOCK TOKEN
-    group('Should pdv put a cf', () => {
+    /* group('Should pdv put a cf', () => {
         group('Returns a token', () => {
             
         const params= {
@@ -140,6 +144,6 @@ export default () => {
             [statusOk()])
          
         })
-    })
+    }) */
     sleep(1)
 }

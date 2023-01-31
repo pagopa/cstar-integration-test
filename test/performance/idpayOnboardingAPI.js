@@ -19,7 +19,6 @@ const REGISTERED_ENVS = [DEV]
 const services = JSON.parse(open('../../services/environments.json'))
 let baseUrl
 let myEnv
-//let fiscalCodeRandom = randomFiscalCode().toUpperCase()
 let init
 let cfList = new SharedArray('cfList', function() {
     return getFCList()
@@ -58,7 +57,7 @@ export let options = {
           }, */
           scenario_uno: {
             executor: 'per-vu-iterations',
-            vus: 300,
+            vus: 50,
             iterations: 1,
             startTime: '0s',
             maxDuration: '1m',
@@ -131,7 +130,7 @@ export default () => {
 
     
     if (checked){
-        const serviceId = "01GNYFQQNXEMQJ23DPXMMJ4M5N"
+        const serviceId = "ABCDEF"
         const params = {
             headers: {
                 'Content-Type': 'application/json',
