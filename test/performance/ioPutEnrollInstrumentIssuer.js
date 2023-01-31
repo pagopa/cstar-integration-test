@@ -27,13 +27,29 @@ const REGISTERED_ENVS = [DEV]
 const services = JSON.parse(open('../../services/environments.json'))
 export let options = {
     scenarios: {
-        scenario_uno: {
+        /* scenario_uno: {
             executor: 'per-vu-iterations',
-            vus: 1,
+            vus: 50,
             iterations: 1,
             startTime: '0s',
             maxDuration: '1m',
-        },
+        }, */
+
+
+        per_vu_iterations: {
+            executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
+            timeUnit: '10s', //period of time to apply the iteration
+            startRate: 20, //Number of iterations to execute each timeUnit period at test start.
+            preAllocatedVUs: 60,
+            stages: [
+                { duration: '5s', target: 10 },
+                { duration: '5s', target: 10 },
+                { duration: '5s', target: 10 },
+                { duration: '5s', target: 10 },
+                
+            ]
+        
+    }
     }
     /* stages: [
         { duration: '1m', target: 1 }
@@ -60,14 +76,15 @@ if (!isTestEnabledOnEnv(DEV, REGISTERED_ENVS)) {
 
 export default () => {
     const cf = cfPanList[vu.idInTest-1].cf
-    const pan = cfPanList[vu.idInTest-1].pan
+    const pgpan = cfPanList[vu.idInTest-1].pan
 
     group('Payment Instrument API', () => {
         group('Should enroll pgpan', () =>{
         
-        let initiativeId = '63b57edff2572314380204e5'
+        let initiativeId = '63d26bbc0e71e44bb08de293'
         const params= {
             headers:  { 
+                'Content-Type' : 'application/json',
                 'Ocp-Apim-Subscription-Key':`${myEnv.APIM_SK}`,
                 'Ocp-Apim-Trace':'true',
                 'Accept-Language':'it_IT',
@@ -76,17 +93,17 @@ export default () => {
             body: {
                 "brand": "VISA",
                 "type": "DEB",
-                "pgpPan": pan,
+                "pgpPan": pgpan,
                 "expireMonth": "08",
                 "expireYear": "2023",
                 "issuerAbiCode": "03069",
                 "holder": "TEST"
             }
         }
-
+        
         let res = putEnrollInstrumentIssuer(
             baseUrl,
-            JSON.stringify(params.body),
+            JSON.stringify(params.body).replace(/\\\\/g, "\\"),
             params.headers,
             initiativeId)
 
