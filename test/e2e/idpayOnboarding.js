@@ -19,7 +19,6 @@ const REGISTERED_ENVS = [DEV]
 const services = JSON.parse(open('../../services/environments.json'))
 let baseUrl
 let myEnv
-//let fiscalCodeRandom = randomFiscalCode().toUpperCase()
 let init
 let cfList = new SharedArray('cfList', function() {
     return getFCList()
@@ -52,7 +51,6 @@ function auth(fiscalCode) {
 export default () => {
     let checked = true
     const cf = auth(cfList[vu.idInTest-1].cf)
-    //const cf = auth(uniqueCF)
 
     if (
         !isEnvValid(DEV) ||
@@ -62,7 +60,7 @@ export default () => {
         return
     }
 
-    const params = "01GNYFQQNXEMQJ23DPXMMJ4M5N"
+    const params = "<SERVICEID>"
     if (checked){
         const res = getInitiative(
             baseUrl,

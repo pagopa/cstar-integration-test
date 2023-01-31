@@ -62,20 +62,12 @@ export let options = {
         },*/
     } 
     
-    /*stages: [
-    { duration: '1m', target: 30 }, // below normal load
-    { duration: '2m', target: 80 },
-    { duration: '5m', target: 500 },
-    ], 
-     thresholds: {
-        http_req_duration: ['p(95)<500'],
-    },*/
 }
 
 
-if (isEnvValid(DEV)) {
-    myEnv = dotenv.parse(open(`../../env.pdv.local`))
-    baseUrl = 'https://api.uat.tokenizer.pdv.pagopa.it'
+if (isEnvValid(__ENV.TARGET_ENV)) {
+    myEnv = dotenv.parse(open(`../../.env.${__ENV.TARGET_ENV}.local`))
+    baseUrl = services[`${__ENV.TARGET_ENV}_io`].baseUrl
 }
 
 

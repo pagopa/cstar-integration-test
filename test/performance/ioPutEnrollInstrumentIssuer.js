@@ -12,7 +12,7 @@ import {exec, vu} from 'k6/execution'
 import {
     putEnrollInstrumentIssuer
    } from '../common/api/idpayWallet.js'
-import { randomFiscalCode, getFCPanList } from '../common/utils.js'
+import { getFCPanList } from '../common/utils.js'
 import { SharedArray } from 'k6/data'
 
 
@@ -51,19 +51,13 @@ export let options = {
         
     }
     }
-    /* stages: [
-        { duration: '1m', target: 1 }
-    ],
-    thresholds: {
-        http_req_duration: ['p(95)<500'],
-    }, */
 }
 let baseUrl
 let myEnv
 
-if (isEnvValid(DEV)) {
-    myEnv = dotenv.parse(open(`../../env.dev.issuer.local`))
-    baseUrl = services[`dev_io`].baseUrl
+if (isEnvValid(__ENV.TARGET_ENV)) {
+    myEnv = dotenv.parse(open(`../../.env.${__ENV.TARGET_ENV}.local`))
+    baseUrl = services[`${__ENV.TARGET_ENV}_io`].baseUrl
 }
 
 
@@ -81,7 +75,7 @@ export default () => {
     group('Payment Instrument API', () => {
         group('Should enroll pgpan', () =>{
         
-        let initiativeId = '63d26bbc0e71e44bb08de293'
+        let initiativeId = '<INITIATIVEID>'
         const params= {
             headers:  { 
                 'Content-Type' : 'application/json',
