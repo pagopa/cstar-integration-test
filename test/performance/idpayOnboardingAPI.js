@@ -10,7 +10,7 @@ import { loginFullUrl } from '../common/api/bpdIoLogin.js'
 import { assert, statusNoContent, statusAccepted, statusOk, bodyJsonSelectorValue } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
-import { randomFiscalCode, getFCList } from '../common/utils.js'
+import { getFCList } from '../common/utils.js'
 import {exec, vu} from 'k6/execution'
 import { SharedArray } from 'k6/data'
 
@@ -19,7 +19,6 @@ const REGISTERED_ENVS = [DEV]
 const services = JSON.parse(open('../../services/environments.json'))
 let baseUrl
 let myEnv
-//let fiscalCodeRandom = randomFiscalCode().toUpperCase()
 let init
 let cfList = new SharedArray('cfList', function() {
     return getFCList()
@@ -39,55 +38,12 @@ export let options = {
                 { duration: '1s', target: 5 },
             ]
         },
-        /* contacts: {
-            executor: 'constant-arrival-rate',
-            duration: '30s',
-            rate: 50,
-            timeUnit: '1s',
-            preAllocatedVUs: 500,
-          }, */
-        /* scenario_uno: {
-            executor: 'per-vu-iterations',
-            vus: 500,
-            iterations: 1,
-        },  */
-          /*scenario_due: {
-            executor: 'per-vu-iterations',
-            vus: 500,
-            iterations: 1,
-            startTime: '60s',
-            maxDuration: '600s',
-        }, 
-        scenario_tre: {
-            executor: 'per-vu-iterations',
-            vus: 3000,
-            iterations: 1,
-            startTime: '60s',
-            maxDuration: '1000s',
-        }, */ 
     },
-    
-     /* stages: [
-        { duration: '5m', target: 50 }, // below normal load
-        { duration: '8m', target: 50 },
-        { duration: '5m', target: 100 }, // normal load
-        { duration: '8m', target: 80 },
-        { duration: '5m', target: 150 }, // around the breaking point
-        { duration: '8m', target: 100 },
-        { duration: '5m', target: 500 }, // beyond the breaking point
-        { duration: '10m', target: 50 },
-        { duration: '15m', target: 0 }, // scale down. Recovery stage.
-        ], */
-
-    /* thresholds: {
-        http_req_duration: ['p(95)<500'],
-    }, */
 }
 
-if (isEnvValid(DEV)) {
-    myEnv = dotenv.parse(open(`../../env.dev.local`))
-    baseUrl = services[`dev_io`].baseUrl
-    //cfList = JSON.parse(open('../../assets/cf_onemb.csv'))
+if (isEnvValid(__ENV.TARGET_ENV)) {
+    myEnv = dotenv.parse(open(`../../.env.${__ENV.TARGET_ENV}.local`))
+    baseUrl = services[`${__ENV.TARGET_ENV}_io`].baseUrl
 }
 
 
@@ -112,13 +68,13 @@ export default () => {
 
 
     if (
-        !isEnvValid(DEV) ||
-        !isTestEnabledOnEnv(DEV, REGISTERED_ENVS)
+        !isEnvValid(__ENV.TARGET_ENV) ||
+        !isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)
     ) {
         exec.test.abort()
     }
 
-    /* const params = "01GNYFQQNXEMQJ23DPXMMJ4M5N"
+    const params = "<SERVICEID>"
     if (checked){
         const res = getInitiative(
             baseUrl,
@@ -133,7 +89,7 @@ export default () => {
     
         const bodyObj = JSON.parse(res.body)
         init = bodyObj.initiativeId
-    } */
+    }
             
 
     group('Should onboard Citizen', () => {
@@ -142,7 +98,7 @@ export default () => {
             if(checked){
             
             const body = {
-                initiativeId: '63b57edff2572314380204e5'
+                initiativeId: init
             }
             
                 let res = putOnboardingCitizen(
@@ -164,7 +120,7 @@ export default () => {
         })
         group('When inititive exists', () => {
             if(checked){
-            const params = '63b57edff2572314380204e5'
+            const params = init
             let res = getStatus(
                     baseUrl,
                     cf,
@@ -187,7 +143,7 @@ export default () => {
         group('When the TC consent exists', () => {
             if(checked){
             const body = {
-                initiativeId: '63b57edff2572314380204e5'
+                initiativeId: init
             }
                 let res = putCheckPrerequisites(
                     baseUrl,

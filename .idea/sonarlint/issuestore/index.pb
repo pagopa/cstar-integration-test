@@ -32,5 +32,3 @@ N
 test/performance/rtdStorage.js,d\6\d6ddfe9420a5626f40d6a68b7a1338fdcf7be9ec
 I
 test/common/assertions.js,c\9\c9870985cbb6f2889010ba9192bd5b9cc6c3e8d6
-9
-	README.md,8\e\8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d

@@ -4,7 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="779d22be-d733-40e4-a3b8-d233ebf1606c" name="Changes" comment="[IDP-66] Test di enrollment massivo caso non whitelist correzioni" />
+    <list default="true" id="339b250f-9b8c-4a02-ad92-f3b7c4db37f7" name="Changes" comment="[IDP-65] test di enrollment issuer">
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/8/e/8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env.dev.issuer.local" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/env.dev.local" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/env.pdv.local" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/performance/idpayOnboardingAPI.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/performance/idpayOnboardingAPI.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/performance/ioPutEnrollInstrumentIssuer.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/performance/ioPutEnrollInstrumentIssuer.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -153,7 +162,14 @@
       <option name="project" value="LOCAL" />
       <updated>1674042818846</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="[IDP-65] test di enrollment issuer">
+      <created>1675182185978</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1675182185978</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -175,6 +191,7 @@
     <MESSAGE value="[IDP-66] Test di enrollment massivo caso non whitelist" />
     <MESSAGE value="[IDP-66] Test di enrollment massivo caso non whitelist add file" />
     <MESSAGE value="[IDP-66] Test di enrollment massivo caso non whitelist correzioni" />
-    <option name="LAST_COMMIT_MESSAGE" value="[IDP-66] Test di enrollment massivo caso non whitelist correzioni" />
+    <MESSAGE value="[IDP-65] test di enrollment issuer" />
+    <option name="LAST_COMMIT_MESSAGE" value="[IDP-65] test di enrollment issuer" />
   </component>
 </project>
