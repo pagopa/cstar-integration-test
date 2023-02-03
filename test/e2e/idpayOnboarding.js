@@ -19,7 +19,6 @@ const REGISTERED_ENVS = [DEV]
 const services = JSON.parse(open('../../services/environments.json'))
 let baseUrl
 let myEnv
-//let fiscalCodeRandom = randomFiscalCode().toUpperCase()
 let init
 let cfList = new SharedArray('cfList', function() {
     return getFCList()

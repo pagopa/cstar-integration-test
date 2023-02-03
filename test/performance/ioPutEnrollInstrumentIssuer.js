@@ -27,20 +27,41 @@ const REGISTERED_ENVS = [DEV]
 const services = JSON.parse(open('../../services/environments.json'))
 export let options = {
     scenarios: {
-        /* scenario_uno: {
+        scenario_uno: {
             executor: 'per-vu-iterations',
-            vus: 50,
+            vus: 25,
             iterations: 1,
-            startTime: '0s',
+            startTime: '5s',
             maxDuration: '1m',
-        }, */
+        },
+        scenario_due: {
+            executor: 'per-vu-iterations',
+            vus: 25,
+            iterations: 1,
+            startTime: '15s',
+            maxDuration: '1m',
+        },
+        /* scenario_tre: {
+            executor: 'per-vu-iterations',
+            vus: 25,
+            iterations: 1,
+            startTime: '30s',
+            maxDuration: '1m',
+        },
+        scenario_quatro: {
+            executor: 'per-vu-iterations',
+            vus: 25,
+            iterations: 1,
+            startTime: '45s',
+            maxDuration: '1m',
+        } */
 
 
-        per_vu_iterations: {
+        /* per_vu_iterations: {
             executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
             timeUnit: '10s', //period of time to apply the iteration
-            startRate: 20, //Number of iterations to execute each timeUnit period at test start.
-            preAllocatedVUs: 60,
+            startRate: 10, //Number of iterations to execute each timeUnit period at test start.
+            preAllocatedVUs: 50,
             stages: [
                 { duration: '5s', target: 10 },
                 { duration: '5s', target: 10 },
@@ -49,7 +70,7 @@ export let options = {
                 
             ]
         
-    }
+    } */
     }
     /* stages: [
         { duration: '1m', target: 1 }

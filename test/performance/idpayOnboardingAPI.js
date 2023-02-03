@@ -62,14 +62,14 @@ export let options = {
             startTime: '0s',
             maxDuration: '1m',
         }, 
-          /* scenario_due: {
+         /*  scenario_due: {
             executor: 'per-vu-iterations',
-            vus: 67,
+            vus: 50,
             iterations: 1,
-            startTime: '1s',
-            maxDuration: '5s',
-        }, 
-        scenario_tre: {
+            startTime: '10s',
+            maxDuration: '1m',
+        },  */
+        /*scenario_tre: {
             executor: 'per-vu-iterations',
             vus: 66,
             iterations: 1,
