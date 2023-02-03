@@ -8,13 +8,13 @@ import {
     } from '../common/api/idpayOnboardingCitizen.js'
 import { loginFullUrl } from '../common/api/bpdIoLogin.js'
 import { assert, statusNoContent, statusAccepted, statusOk, bodyJsonSelectorValue } from '../common/assertions.js'
-import { isEnvValid, isTestEnabledOnEnv, DEV } from '../common/envs.js'
+import { isEnvValid, isTestEnabledOnEnv, DEV, UAT, PROD } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
 import { getFCList } from '../common/utils.js'
 import {exec, vu} from 'k6/execution'
 import { SharedArray } from 'k6/data'
 
-const REGISTERED_ENVS = [DEV]
+const REGISTERED_ENVS = [DEV, UAT, PROD]
 
 const services = JSON.parse(open('../../services/environments.json'))
 let baseUrl
@@ -38,7 +38,6 @@ export let options = {
                     { duration: '1s', target: 100 },
                     
                 ]
-            
         } */
           scenario_uno: {
             executor: 'per-vu-iterations',
@@ -120,22 +119,18 @@ export default () => {
             
             const body = {
                 initiativeId: init
-            }
-            
+            }  
                 let res = putOnboardingCitizen(
                     baseUrl,
                     JSON.stringify(body),
                     cf
                 )
-
                 if(res.status != 204){
                     console.error('PutOnboardingCitizen -> '+JSON.stringify(res))
                     checked = false
                     return
                 }
-                
-                assert(res,
-                [statusNoContent()])
+                assert(res, [statusNoContent()])
             }
   
         })
@@ -147,13 +142,11 @@ export default () => {
                     cf,
                     params
                 )
-
             if(res.status != 200){
                 console.error('GetStatus -> '+JSON.stringify(res))
                 checked = false
                 return
             }
-            
             assert(res,
             [statusOk(),
             bodyJsonSelectorValue('status', 'ACCEPTED_TC')])
@@ -204,8 +197,6 @@ export default () => {
             [statusAccepted()])
             }
         })
-
-
     })
     sleep(1)
 }

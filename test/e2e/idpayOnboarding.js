@@ -8,13 +8,13 @@ import {
     } from '../common/api/idpayOnboardingCitizen.js'
 import { loginFullUrl } from '../common/api/bpdIoLogin.js'
 import { assert, statusNoContent, statusAccepted, statusOk, bodyJsonSelectorValue } from '../common/assertions.js'
-import { isEnvValid, isTestEnabledOnEnv, DEV } from '../common/envs.js'
+import { isEnvValid, isTestEnabledOnEnv, DEV, UAT, PROD } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
-import { randomFiscalCode, getFCList } from '../common/utils.js'
+import { getFCList } from '../common/utils.js'
 import { SharedArray } from 'k6/data'
 import {exec, vu} from 'k6/execution'
 
-const REGISTERED_ENVS = [DEV]
+const REGISTERED_ENVS = [DEV, UAT, PROD]
 
 const services = JSON.parse(open('../../services/environments.json'))
 let baseUrl
@@ -25,10 +25,8 @@ let cfList = new SharedArray('cfList', function() {
 })
 
 
-
-
 if (isEnvValid(DEV)) {
-    myEnv = dotenv.parse(open(`../../env.dev.local`))
+    myEnv = dotenv.parse(open(`../../.env.${__ENV.TARGET_ENV}.local`))
     baseUrl = services[`dev_io`].baseUrl
 }
 

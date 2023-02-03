@@ -15,14 +15,12 @@ import {
 import { getFCPanList } from '../common/utils.js'
 import { SharedArray } from 'k6/data'
 
-
-
    let cfPanList = new SharedArray('cfPanList', function() {
     return getFCPanList()
 })
 
 
-const REGISTERED_ENVS = [DEV]
+const REGISTERED_ENVS = [DEV, UAT, PROD]
 
 const services = JSON.parse(open('../../services/environments.json'))
 export let options = {
@@ -49,7 +47,7 @@ export let options = {
                 
             ]
         
-    }
+        }
     }
 }
 let baseUrl
