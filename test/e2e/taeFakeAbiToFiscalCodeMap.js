@@ -13,7 +13,7 @@ const REGISTERED_ENVS = [DEV]
 
 const services = JSON.parse(open('../../services/environments.json'))
 let params = {}
-let options = {}
+export let options = {}
 let baseUrl
 let myEnv
 
