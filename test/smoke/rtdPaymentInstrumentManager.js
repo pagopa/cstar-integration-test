@@ -1,9 +1,9 @@
-import { group, check} from 'k6'
+import {group, check} from 'k6'
 import {
     getHashedPan,
     getSalt,
 } from '../common/api/rtdPaymentInstrumentManager.js'
-import { assert, statusOk, bodyLengthBetween } from '../common/assertions.js'
+import {assert, statusOk, bodyLengthBetween, isNotFakeSalt} from '../common/assertions.js'
 import {
     isEnvValid,
     isTestEnabledOnEnv,
@@ -39,6 +39,9 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
     }
 }
 
+const isProd = __ENV.TARGET_ENV === PROD;
+const isUat = __ENV.TARGET_ENV === UAT;
+
 export default () => {
     if (
         !isEnvValid(__ENV.TARGET_ENV) ||
@@ -54,26 +57,66 @@ export default () => {
             ])
         )
         group('Should get salt', () =>
-            assert(getSalt(baseUrl, params), [statusOk()])
+            assert(getSalt(baseUrl, params), [
+                statusOk(),
+                ...(isUat ? [isNotFakeSalt] : []),
+            ])
         )
     })
 
     group('Payment Instrument API v2', () => {
         group('Should get hashed pans', () =>
-            assert(getHashedPan(baseUrl, params, { version: 'v2' }), [
+            assert(getHashedPan(baseUrl, params, {version: 'v2'}), [
                 statusOk(),
                 bodyLengthBetween(0, myEnv.RTD_HASHPAN_MAX_CONTENT_LENGTH),
-                (res) => 'Last-Modified' in res.headers
+                (res) => 'Last-Modified' in res.headers,
             ])
         )
         group('Should get 404 when no hashed pans file found', () => {
-            const queryParams = "filePart=1000"
-            check(getHashedPan(baseUrl, params, { version: 'v2', queryParams: queryParams }), {
-                'Not existing file: is 404': (r) => r.status === 404,
-            })
-        });
+            const queryParams = 'filePart=1000'
+            check(
+                getHashedPan(baseUrl, params, {
+                    version: 'v2',
+                    queryParams: queryParams,
+                }),
+                {
+                    'Not existing file: is 404': (r) => r.status === 404,
+                }
+            )
+        })
         group('Should get salt', () =>
-            assert(getSalt(baseUrl, params, 'v2'), [statusOk()])
+            assert(getSalt(baseUrl, params, 'v2'), [
+                statusOk(),
+                ...(isUat ? [isNotFakeSalt()] : []),
+            ])
+        )
+    })
+
+    group('Payment Instrument API v3', () => {
+        group('Should get hashed pans', () =>
+            assert(getHashedPan(baseUrl, params, {version: 'v3'}), [
+                statusOk(),
+                bodyLengthBetween(0, myEnv.RTD_HASHPAN_MAX_CONTENT_LENGTH),
+                (res) => 'Last-Modified' in res.headers,
+            ])
+        )
+        group('Should get 404 when no hashed pans file found', () => {
+            const queryParams = 'filePart=1000'
+            check(
+                getHashedPan(baseUrl, params, {
+                    version: 'v3',
+                    queryParams: queryParams,
+                }),
+                {
+                    'Not existing file: is 404': (r) => r.status === 404,
+                }
+            )
+        })
+        group('Should get salt', () =>
+            assert(getSalt(baseUrl, params, 'v3'), [
+                statusOk(),
+                ...(isProd ? [isNotFakeSalt] : []),
+            ])
         )
     })
 }

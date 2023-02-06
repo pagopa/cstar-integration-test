@@ -24,6 +24,18 @@ export function putFaCustomer(baseUrl, params, body) {
     return res
 }
 
+export function deleteFaCustomer(baseUrl, params, id, channel) {
+    const myParams = Object.assign({}, params)
+    myParams.headers.id = id
+    const res = http.del(
+        `${baseUrl}${API_PREFIX}`,
+        JSON.stringify({ channel }),
+        myParams
+    )
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
+    return res
+}
+
 export function getFaCustomerInternal(baseUrl, params, id) {
     const myParams = Object.assign({}, params)
     const apiPrefix = '/famscustomer/fa/customer'
@@ -39,6 +51,19 @@ export function putFaCustomerInternal(baseUrl, params, body) {
     const apiPrefix = '/famsenrollment/fa/enrollment/customer'
     const url = `${baseUrl}${apiPrefix}/${body.id}`
     const res = http.put(url, JSON.stringify(body), myParams)
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
+    return res
+}
+
+export function deleteFaCustomerInternal(baseUrl, params, id, channel) {
+    const myParams = Object.assign({}, params)
+    myParams.headers.id = id
+    const apiPrefix = '/famsenrollment/fa/enrollment/customer'
+    const res = http.del(
+        `${baseUrl}${apiPrefix}/${id}`,
+        JSON.stringify({ channel }),
+        myParams
+    )
     __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
     return res
 }
