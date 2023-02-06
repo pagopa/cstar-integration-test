@@ -19,7 +19,7 @@ let myEnv
 
 if (isEnvValid(__ENV.TARGET_ENV)) {
     myEnv = dotenv.parse(open(`../../.env.${__ENV.TARGET_ENV}.local`))
-    baseUrl = services[`${__ENV.TARGET_ENV}_io`].baseUrl
+    baseUrl = services[`${__ENV.TARGET_ENV}_issuer`].baseUrl
 
     options.tlsAuth = [
         {
