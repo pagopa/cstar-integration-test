@@ -8,13 +8,13 @@ import {
     } from '../common/api/idpayOnboardingCitizen.js'
 import { loginFullUrl } from '../common/api/bpdIoLogin.js'
 import { assert, statusNoContent, statusAccepted, statusOk, bodyJsonSelectorValue } from '../common/assertions.js'
-import { isEnvValid, isTestEnabledOnEnv, DEV } from '../common/envs.js'
+import { isEnvValid, isTestEnabledOnEnv, DEV, UAT, PROD } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
-import { randomFiscalCode, getFCList } from '../common/utils.js'
+import { getFCList } from '../common/utils.js'
 import { SharedArray } from 'k6/data'
 import {exec, vu} from 'k6/execution'
 
-const REGISTERED_ENVS = [DEV]
+const REGISTERED_ENVS = [DEV, UAT, PROD]
 
 const services = JSON.parse(open('../../services/environments.json'))
 let baseUrl
@@ -25,10 +25,8 @@ let cfList = new SharedArray('cfList', function() {
 })
 
 
-
-
-if (isEnvValid(DEV)) {
-    myEnv = dotenv.parse(open(`../../env.dev.local`))
+if (isEnvValid(__ENV.TARGET_ENV)){
+    myEnv = dotenv.parse(open(`../../.env.${__ENV.TARGET_ENV}.local`))
     baseUrl = services[`dev_io`].baseUrl
 }
 
@@ -51,7 +49,6 @@ function auth(fiscalCode) {
 export default () => {
     let checked = true
     const cf = auth(cfList[vu.idInTest-1].cf)
-    //const cf = auth(uniqueCF)
 
     if (
         !isEnvValid(DEV) ||
@@ -61,7 +58,7 @@ export default () => {
         return
     }
 
-    const params = "01GNYFQQNXEMQJ23DPXMMJ4M5N"
+    const params = `${myEnv.SERVICE_ID}`
     if (checked){
         const res = getInitiative(
             baseUrl,
@@ -73,20 +70,20 @@ export default () => {
             checked = false
             return
         }
-    
+
         const bodyObj = JSON.parse(res.body)
         init = bodyObj.initiativeId
     }
-            
+
 
     group('Should onboard Citizen', () => {
         group('When the inititive exists', () => {
             if(checked){
-            
+
             const body = {
                 initiativeId: init
             }
-            
+
                 let res = putOnboardingCitizen(
                     baseUrl,
                     JSON.stringify(body),
@@ -97,13 +94,13 @@ export default () => {
                     console.error('PutOnboardingCitizen -> '+JSON.stringify(res))
                     checked = false
                 }
-                
+
                 assert(res,
                 [statusNoContent()])
             }
 
             return
-            
+
         })
     })
 
@@ -121,7 +118,7 @@ export default () => {
                 console.error('GetStatus -> '+JSON.stringify(res))
                 checked = false
             }
-            
+
             assert(res,
             [statusOk(),
             bodyJsonSelectorValue('status', 'ACCEPTED_TC')])
@@ -145,7 +142,7 @@ export default () => {
                 console.error('PutCheckPrerequisites -> '+JSON.stringify(res))
                 checked = false
             }
-            
+
             assert(res,
             [statusOk()])
             }
@@ -171,7 +168,7 @@ export default () => {
                 console.error('PutSaveConsent -> '+JSON.stringify(res))
                 checked = false
             }
-            
+
             assert(res,
             [statusAccepted()])
             }

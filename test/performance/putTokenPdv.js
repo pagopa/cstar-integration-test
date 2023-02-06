@@ -4,20 +4,19 @@ import {
      upsertMockToken
     } from '../common/api/pdv.js'
 import { assert, statusOk, } from '../common/assertions.js'
-import { isEnvValid, DEV } from '../common/envs.js'
+import { isEnvValid, DEV, UAT, PROD } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
-import { getFCList, randomFiscalCode } from '../common/utils.js'
-import {exec, vu} from 'k6/execution'
+import { getFCList} from '../common/utils.js'
+import {vu} from 'k6/execution'
 import { SharedArray } from 'k6/data'
 
-const REGISTERED_ENVS = [DEV]
+const REGISTERED_ENVS = [DEV, UAT, PROD]
 
 let baseUrl
 let myEnv
 let cfList = new SharedArray('cfList', function() {
     return getFCList()
 })
-//let fiscalCodeRandom = randomFiscalCode().toUpperCase()
 
 
 export let options = {
@@ -46,36 +45,13 @@ export let options = {
             startTime: '0s',
             maxDuration: '600s',
         }, */
-        /*scenario_due: {
-            executor: 'per-vu-iterations',
-            vus: 334,
-            iterations: 1,
-            startTime: '1s',
-            maxDuration: '300s',
-        },
-        scenario_tre: {
-            executor: 'per-vu-iterations',
-            vus: 334,
-            iterations: 1,
-            startTime: '2s',
-            maxDuration: '300s',
-        },*/
     } 
     
-    /*stages: [
-    { duration: '1m', target: 30 }, // below normal load
-    { duration: '2m', target: 80 },
-    { duration: '5m', target: 500 },
-    ], 
-     thresholds: {
-        http_req_duration: ['p(95)<500'],
-    },*/
 }
 
-
-if (isEnvValid(DEV)) {
-    myEnv = dotenv.parse(open(`../../env.pdv.local`))
-    baseUrl = 'https://api.uat.tokenizer.pdv.pagopa.it'
+if (isEnvValid(__ENV.TARGET_ENV)) {
+    myEnv = dotenv.parse(open(`../../.env.${__ENV.TARGET_ENV}.local`))
+    baseUrl = services[`${__ENV.TARGET_ENV}_pdv`].baseUrl
 }
 
 
@@ -129,17 +105,14 @@ export default () => {
                 "pii": uniqueCF,
             }
         }
-
         let res = upsertMockToken(
             JSON.stringify(params.body),
             params
         )
-
         if(res.status != 200){
             console.error('ERROR-> '+JSON.stringify(res))
             return
         }
-
         assert(res,
             [statusOk()])
          

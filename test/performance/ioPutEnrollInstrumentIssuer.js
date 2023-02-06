@@ -12,79 +12,50 @@ import {exec, vu} from 'k6/execution'
 import {
     putEnrollInstrumentIssuer
    } from '../common/api/idpayWallet.js'
-import { randomFiscalCode, getFCPanList } from '../common/utils.js'
+import { getFCPanList } from '../common/utils.js'
 import { SharedArray } from 'k6/data'
-
-
 
    let cfPanList = new SharedArray('cfPanList', function() {
     return getFCPanList()
 })
 
 
-const REGISTERED_ENVS = [DEV]
+const REGISTERED_ENVS = [DEV, UAT, PROD]
 
 const services = JSON.parse(open('../../services/environments.json'))
 export let options = {
     scenarios: {
-        scenario_uno: {
+        /* scenario_uno: {
             executor: 'per-vu-iterations',
-            vus: 25,
+            vus: 50,
             iterations: 1,
-            startTime: '5s',
+            startTime: '0s',
             maxDuration: '1m',
-        },
-        scenario_due: {
-            executor: 'per-vu-iterations',
-            vus: 25,
-            iterations: 1,
-            startTime: '15s',
-            maxDuration: '1m',
-        },
-        /* scenario_tre: {
-            executor: 'per-vu-iterations',
-            vus: 25,
-            iterations: 1,
-            startTime: '30s',
-            maxDuration: '1m',
-        },
-        scenario_quatro: {
-            executor: 'per-vu-iterations',
-            vus: 25,
-            iterations: 1,
-            startTime: '45s',
-            maxDuration: '1m',
-        } */
+        }, */
 
 
-        /* per_vu_iterations: {
+        per_vu_iterations: {
             executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
             timeUnit: '10s', //period of time to apply the iteration
-            startRate: 10, //Number of iterations to execute each timeUnit period at test start.
-            preAllocatedVUs: 50,
+            startRate: 20, //Number of iterations to execute each timeUnit period at test start.
+            preAllocatedVUs: 60,
             stages: [
                 { duration: '5s', target: 10 },
                 { duration: '5s', target: 10 },
                 { duration: '5s', target: 10 },
                 { duration: '5s', target: 10 },
-                
+
             ]
-        
-    } */
+
+        }
     }
-    /* stages: [
-        { duration: '1m', target: 1 }
-    ],
-    thresholds: {
-        http_req_duration: ['p(95)<500'],
-    }, */
 }
 let baseUrl
 let myEnv
 
-if (isEnvValid(DEV)) {
-    myEnv = dotenv.parse(open(`../../env.dev.issuer.local`))
-    baseUrl = services[`dev_io`].baseUrl
+if (isEnvValid(__ENV.TARGET_ENV)) {
+    myEnv = dotenv.parse(open(`../../.env.${__ENV.TARGET_ENV}.local`))
+    baseUrl = services[`${__ENV.TARGET_ENV}_io`].baseUrl
 }
 
 
@@ -101,10 +72,10 @@ export default () => {
 
     group('Payment Instrument API', () => {
         group('Should enroll pgpan', () =>{
-        
-        let initiativeId = '63d26bbc0e71e44bb08de293'
+
+        let initiativeId = `${myEnv.INITIATIVE_ID}`
         const params= {
-            headers:  { 
+            headers:  {
                 'Content-Type' : 'application/json',
                 'Ocp-Apim-Subscription-Key':`${myEnv.APIM_SK}`,
                 'Ocp-Apim-Trace':'true',
@@ -112,16 +83,16 @@ export default () => {
                 'Fiscal-Code': cf,
             },
             body: {
-                "brand": "VISA",
-                "type": "DEB",
+                "brand": `${myEnv.BRAND}`,
+                "type": `${myEnv.TYPE}`,
                 "pgpPan": pgpan,
-                "expireMonth": "08",
-                "expireYear": "2023",
-                "issuerAbiCode": "03069",
-                "holder": "TEST"
+                "expireMonth": `${myEnv.EXPIRE_MONTH}`,
+                "expireYear": `${myEnv.EXPIRE_YEAR}`,
+                "issuerAbiCode": `${myEnv.ISSUER_ABI_CODE}`,
+                "holder": `${myEnv.HOLDER}`
             }
         }
-        
+
         let res = putEnrollInstrumentIssuer(
             baseUrl,
             JSON.stringify(params.body).replace(/\\\\/g, "\\"),
@@ -135,7 +106,7 @@ export default () => {
 
         assert(res,
             [statusOk()])
-            
+
     })
     })
     sleep(1)
