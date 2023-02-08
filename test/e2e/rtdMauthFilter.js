@@ -1,11 +1,7 @@
 import { group } from 'k6'
 import exec from 'k6/execution'
-import { getAbiToFiscalCodesMap } from '../common/api/taeAbiToFiscalCodes.js'
-import {
-    assert,
-    bodyJsonSelectorValue,
-    statusOk,
-} from '../common/assertions.js'
+import { createRtdSas } from '../common/api/rtdCsvTransaction.js'
+import { assert, statusCreated, statusForbidden } from '../common/assertions.js'
 import {
     isEnvValid,
     isTestEnabledOnEnv,
@@ -18,27 +14,20 @@ import dotenv from 'k6/x/dotenv'
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
 const services = JSON.parse(open('../../services/environments.json'))
-export let options = {
-    stages: [
-        { duration: '1m', target: 10 },
-        { duration: '3m', target: 30 },
-        { duration: '1m', target: 10 },
-    ],
-    thresholds: {
-        http_req_duration: ['p(95)<500'],
-    },
-}
+export let options = {}
 let params = {}
-let baseUrl
+let baseUrl_acq
+let baseUrl_io
 let myEnv
 
 if (isEnvValid(__ENV.TARGET_ENV)) {
     myEnv = dotenv.parse(open(`../../.env.${__ENV.TARGET_ENV}.local`))
-    baseUrl = services[`${__ENV.TARGET_ENV}_issuer`].baseUrl
+    baseUrl_acq = services[`${__ENV.TARGET_ENV}_issuer`].baseUrl
+    baseUrl_io  = services[`${__ENV.TARGET_ENV}_io`].baseUrl
 
     options.tlsAuth = [
         {
-            domains: [baseUrl],
+            domains: [baseUrl_acq],
             cert: open(`../../certs/${myEnv.MAUTH_CERT_NAME}`),
             key: open(`../../certs/${myEnv.MAUTH_PRIVATE_KEY_NAME}`),
         },
@@ -57,12 +46,12 @@ if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
 }
 
 export default () => {
-    group('TAE AbiToFiscalCode API', () => {
-        group('Should retrieve conversion map', () =>
-            assert(getAbiToFiscalCodesMap(baseUrl, params), [
-                statusOk(),
-                bodyJsonSelectorValue('STPAY', 'LU30726739'),
-            ])
+    group('CSV Transaction API', () => {
+        group('Should create RTD SAS uri when called on acquirer listener', () =>
+            assert(createRtdSas(baseUrl_acq, params), [statusCreated()])
+        )
+        group('Should NOT create RTD SAS uri when called on IO listener', () =>
+            assert(createRtdSas(baseUrl_io, params), [statusForbidden()])
         )
     })
 }

@@ -7,7 +7,11 @@ import {
     bodyLengthBetween,
 } from '../common/assertions.js'
 import { createCustomerBody } from './faHbCustomer.js'
-import { getFaCustomer, putFaCustomer } from '../common/api/faHbCustomer.js'
+import {
+    getFaCustomer,
+    putFaCustomer,
+    deleteFaCustomer,
+} from '../common/api/faHbCustomer.js'
 import { createPaymentInstrumentBody } from './faHbPaymentInstruments.js'
 import {
     getFAPaymentInstrument,
@@ -117,6 +121,17 @@ export default () => {
             assert(getFaCustomer(baseUrl, params, customerBody.id), [
                 statusOk(),
             ])
+        )
+        group('Should delete a FA CUSTOMER', () =>
+            assert(
+                deleteFaCustomer(
+                    baseUrl,
+                    params,
+                    customerBody.id,
+                    'test_channel'
+                ),
+                [statusOk()]
+            )
         )
 
         // fa hb payment instruments
