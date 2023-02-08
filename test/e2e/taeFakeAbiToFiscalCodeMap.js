@@ -13,13 +13,13 @@ const REGISTERED_ENVS = [DEV]
 
 const services = JSON.parse(open('../../services/environments.json'))
 let params = {}
-let options = {}
+export let options = {}
 let baseUrl
 let myEnv
 
 if (isEnvValid(__ENV.TARGET_ENV)) {
     myEnv = dotenv.parse(open(`../../.env.${__ENV.TARGET_ENV}.local`))
-    baseUrl = services[`${__ENV.TARGET_ENV}_io`].baseUrl
+    baseUrl = services[`${__ENV.TARGET_ENV}_issuer`].baseUrl
 
     options.tlsAuth = [
         {
@@ -45,6 +45,7 @@ export default () => {
                 bodyJsonSelectorValue('ICARD', 'BG175325806'),
                 bodyJsonSelectorValue('TPAY1', '09771701001'),
                 bodyJsonSelectorValue('AMAZN', '97898850157'),
+                bodyJsonSelectorValue('EURON', 'DE182769455'),
                 bodyJsonSelectorValue('UBER1', 'NL858620285B01')
             ])
         )

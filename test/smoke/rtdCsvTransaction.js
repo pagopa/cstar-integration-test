@@ -8,6 +8,7 @@ import {
     assert,
     statusOk,
     statusCreated,
+    statusForbidden,
     bodyPgpPublicKey,
 } from '../common/assertions.js'
 import {
@@ -25,11 +26,13 @@ const services = JSON.parse(open('../../services/environments.json'))
 export let options = {}
 let params = {}
 let baseUrl
+let baseUrl_io
 let myEnv
 
 if (isEnvValid(__ENV.TARGET_ENV)) {
     myEnv = dotenv.parse(open(`../../.env.${__ENV.TARGET_ENV}.local`))
     baseUrl = services[`${__ENV.TARGET_ENV}_issuer`].baseUrl
+    baseUrl_io = services[`${__ENV.TARGET_ENV}_io`].baseUrl
 
     options.tlsAuth = [
         {
@@ -64,6 +67,9 @@ export default () => {
         )
         group('Should create RTD SAS', () =>
             assert(createRtdSas(baseUrl, params), [statusCreated()])
+        )
+        group('Should not get public key through IO listener', () =>
+            assert(getPublicKey(baseUrl_io, params), [statusForbidden()])
         )
     })
 }
