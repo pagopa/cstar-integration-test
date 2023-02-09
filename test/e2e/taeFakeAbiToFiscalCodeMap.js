@@ -46,6 +46,7 @@ export default () => {
                 bodyJsonSelectorValue('TPAY1', '09771701001'),
                 bodyJsonSelectorValue('AMAZN', '97898850157'),
                 bodyJsonSelectorValue('EURON', 'DE182769455'),
+                bodyJsonSelectorValue('UBER1', 'NL858620285B01')
             ])
         )
     })
