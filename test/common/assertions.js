@@ -14,6 +14,14 @@ export function statusOk() {
     }
 }
 
+export function statusAccepted() {
+    return function doCheck(res) {
+        const isOk = check(res, {
+            'HTTP status is 202': (r) => r.status === 202,
+        })
+    }
+}
+
 export function statusCreated() {
     return function doCheck(res) {
         check(res, { 'HTTP status is 201': (r) => r.status === 201 })

@@ -1,4 +1,4 @@
-import { group } from 'k6'
+import { group, sleep } from 'k6'
 import {
      putOnboardingCitizen,
      putCheckPrerequisites,
@@ -11,8 +11,8 @@ import { assert, statusNoContent, statusAccepted, statusOk, bodyJsonSelectorValu
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT, PROD } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
 import { getFCList } from '../common/utils.js'
-import { SharedArray } from 'k6/data'
 import {exec, vu} from 'k6/execution'
+import { SharedArray } from 'k6/data'
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
@@ -25,9 +25,33 @@ let cfList = new SharedArray('cfList', function() {
 })
 
 
-if (isEnvValid(DEV)) {
+export let options = {
+    scenarios: {
+            /* per_vu_iterations: {
+                executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
+                timeUnit: '1s', //period of time to apply the iteration
+                startRate: 100, //Number of iterations to execute each timeUnit period at test start.
+                preAllocatedVUs: 500,
+                stages: [
+                    { duration: '1s', target: 100 },
+                    { duration: '1s', target: 100 },
+                    { duration: '1s', target: 100 },
+                    
+                ]
+        } */
+          scenario_uno: {
+            executor: 'per-vu-iterations',
+            vus: 50,
+            iterations: 1,
+            startTime: '0s',
+            maxDuration: '1m',
+        }, 
+    },
+}
+
+if (isEnvValid(__ENV.TARGET_ENV)) {
     myEnv = dotenv.parse(open(`../../.env.${__ENV.TARGET_ENV}.local`))
-    baseUrl = services[`dev_io`].baseUrl
+    baseUrl = services[`${__ENV.TARGET_ENV}_io`].baseUrl
 }
 
 
@@ -50,61 +74,66 @@ export default () => {
     let checked = true
     const cf = auth(cfList[vu.idInTest-1].cf)
 
-    if (
-        !isEnvValid(DEV) ||
-        !isTestEnabledOnEnv(DEV, REGISTERED_ENVS)
-    ) {
 
-        return
+    if (
+        !isEnvValid(__ENV.TARGET_ENV) ||
+        !isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)
+    ) {
+        exec.test.abort()
     }
 
-    const params = "<SERVICEID>"
+    
     if (checked){
+        const serviceId = "<SERVICEID>"
+        const params = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Ocp-Apim-Trace': 'true'
+            } 
+        } 
         const res = getInitiative(
             baseUrl,
             cf,
+            serviceId,
             params
         )
+            
         if(res.status != 200){
             console.error('GetInitiative -> '+JSON.stringify(res))
             checked = false
             return
         }
+        assert(res,
+            [statusOk()])
     
         const bodyObj = JSON.parse(res.body)
         init = bodyObj.initiativeId
     }
+
             
 
     group('Should onboard Citizen', () => {
+
         group('When the inititive exists', () => {
             if(checked){
             
             const body = {
                 initiativeId: init
-            }
-            
+            }  
                 let res = putOnboardingCitizen(
                     baseUrl,
                     JSON.stringify(body),
                     cf
                 )
-
                 if(res.status != 204){
                     console.error('PutOnboardingCitizen -> '+JSON.stringify(res))
                     checked = false
+                    return
                 }
-                
-                assert(res,
-                [statusNoContent()])
+                assert(res, [statusNoContent()])
             }
-
-            return
-            
+  
         })
-    })
-
-    group('Should onboard status be', () => {
         group('When inititive exists', () => {
             if(checked){
             const params = init
@@ -113,21 +142,18 @@ export default () => {
                     cf,
                     params
                 )
-
             if(res.status != 200){
                 console.error('GetStatus -> '+JSON.stringify(res))
                 checked = false
+                return
             }
-            
             assert(res,
             [statusOk(),
             bodyJsonSelectorValue('status', 'ACCEPTED_TC')])
         }
-        return
+        
         })
-    })
 
-    group('Should Citizen pre-requisites', () => {
         group('When the TC consent exists', () => {
             if(checked){
             const body = {
@@ -141,17 +167,15 @@ export default () => {
             if(res.status != 200){
                 console.error('PutCheckPrerequisites -> '+JSON.stringify(res))
                 checked = false
+                return
             }
             
             assert(res,
             [statusOk()])
             }
-            return
+            
         })
-    })
 
-
-    group('Save consent should be ok', () => {
         group('When the inititive and consents exist', () => {
             if(checked){
             const body = {
@@ -174,4 +198,5 @@ export default () => {
             }
         })
     })
+    sleep(1)
 }
