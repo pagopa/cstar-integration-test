@@ -10,13 +10,13 @@ import {
 import dotenv from 'k6/x/dotenv'
 import {exec, vu} from 'k6/execution'
 import {
-    putEnrollInstrumentIssuer
+    putEnrollIbanIssuer
    } from '../common/api/idpayWallet.js'
-import { getFCPanList } from '../common/utils.js'
+import { getFCIbanList } from '../common/utils.js'
 import { SharedArray } from 'k6/data'
 
    let cfPanList = new SharedArray('cfPanList', function() {
-    return getFCPanList()
+    return getFCIbanList()
 })
 
 
@@ -27,18 +27,16 @@ export let options = {
     scenarios: {
         per_vu_iterations: {
             executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
-            timeUnit: '10s', //period of time to apply the iteration
-            startRate: 20, //Number of iterations to execute each timeUnit period at test start.
-            preAllocatedVUs: 60,
+            timeUnit: '1s', //period of time to apply the iteration
+            startRate: 100, //Number of iterations to execute each timeUnit period at test start.
+            preAllocatedVUs: 500,
             stages: [
-                { duration: '5s', target: 10 },
-                { duration: '5s', target: 10 },
-                { duration: '5s', target: 10 },
-                { duration: '5s', target: 10 },
-
+                { duration: '1s', target: 100 },
+                { duration: '1s', target: 100 },
+                { duration: '1s', target: 100 },
             ]
         }
-    }
+    },
 }
 let baseUrl
 let myEnv
@@ -58,10 +56,10 @@ if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
 
 export default () => {
     const cf = cfPanList[vu.idInTest-1].cf
-    const pgpan = cfPanList[vu.idInTest-1].pan
+    const iban = cfPanList[vu.idInTest-1].iban
 
-    group('Payment Instrument API', () => {
-        group('Should enroll pgpan', () =>{
+    group('Iban API', () => {
+        group('Should enroll iban', () =>{
 
         let initiativeId = `${myEnv.INITIATIVE_ID}`
         const params= {
@@ -73,24 +71,19 @@ export default () => {
                 'Fiscal-Code': cf,
             },
             body: {
-                "brand": `${myEnv.BRAND}`,
-                "type": `${myEnv.TYPE}`,
-                "pgpPan": pgpan,
-                "expireMonth": `${myEnv.EXPIRE_MONTH}`,
-                "expireYear": `${myEnv.EXPIRE_YEAR}`,
-                "issuerAbiCode": `${myEnv.ISSUER_ABI_CODE}`,
-                "holder": `${myEnv.HOLDER}`
+                "iban": iban,
+                "description": `conto cointestato`
             }
         }
 
-        let res = putEnrollInstrumentIssuer(
+        let res = putEnrollIbanIssuer(
             baseUrl,
-            JSON.stringify(params.body).replace(/\\\\/g, "\\"),
+            JSON.stringify(params.body),
             params.headers,
             initiativeId)
 
         if(res.status != 200){
-            console.error('Enrollment Carte-> '+JSON.stringify(res))
+            console.error('Enrollment IBAN-> '+JSON.stringify(res))
             return
         }
 

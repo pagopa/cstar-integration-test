@@ -29,7 +29,7 @@ export function createRtdSas(baseUrl, params) {
     return res
 }
 
-export function putGpgFile(baseUrl, body, headers, authorizedContainer, fileName, sas) {
+export function putPgpFile(baseUrl, body, headers, authorizedContainer, fileName, sas) {
     const res = http.put(
         `${baseUrl}/pagopastorage/${authorizedContainer}/${fileName}?${sas}`,
         body,

@@ -27,25 +27,17 @@ let cfList = new SharedArray('cfList', function() {
 
 export let options = {
     scenarios: {
-            /* per_vu_iterations: {
-                executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
-                timeUnit: '1s', //period of time to apply the iteration
-                startRate: 100, //Number of iterations to execute each timeUnit period at test start.
-                preAllocatedVUs: 500,
-                stages: [
-                    { duration: '1s', target: 100 },
-                    { duration: '1s', target: 100 },
-                    { duration: '1s', target: 100 },
-
-                ]
-        } */
-          scenario_uno: {
-            executor: 'per-vu-iterations',
-            vus: 50,
-            iterations: 1,
-            startTime: '0s',
-            maxDuration: '1m',
-        },
+        per_vu_iterations: {
+            executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
+            timeUnit: '1s', //period of time to apply the iteration
+            startRate: 100, //Number of iterations to execute each timeUnit period at test start.
+            preAllocatedVUs: 500,
+            stages: [
+                { duration: '1s', target: 100 },
+                { duration: '1s', target: 100 },
+                { duration: '1s', target: 100 },
+            ]
+        }
     },
 }
 

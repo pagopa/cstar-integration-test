@@ -1,5 +1,5 @@
 import { group } from 'k6'
-import { createRtdSas, putGpgFile } from '../common/api/rtdCsvTransaction.js'
+import { createRtdSas, putPgpFile } from '../common/api/rtdCsvTransaction.js'
 import { assert, statusCreated } from '../common/assertions.js'
 import {
     isEnvValid,
@@ -24,13 +24,13 @@ let gpgFile
 
 export let options = {}
 
-let fileName = '<fileName>'
+let fileName = `${myEnv.FILE_NAME}`
 
 
 if (isEnvValid(__ENV.TARGET_ENV)) {
     myEnv = dotenv.parse(open(`../../.env.${__ENV.TARGET_ENV}.local`))
     baseUrl = services[`${__ENV.TARGET_ENV}_issuer`].baseUrl
-    gpgFile = open('../../assets/<fileName>', 'b')
+    gpgFile = open(`../../assets/${fileName}`, 'b')
 
     options.tlsAuth = [
         {
@@ -79,7 +79,7 @@ export default () => {
 
         group('Should put file pgp', () =>{
 
-            const rest = putGpgFile(
+            const rest = putPgpFile(
                 baseUrl,
                 gpgFile,
                 param,
