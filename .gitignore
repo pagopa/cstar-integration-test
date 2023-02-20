@@ -6,4 +6,4 @@ k6.*
 .env.test.local
 .env.production.local
 .idea/
-env*
+/.idea/
