@@ -1,0 +1,34 @@
+# Run Automated Test in UAT environment
+
+trigger: none
+
+pool:
+  vmImage: ubuntu-22.04
+
+parameters:
+  - name: 'SCRIPT'
+    displayName: 'Script name'
+    type: string
+    values:
+      - putTokenMockedPdv
+  - name: 'TARGET_ENV'
+    displayName: 'Target Environment'
+    type: string
+    default: 'uat'
+
+steps:
+  - script: |
+#      docker pull ghcr.io/pagopa/cstar-integration-test:main
+       docker pull grafana/k6:latest #TODO Only test scope
+    displayName: Pull k6 image
+  - script: |
+      pwd
+      ls -lrt
+      docker run -i \
+        -v $(pwd)/src:/src \
+        -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
+#        ghcr.io/pagopa/cstar-integration-test:main \
+        grafana/k6:latest \ #TODO Only test scope
+        run /test/performance/${{ parameters.SCRIPT }}.js
+    displayName: Run k6 ${{ parameters.SCRIPT }}
+
