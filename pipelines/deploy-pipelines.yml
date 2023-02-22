@@ -39,6 +39,6 @@ steps:
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: 'JUnit'
-      testResultsFiles: '/app/performancetest-result.xml'
+      testResultsFiles: 'performancetest-result.xml'
       failTaskOnFailedTests: true
 
