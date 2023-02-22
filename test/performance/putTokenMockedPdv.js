@@ -8,6 +8,7 @@ import { isEnvValid, DEV, UAT, PROD } from '../common/envs.js'
 import { getFCList } from '../common/utils.js'
 import { vu } from 'k6/execution'
 import { SharedArray } from 'k6/data'
+import { jUnit, textSummary } from 'https://jslib.k6.io/k6-summary/0.0.1/index.js';
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
@@ -90,9 +91,8 @@ export default () => {
 }
 
 export function handleSummary(data){
-    let filepath = `./${__ENV.TESTRESULT_FILENAME}-result.xml`;
     return {
             'stdout': textSummary(data, { indent: ' ', enableColors: true}),
-            filepath: jUnit(data),
+            './performancetest-result.xml': jUnit(data),
         }
 }
