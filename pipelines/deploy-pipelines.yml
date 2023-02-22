@@ -27,7 +27,7 @@ steps:
       pwd
       ls -lrt
       docker run -i \
-        -v $(pwd)/test:/test \
+        -v $(pwd):./ \
         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
         grafana/k6:latest \
         run /test/performance/${{ parameters.SCRIPT }}.js
