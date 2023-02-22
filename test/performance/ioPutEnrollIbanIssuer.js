@@ -3,37 +3,40 @@ import { assert, statusOk} from '../common/assertions.js'
 import {
     isEnvValid,
     isTestEnabledOnEnv,
-    DEV
+    DEV,
+    UAT,
+    PROD,
 } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
 import {exec, vu} from 'k6/execution'
 import {
-    getWalletDetail
+    putEnrollIbanIssuer
    } from '../common/api/idpayWallet.js'
-import { getFCPanList } from '../common/utils.js'
+import { getFCIbanList } from '../common/utils.js'
 import { SharedArray } from 'k6/data'
-import { loginFullUrl } from '../common/api/bpdIoLogin.js'
-
-
 
    let cfPanList = new SharedArray('cfPanList', function() {
-    return getFCPanList()
+    return getFCIbanList()
 })
 
 
-const REGISTERED_ENVS = [DEV]
+const REGISTERED_ENVS = [DEV, UAT, PROD]
 
 const services = JSON.parse(open('../../services/environments.json'))
 export let options = {
     scenarios: {
-        scenario_uno: {
-            executor: 'per-vu-iterations',
-            vus: 100,
-            iterations: 1,
-            startTime: '0s',
-            maxDuration: '1s',
-        },
-    }
+        per_vu_iterations: {
+            executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
+            timeUnit: '1s', //period of time to apply the iteration
+            startRate: 100, //Number of iterations to execute each timeUnit period at test start.
+            preAllocatedVUs: 500,
+            stages: [
+                { duration: '1s', target: 100 },
+                { duration: '1s', target: 100 },
+                { duration: '1s', target: 100 },
+            ]
+        }
+    },
 }
 let baseUrl
 let myEnv
@@ -44,33 +47,19 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
 }
 
 
-function auth(fiscalCode) {
-    const authToken = loginFullUrl(
-        `${baseUrl}/bpd/pagopa/api/v1/login`,
-        fiscalCode
-    )
-    return {
-        headers: {
-            Authorization: `Bearer ${authToken}`,
-            'Content-Type': 'application/json',
-            'Ocp-Apim-Subscription-Key': `${myEnv.APIM_SK}`,
-            'Ocp-Apim-Trace': 'true'
-        },
-    }
-}
-
 // In performance tests we shall use abort() to prevent the execution
 // of the default function, otherwise the VUs will be spawned
-if (!isTestEnabledOnEnv(DEV, REGISTERED_ENVS)) {
+if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
     console.log('Test not enabled for target env')
     exec.test.abort()
 }
 
 export default () => {
     const cf = cfPanList[vu.idInTest-1].cf
+    const iban = cfPanList[vu.idInTest-1].iban
 
-    group('Payment Instrument API', () => {
-        group('Should enroll pgpan', () =>{
+    group('Iban API', () => {
+        group('Should enroll iban', () =>{
 
         let initiativeId = `${myEnv.INITIATIVE_ID}`
         const params= {
@@ -79,17 +68,22 @@ export default () => {
                 'Ocp-Apim-Subscription-Key':`${myEnv.APIM_SK}`,
                 'Ocp-Apim-Trace':'true',
                 'Accept-Language':'it_IT',
+                'Fiscal-Code': cf,
             },
+            body: {
+                "iban": iban,
+                "description": `conto cointestato`
+            }
         }
 
-        let res = getWalletDetail(
+        let res = putEnrollIbanIssuer(
             baseUrl,
+            JSON.stringify(params.body),
             params.headers,
-            auth(cf),
             initiativeId)
 
         if(res.status != 200){
-            console.error('Enrollment Carte-> '+JSON.stringify(res))
+            console.error('Enrollment IBAN-> '+JSON.stringify(res))
             return
         }
 

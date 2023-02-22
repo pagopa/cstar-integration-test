@@ -27,25 +27,17 @@ let cfList = new SharedArray('cfList', function() {
 
 export let options = {
     scenarios: {
-            /* per_vu_iterations: {
-                executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
-                timeUnit: '1s', //period of time to apply the iteration
-                startRate: 100, //Number of iterations to execute each timeUnit period at test start.
-                preAllocatedVUs: 500,
-                stages: [
-                    { duration: '1s', target: 100 },
-                    { duration: '1s', target: 100 },
-                    { duration: '1s', target: 100 },
-                    
-                ]
-        } */
-          scenario_uno: {
-            executor: 'per-vu-iterations',
-            vus: 50,
-            iterations: 1,
-            startTime: '0s',
-            maxDuration: '1m',
-        }, 
+        per_vu_iterations: {
+            executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
+            timeUnit: '1s', //period of time to apply the iteration
+            startRate: 100, //Number of iterations to execute each timeUnit period at test start.
+            preAllocatedVUs: 500,
+            stages: [
+                { duration: '1s', target: 100 },
+                { duration: '1s', target: 100 },
+                { duration: '1s', target: 100 },
+            ]
+        }
     },
 }
 
@@ -82,22 +74,22 @@ export default () => {
         exec.test.abort()
     }
 
-    
+
     if (checked){
-        const serviceId = "<SERVICEID>"
+        const serviceId = `${myEnv.SERVICE_ID}`
         const params = {
             headers: {
                 'Content-Type': 'application/json',
                 'Ocp-Apim-Trace': 'true'
-            } 
-        } 
+            }
+        }
         const res = getInitiative(
             baseUrl,
             cf,
             serviceId,
             params
         )
-            
+
         if(res.status != 200){
             console.error('GetInitiative -> '+JSON.stringify(res))
             checked = false
@@ -105,21 +97,21 @@ export default () => {
         }
         assert(res,
             [statusOk()])
-    
+
         const bodyObj = JSON.parse(res.body)
         init = bodyObj.initiativeId
     }
 
-            
+
 
     group('Should onboard Citizen', () => {
 
         group('When the inititive exists', () => {
             if(checked){
-            
+
             const body = {
                 initiativeId: init
-            }  
+            }
                 let res = putOnboardingCitizen(
                     baseUrl,
                     JSON.stringify(body),
@@ -132,7 +124,7 @@ export default () => {
                 }
                 assert(res, [statusNoContent()])
             }
-  
+
         })
         group('When inititive exists', () => {
             if(checked){
@@ -151,7 +143,7 @@ export default () => {
             [statusOk(),
             bodyJsonSelectorValue('status', 'ACCEPTED_TC')])
         }
-        
+
         })
 
         group('When the TC consent exists', () => {
@@ -169,11 +161,11 @@ export default () => {
                 checked = false
                 return
             }
-            
+
             assert(res,
             [statusOk()])
             }
-            
+
         })
 
         group('When the inititive and consents exist', () => {
@@ -192,7 +184,7 @@ export default () => {
                 console.error('PutSaveConsent -> '+JSON.stringify(res))
                 checked = false
             }
-            
+
             assert(res,
             [statusAccepted()])
             }

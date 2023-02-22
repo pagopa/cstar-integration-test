@@ -105,17 +105,14 @@ export default () => {
                 "pii": uniqueCF,
             }
         }
-
         let res = upsertMockToken(
             JSON.stringify(params.body),
             params
         )
-
         if(res.status != 200){
             console.error('ERROR-> '+JSON.stringify(res))
             return
         }
-
         assert(res,
             [statusOk()])
          

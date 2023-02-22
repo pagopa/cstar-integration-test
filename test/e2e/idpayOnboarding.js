@@ -25,7 +25,7 @@ let cfList = new SharedArray('cfList', function() {
 })
 
 
-if (isEnvValid(DEV)) {
+if (isEnvValid(__ENV.TARGET_ENV)){
     myEnv = dotenv.parse(open(`../../.env.${__ENV.TARGET_ENV}.local`))
     baseUrl = services[`dev_io`].baseUrl
 }
@@ -58,7 +58,7 @@ export default () => {
         return
     }
 
-    const params = "<SERVICEID>"
+    const params = `${myEnv.SERVICE_ID}`
     if (checked){
         const res = getInitiative(
             baseUrl,
@@ -70,20 +70,20 @@ export default () => {
             checked = false
             return
         }
-    
+
         const bodyObj = JSON.parse(res.body)
         init = bodyObj.initiativeId
     }
-            
+
 
     group('Should onboard Citizen', () => {
         group('When the inititive exists', () => {
             if(checked){
-            
+
             const body = {
                 initiativeId: init
             }
-            
+
                 let res = putOnboardingCitizen(
                     baseUrl,
                     JSON.stringify(body),
@@ -94,13 +94,13 @@ export default () => {
                     console.error('PutOnboardingCitizen -> '+JSON.stringify(res))
                     checked = false
                 }
-                
+
                 assert(res,
                 [statusNoContent()])
             }
 
             return
-            
+
         })
     })
 
@@ -118,7 +118,7 @@ export default () => {
                 console.error('GetStatus -> '+JSON.stringify(res))
                 checked = false
             }
-            
+
             assert(res,
             [statusOk(),
             bodyJsonSelectorValue('status', 'ACCEPTED_TC')])
@@ -142,7 +142,7 @@ export default () => {
                 console.error('PutCheckPrerequisites -> '+JSON.stringify(res))
                 checked = false
             }
-            
+
             assert(res,
             [statusOk()])
             }
@@ -168,7 +168,7 @@ export default () => {
                 console.error('PutSaveConsent -> '+JSON.stringify(res))
                 checked = false
             }
-            
+
             assert(res,
             [statusAccepted()])
             }
