@@ -18,6 +18,10 @@ parameters:
     values:
       - 'dev'
       - 'uat'
+  - name: 'TESTRESULT_FILENAME'
+    displayName: 'File name for result'
+    type: string
+    default: 'performancetest'
 
 steps:
   - script: |

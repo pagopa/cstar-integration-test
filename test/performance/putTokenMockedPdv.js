@@ -88,3 +88,11 @@ export default () => {
     })
     sleep(1)
 }
+
+export function handleSummary(data){
+    let filepath = `./${__ENV.TESTRESULT_FILENAME}-result.xml`;
+    return {
+            'stdout': textSummary(data, { indent: ' ', enableColors: true}),
+            filepath: jUnit(data),
+        }
+}
