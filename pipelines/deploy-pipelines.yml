@@ -15,20 +15,21 @@ parameters:
     displayName: 'Target Environment'
     type: string
     default: 'uat'
+    values:
+      - 'dev'
+      - 'uat'
 
 steps:
   - script: |
-#      docker pull ghcr.io/pagopa/cstar-integration-test:main
-       docker pull grafana/k6:latest #TODO Only test scope
+       docker pull grafana/k6:latest
     displayName: Pull k6 image
   - script: |
       pwd
       ls -lrt
       docker run -i \
-        -v $(pwd)/src:/src \
+        -v ${PWD}:/test/performance
         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
-#        ghcr.io/pagopa/cstar-integration-test:main \
-        grafana/k6:latest \ #TODO Only test scope
+        grafana/k6:latest \
         run /test/performance/${{ parameters.SCRIPT }}.js
     displayName: Run k6 ${{ parameters.SCRIPT }}
 
