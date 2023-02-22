@@ -22,5 +22,11 @@
   },
   "dev_issuer_internal": {
     "baseUrl": "http://10.1.0.250"
+  },
+  "dev_pdv":{
+    "baseUrl" : "https://api.uat.tokenizer.pdv.pagopa.it"
+  },
+  "uat_pdv":{
+    "baseUrl" : "https://api.uat.tokenizer.pdv.pagopa.it"
   }
 }
