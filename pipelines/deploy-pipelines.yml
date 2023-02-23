@@ -33,10 +33,12 @@ steps:
         grafana/k6:latest \
         run /app/test/performance/${{ parameters.SCRIPT }}.js \
     displayName: Run k6 ${{ parameters.SCRIPT }}
+  - powershell: 'Start-Sleep -s 10'
+    displayName: 'PowerShell Script'
   - script: |
       docker ps -a
       CONTAINER_ID=$(docker ps -l -q) 
-      docker cp ksixtests:/app/ $(System.DefaultWorkingDirectory)
+      docker cp ksixtests:/app/performancetest-result.xml $(System.DefaultWorkingDirectory)
       pwd
       ls -lrt
       cd ./app
