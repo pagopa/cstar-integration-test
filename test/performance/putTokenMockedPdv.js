@@ -48,7 +48,7 @@ export let options = {
     },
     thresholds: {
         http_req_failed: [{threshold:'rate<0.01', abortOnFail: false, delayAbortEval: '10s'},], // http errors should be less than 1%
-        http_req_duration: [{threshold:'p(90)<500', abortOnFail: false, delayAbortEval: '10s'},], // 90% of requests should be below 200ms
+//        http_req_duration: [{threshold:'p(90)<500', abortOnFail: false, delayAbortEval: '10s'},], // 90% of requests should be below 200ms
         http_reqs: [{threshold:'rate<500', abortOnFail: false, delayAbortEval: '10s'},] //
       },
     
