@@ -24,8 +24,6 @@ steps:
        docker pull grafana/k6:latest
     displayName: Pull k6 image
   - script: |
-      pwd
-      ls -lrt
       docker run -i \
         --name ksixtests \
         --user $UID \
@@ -34,7 +32,6 @@ steps:
         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
         grafana/k6:latest \
         run /app/test/performance/${{ parameters.SCRIPT }}.js
-      ls -lrt
     displayName: Run k6 ${{ parameters.SCRIPT }}
   - task: PublishTestResults@2
     inputs:
