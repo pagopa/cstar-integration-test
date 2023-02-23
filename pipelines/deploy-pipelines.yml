@@ -31,8 +31,11 @@ steps:
         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
         grafana/k6:latest \
         run /app/test/performance/${{ parameters.SCRIPT }}.js \
-      ls -lrt
     displayName: Run k6 ${{ parameters.SCRIPT }}
+  - script: |
+      pwd
+      ls -lrt
+    displayName: Check files test
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: 'JUnit'
