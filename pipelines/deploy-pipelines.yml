@@ -42,6 +42,7 @@ steps:
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: 'JUnit'
-      testResultsFiles: 'performancetest-result.xml'
+      testResultsFiles: '**/performancetest-result.xml'
+      searchFolder: '$(System.DefaultWorkingDirectory)'
       failTaskOnFailedTests: true
 
