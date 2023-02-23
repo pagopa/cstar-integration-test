@@ -34,7 +34,7 @@ steps:
     displayName: Run k6 ${{ parameters.SCRIPT }}
   - script: |
       CONTAINER_ID = $(docker ps -lq)
-      docker cp $CONTAINER_ID:/app/performancetest-result.xml .
+      docker cp $CONTAINER_ID:/app:performancetest-result.xml .
       pwd
       ls -lrt
     displayName: Retrieve result file
