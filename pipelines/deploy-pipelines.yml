@@ -33,9 +33,9 @@ steps:
         run /app/test/performance/${{ parameters.SCRIPT }}.js \
     displayName: Run k6 ${{ parameters.SCRIPT }}
   - script: |
-      CONTAINER_ID=$(docker ps -l -q) \
-      docker exec CONTAINER_ID sh -c "ls" \
-      docker cp $CONTAINER_ID:/app/performancetest-result.xml:performancetest-result.xml \
+      CONTAINER_ID=$(docker ps -l -q) 
+      docker exec CONTAINER_ID sh -c "ls" 
+      docker cp $CONTAINER_ID:/app/performancetest-result.xml:performancetest-result.xml 
       pwd
       ls -lrt
     displayName: Retrieve result file
