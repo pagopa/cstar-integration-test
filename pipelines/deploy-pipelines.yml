@@ -26,7 +26,7 @@ steps:
   - script: |
       pwd
       ls -lrt
-      docker run -i -d \
+      docker run -i \
         --name ksixtests \
         -v $(pwd):/app \
         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
@@ -36,10 +36,8 @@ steps:
   - script: |
       docker ps -a
       CONTAINER_ID=$(docker ps -l -q) 
-      docker cp ksixtests:/app/performancetest-result.xml $(System.DefaultWorkingDirectory)
+      docker cp ksixtests:**/performancetest-result.xml $(System.DefaultWorkingDirectory)
       pwd
-      ls -lrt
-      cd ./app
       ls -lrt
     displayName: Retrieve result file
   - task: PublishTestResults@2
