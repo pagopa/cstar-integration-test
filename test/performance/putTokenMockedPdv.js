@@ -8,7 +8,7 @@ import { isEnvValid, DEV, UAT, PROD } from '../common/envs.js'
 import { getFCList } from '../common/utils.js'
 import { vu } from 'k6/execution'
 import { SharedArray } from 'k6/data'
-import { jUnit, textSummary } from 'https://jslib.k6.io/k6-summary/0.0.1/index.js';
+import { jUnit, textSummary } from 'https://jslib.k6.io/k6-summary/0.0.2/index.js';
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
@@ -45,7 +45,12 @@ export let options = {
             startTime: '0s',
             maxDuration: '600s',
         },
-    } 
+    },
+    thresholds: {
+        http_req_failed: [{threshold:'rate<0.01', abortOnFail: true, delayAbortEval: '10s'},], // http errors should be less than 1%
+        http_req_duration: [{threshold:'p(90)<500', abortOnFail: true, delayAbortEval: '10s'},], // 90% of requests should be below 200ms
+        http_reqs: [{threshold:'rate<500', abortOnFail: true, delayAbortEval: '10s'},] //
+      },
     
 }
 
@@ -84,7 +89,6 @@ export default () => {
 
         assert(res,
             [statusOk()])
-         
         })
     })
     sleep(1)
@@ -94,5 +98,7 @@ export function handleSummary(data){
     return {
             'stdout': textSummary(data, { indent: ' ', enableColors: true}),
             './performancetest-result.xml': jUnit(data),
-        }
+    }
 }
+
+
