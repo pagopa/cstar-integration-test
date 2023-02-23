@@ -33,9 +33,9 @@ steps:
         --workdir "/app" \
         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
         grafana/k6:latest \
-        run /app/test/performance/${{ parameters.SCRIPT }}.js 
+        run /app/test/performance/${{ parameters.SCRIPT }}.js \
         --summary-export=/app/performancetest-result.xml
-      docker cp ksixtests:./performancetest-result.xml $(System.DefaultWorkingDirectory)
+      docker cp ksixtests:/app/performancetest-result.xml $(System.DefaultWorkingDirectory)
       ls -lrt
     displayName: Run k6 ${{ parameters.SCRIPT }}
   - script: |
