@@ -18,10 +18,6 @@ parameters:
     values:
       - 'dev'
       - 'uat'
-  - name: 'TESTRESULT_FILENAME'
-    displayName: 'File name for result'
-    type: string
-    default: 'performancetest'
 
 steps:
   - script: |
@@ -34,7 +30,8 @@ steps:
         -v $(pwd):/app \
         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
         grafana/k6:latest \
-        run /app/test/performance/${{ parameters.SCRIPT }}.js
+        run /app/test/performance/${{ parameters.SCRIPT }}.js \
+      ls -lrt
     displayName: Run k6 ${{ parameters.SCRIPT }}
   - task: PublishTestResults@2
     inputs:
