@@ -33,9 +33,11 @@ steps:
         run /app/test/performance/${{ parameters.SCRIPT }}.js \
     displayName: Run k6 ${{ parameters.SCRIPT }}
   - script: |
+      CONTAINER_ID = $(docker ps -lq)
+      docker cp $CONTAINER_ID:/app/performancetest-result.xml .
       pwd
       ls -lrt
-    displayName: Check files test
+    displayName: Retrieve result file
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: 'JUnit'
