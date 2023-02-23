@@ -40,6 +40,8 @@ steps:
       docker cp ksixtests:./performancetest-result.xml $(System.DefaultWorkingDirectory)
       pwd
       ls -lrt
+      cd ./test/performance
+      ls -lrt
     displayName: Retrieve result file
   - task: PublishTestResults@2
     inputs:
