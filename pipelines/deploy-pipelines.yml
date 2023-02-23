@@ -27,12 +27,12 @@ steps:
       pwd
       ls -lrt
       docker run -i \
-        --name k6tests \
+        --name ksixtests \
         -v $(pwd):/app \
         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
         grafana/k6:latest \
-        run /app/test/performance/${{ parameters.SCRIPT }}.js \
-      docker cp k6tests:app/performancetest-result.xml $(System.DefaultWorkingDirectory)
+        run /app/test/performance/${{ parameters.SCRIPT }}.js
+      docker cp ksixtests:app/performancetest-result.xml $(System.DefaultWorkingDirectory)
     displayName: Run k6 ${{ parameters.SCRIPT }}
   - script: |
       docker ps -a
