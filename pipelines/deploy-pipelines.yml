@@ -32,7 +32,7 @@ steps:
         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
         grafana/k6:latest \
         run /app/test/performance/${{ parameters.SCRIPT }}.js \
-        cp ksixtests:app/performancetest-result.xml $(System.DefaultWorkingDirectory)
+        cat ksixtests:app/performancetest-result.xml $(System.DefaultWorkingDirectory)
     displayName: Run k6 ${{ parameters.SCRIPT }}
   - script: |
       docker ps -a
