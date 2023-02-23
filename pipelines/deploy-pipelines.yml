@@ -26,7 +26,7 @@ steps:
   - script: |
       pwd
       ls -lrt
-      docker run -i \
+      docker run -i -d \
         --name ksixtests \
         -v $(pwd):/app \
         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
