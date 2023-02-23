@@ -39,6 +39,8 @@ steps:
       docker cp ksixtests:/app/ $(System.DefaultWorkingDirectory)
       pwd
       ls -lrt
+      cd ./app
+      ls -lrt
     displayName: Retrieve result file
   - task: PublishTestResults@2
     inputs:
