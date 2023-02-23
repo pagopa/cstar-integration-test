@@ -35,7 +35,7 @@ steps:
   - script: |
       docker ps -a
       CONTAINER_ID=$(docker ps -l -q) 
-      docker cp $CONTAINER_ID:/app/performancetest-result.xml performancetest-result.xml 
+      docker cp $CONTAINER_ID:$(pwd)/app/performancetest-result.xml $(pwd)/performancetest-result.xml 
       pwd
       ls -lrt
     displayName: Retrieve result file
