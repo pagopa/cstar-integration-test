@@ -26,13 +26,14 @@ steps:
       curl -sSL https://install.python-poetry.org | python3 -
       curl -L https://github.com/pagopa/cstar-cli/archive/refs/heads/main.zip -o cstar-cli.zip
       unzip cstar-cli.zip
+      ls -lrt
       cd cstar-cli-main
       pip install --force-reinstall src/cstar-cli-core
       pip install --no-deps --force-reinstall src/cstar-cli
     displayName: Set environment
   - script: |
       cd src/cstar-cli/
-      python cst idpay idpaydataset \
+      python3 cst idpay idpaydataset \
               --action dataset_and_transactions \
               --env ${{ parameters.TARGET_ENV }} \
               --out-dir .\generated  \
@@ -41,6 +42,7 @@ steps:
               --start-datetime 2023-02-27T20:30:00.000Z \
               --mcc 1234 \
               --PM-salt SALT123
+      ls -lrt
       cd ../../../
     displayName: Retrieve resource from cstar-cli
   - script: |
