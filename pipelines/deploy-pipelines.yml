@@ -32,7 +32,7 @@ steps:
       pip install --no-deps --force-reinstall src/cstar-cli
     displayName: Set environment
   - script: |
-      cd src/cstar-cli
+      cd cstar-cli-main/src/cstar-cli
       python3 cst idpay idpaydataset \
               --action dataset_and_transactions \
               --env ${{ parameters.TARGET_ENV }} \
