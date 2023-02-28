@@ -67,8 +67,14 @@ export default () => {
                 bodyPgpPublicKey(),
             ])
         })
-        group('Batch service deprecated version returns 403', () => {
+        group('Batch service deprecated patch returns 403', () => {
             params.headers['User-Agent'] = 'BatchService/1.2.0'
+            assert(getPublicKey(baseUrl, params), [
+                statusForbidden()
+            ])
+        })
+        group('Batch service previous minor returns 403', () => {
+            params.headers['User-Agent'] = 'BatchService/1.1.0'
             assert(getPublicKey(baseUrl, params), [
                 statusForbidden()
             ])
