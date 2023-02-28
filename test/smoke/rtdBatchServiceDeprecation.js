@@ -53,7 +53,6 @@ export default () => {
         return
     }
     group('Public Key API', () => {
-    // the first assertion can be later removed for maintainability purpose
         group('Batch service minimum version returns OK', () => {
             params.headers['User-Agent'] = 'BatchService/1.2.5'
             assert(getPublicKey(baseUrl, params), [
