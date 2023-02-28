@@ -18,6 +18,20 @@ parameters:
     values:
       - 'dev'
       - 'uat'
+  - name: 'SCENARIO_TYPE_ENV'
+    displayName: 'Scenario type'
+    type: string
+    default: 'sequence'
+    values:
+      - 'sequence'
+      - 'rampage'
+  - name: 'VIRTUAL_USERS_ENV'
+    displayName: 'Number of virtual users'
+    type: number
+  - name: 'TRX_FOR_VU_ENV'
+    displayName: 'Number of transactions for each virtual user'
+    type: number
+    default: 1
 
 steps:
   - script: |
