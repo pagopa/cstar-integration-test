@@ -18,17 +18,17 @@ parameters:
     values:
       - 'dev'
       - 'uat'
-  - name: 'SCENARIO_TYPE_ENV'
+  - name: 'SCENARIOTYPE_ENV'
     displayName: 'Scenario type'
     type: string
     default: 'ramping-arrival-rate'
     values:
       - 'ramping-arrival-rate'
       - 'per-vu-iterations'
-  - name: 'VIRTUAL_USERS_ENV'
+  - name: 'VIRTUALUSERSR_ENV'
     displayName: 'Number of virtual users (1 - 100 000)'
     type: number
-  - name: 'TRX_FOR_VU_ENV'
+  - name: 'TRXFORVU_ENV'
     displayName: 'Number of transactions for each virtual user'
     type: number
     default: 1
