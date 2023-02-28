@@ -18,17 +18,17 @@ parameters:
     values:
       - 'dev'
       - 'uat'
-  - name: 'SCENARIOTYPE_ENV'
+  - name: 'SCENARIO_TYPE_ENV'
     displayName: 'Scenario type'
     type: string
     default: 'ramping-arrival-rate'
     values:
       - 'ramping-arrival-rate'
       - 'per-vu-iterations'
-  - name: 'VIRTUALUSERSR_ENV'
+  - name: 'VIRTUAL_USERS_ENV'
     displayName: 'Number of virtual users (1 - 100 000)'
     type: number
-  - name: 'TRXFORVU_ENV'
+  - name: 'TRX_FOR_VU_ENV'
     displayName: 'Number of transactions for each virtual user'
     type: number
     default: 1
@@ -44,6 +44,8 @@ steps:
         -v $(pwd):/app \
         --workdir "/app" \
         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
+        -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
+        -e VIRTUAL_USERS_ENV=${{ VIRTUAL_USERS_ENV }} \
         grafana/k6:latest \
         run /app/test/performance/${{ parameters.SCRIPT }}.js
     displayName: Run k6 ${{ parameters.SCRIPT }}

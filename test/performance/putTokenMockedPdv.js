@@ -40,7 +40,7 @@ export let options = {
      scenarios: { //TODO only test scope
         scenario_uno: {
             executor: 'per-vu-iterations',
-            vus: __ENV.VIRTUALUSERS_ENV,
+            vus: __ENV.VIRTUAL_USERS_ENV,
             iterations: 1,
             startTime: '0s',
             maxDuration: '600s', //TODO to be parametrized according to the number of VUs
@@ -49,7 +49,7 @@ export let options = {
     thresholds: {
         http_req_failed: [{threshold:'rate<0.01', abortOnFail: false, delayAbortEval: '10s'},], // http errors should be less than 1%
 //        http_req_duration: [{threshold:'p(90)<500', abortOnFail: false, delayAbortEval: '10s'},], // 90% of requests should be below 200ms
-//        http_reqs: [{threshold: `count<=${__ENV.VIRTUALUSERS_ENV}`, abortOnFail: false, delayAbortEval: '10s'},]
+        http_reqs: [{threshold: `count<=${__ENV.VIRTUAL_USERS_ENV}`, abortOnFail: false, delayAbortEval: '10s'},]
       },
     
 }
@@ -98,8 +98,8 @@ export function handleSummary(data){
     console.log(`
     ****************************************************************\nTEST DETAILS:\n\r- Time to complete test: ${data.state.testRunDurationMs} ms
     - Environment target: ${__ENV.TARGET_ENV}
-    - Scenario test type: ${__ENV.SCENARIOTYPE_ENV}
-    - Number of VUs: ${__ENV.VIRTUALUSERS_ENV} (OK: ${data.metrics.checks.values.passes} - ERRORS: ${data.metrics.checks.values.fails})
+    - Scenario test type: ${__ENV.SCENARIO_TYPE_ENV}
+    - Number of VUs: ${__ENV.VIRTUAL_USERS_ENV} (OK: ${data.metrics.checks.values.passes} - ERRORS: ${data.metrics.checks.values.fails})
     ****************************************************************`)
     return {
             'stdout': textSummary(data, { indent: ' ', enableColors: true}),
