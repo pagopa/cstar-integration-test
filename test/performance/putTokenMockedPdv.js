@@ -95,12 +95,7 @@ export default () => {
 }
 
 export function handleSummary(data){
-    console.log(`
-    ****************************************************************\nTEST DETAILS:\n\r- Time to complete test: ${data.state.testRunDurationMs} ms
-    - Environment target: ${__ENV.TARGET_ENV}
-    - Scenario test type: ${__ENV.SCENARIO_TYPE_ENV}
-    - Number of VUs: ${__ENV.VIRTUAL_USERS_ENV} (OK: ${data.metrics.checks.values.passes} - ERRORS: ${data.metrics.checks.values.fails})
-    ****************************************************************`)
+    console.log(`TEST DETAILS: [Time to complete test: ${data.state.testRunDurationMs} ms, Environment target: ${__ENV.TARGET_ENV}, Scenario test type: ${__ENV.SCENARIO_TYPE_ENV}, Number of VUs: ${__ENV.VIRTUAL_USERS_ENV}, Request OK: ${data.metrics.checks.values.passes}, ERRORS: ${data.metrics.checks.values.fails}`)
     return {
             'stdout': textSummary(data, { indent: ' ', enableColors: true}),
             './performancetest-result.xml': jUnit(data),
