@@ -21,12 +21,12 @@ parameters:
   - name: 'SCENARIO_TYPE_ENV'
     displayName: 'Scenario type'
     type: string
-    default: 'sequence'
+    default: 'ramping-arrival-rate'
     values:
-      - 'sequence'
-      - 'rampage'
+      - 'ramping-arrival-rate'
+      - 'per-vu-iterations'
   - name: 'VIRTUAL_USERS_ENV'
-    displayName: 'Number of virtual users'
+    displayName: 'Number of virtual users (1 - 100 000)'
     type: number
   - name: 'TRX_FOR_VU_ENV'
     displayName: 'Number of transactions for each virtual user'
