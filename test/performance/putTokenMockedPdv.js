@@ -1,4 +1,4 @@
-import { group, sleep } from 'k6'
+import { group, sleep} from 'k6'
 import {
      upsertToken,
      upsertMockToken
@@ -9,6 +9,7 @@ import { getFCList } from '../common/utils.js'
 import { vu } from 'k6/execution'
 import { SharedArray } from 'k6/data'
 import { jUnit, textSummary } from 'https://jslib.k6.io/k6-summary/0.0.2/index.js';
+import { setStages } from '../common/stageUtils.js';
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
@@ -19,33 +20,33 @@ let cfList = new SharedArray('cfList', function() {
 
 const services = JSON.parse(open('../../services/environments.json'))
 
-export let options = {
-//    scenarios: {
-//        per_vu_iterations: {
-//            executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
-//            timeUnit: '1s', //period of time to apply the iteration
-//            startRate: 10, //Number of iterations to execute each timeUnit period at test start.
-//            preAllocatedVUs: 500,
-//            stages: [ //TODO to be parametrized according to the number of VUs
-//                { duration: '1s', target: 10 },
-//                { duration: '1s', target: 50 },
-//                { duration: '1s', target: 10 },
-//                { duration: '1s', target: 100 },
-//                { duration: '1s', target: 20 },
-//                { duration: '1s', target: 300 },
-//                { duration: '1s', target: 0 },
-//            ]
-//        }
-    
-     scenarios: { //TODO only test scope
-        scenario_uno: {
-            executor: 'per-vu-iterations',
-            vus: __ENV.VIRTUAL_USERS_ENV,
-            iterations: 1,
-            startTime: '0s',
-            maxDuration: '600s', //TODO to be parametrized according to the number of VUs
-        },
+let retrieveStageNumber
+if(__ENV.STAGE_NUMBER_ENV > 3){
+    retrieveStageNumber = __ENV.STAGE_NUMBER_ENV
+} else {
+    retrieveStageNumber = 3
+}
+const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, retrieveStageNumber)
+
+let scenarios = {
+    rampingArrivalRate: {
+        executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
+        timeUnit: '1s', //period of time to apply the iteration
+        preAllocatedVUs: __ENV.VIRTUAL_USERS_ENV,
+        maxVUs: __ENV.VIRTUAL_USERS_ENV,
+        stages: customStages
     },
+    perVuIterations: {
+        executor: 'per-vu-iterations',
+        vus: __ENV.VIRTUAL_USERS_ENV,
+        iterations: 1,
+        startTime: '0s',
+        maxDuration: `${__ENV.DURATION_PER_VU_ITERATION}s`,
+    },
+};
+
+export let options = {
+    scenarios: {},
     thresholds: {
         http_req_failed: [{threshold:'rate<0.01', abortOnFail: false, delayAbortEval: '10s'},], // http errors should be less than 1%
 //        http_req_duration: [{threshold:'p(90)<500', abortOnFail: false, delayAbortEval: '10s'},], // 90% of requests should be below 200ms
@@ -54,18 +55,22 @@ export let options = {
     
 }
 
+if (__ENV.SCENARIO_TYPE_ENV) {
+    options.scenarios[__ENV.SCENARIO_TYPE_ENV] = scenarios[__ENV.SCENARIO_TYPE_ENV]; // Use just a single scenario if `--env scenario=whatever` is used
+} else {
+    options.scenarios = scenarios; // Use all scenrios
+}
+
 if (isEnvValid(__ENV.TARGET_ENV)) {
     baseUrl = services[`${__ENV.TARGET_ENV}_pdv`].baseUrl
 }
 
-
-
 export default () => {
-    const uniqueCF = cfList[vu.idInTest-1].cf
-
     //MOCK TOKEN
     group('Should pdv put a cf', () => {
         group('Returns a token', () => {
+
+        const uniqueCF = cfList[vu.idInTest-1].cf
             
         const params= {
             headers:  { 
@@ -95,7 +100,14 @@ export default () => {
 }
 
 export function handleSummary(data){
-    console.log(`TEST DETAILS: [Time to complete test: ${data.state.testRunDurationMs} ms, Environment target: ${__ENV.TARGET_ENV}, Scenario test type: ${__ENV.SCENARIO_TYPE_ENV}, Number of VUs: ${__ENV.VIRTUAL_USERS_ENV}, Request OK: ${data.metrics.checks.values.passes}, ERRORS: ${data.metrics.checks.values.fails}]`)
+    console.log(`TEST DETAILS: [Time to complete test: ${data.state.testRunDurationMs} ms, Environment target: ${__ENV.TARGET_ENV}, Scenario test type: ${__ENV.SCENARIO_TYPE_ENV}, Number of VUs: ${__ENV.VIRTUAL_USERS_ENV}, Request processed: ${data.metrics.http_reqs.values.count}, Request OK: ${data.metrics.http_req_failed.values.fails}, ERRORS: ${data.metrics.http_req_failed.values.passes}]`)
+    if(__ENV.SCENARIO_TYPE_ENV == 'rampingArrivalRate'){
+        let stringRamping = 'Ramping points : { '
+        for(let i=0; i<customStages.length-1; i++){
+            stringRamping += `${customStages[i].target}, `
+        }
+        console.log(stringRamping+ `${customStages[customStages.length-1].target} } `)
+    }
     return {
             'stdout': textSummary(data, { indent: ' ', enableColors: true}),
             './performancetest-result.xml': jUnit(data),
