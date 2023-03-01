@@ -50,7 +50,7 @@ export let options = {
 }
 
 if (__ENV.SCENARIO_TYPE_ENV) {
-    options.scenarios[__ENV.SCENARIO_TYPE_ENV] = scenarios[__ENV.SCENARIO_TYPE_ENV]; // Use just a single scenario if `--env scenario=whatever` is used
+    options.scenarios[__ENV.SCENARIO_TYPE_ENV] = scenarios[__ENV.SCENARIO_TYPE_ENV]; // Use just a single scenario if ` -e SCENARIO_TYPE_ENV` is used
 } else {
     options.scenarios = scenarios; // Use all scenrios
 }
