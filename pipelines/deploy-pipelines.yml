@@ -33,7 +33,7 @@ parameters:
     type: number
     default: 3
   - name: 'DURATION_PER_VU_ITERATION'
-    displayName: 'Maximum duration in seconds of the perVuIterations-type scenario'
+    displayName: 'Maximum duration in seconds for the perVuIterations-type scenario'
     type: number
     default: 600
   - name: 'TRX_FOR_VU_ENV'
