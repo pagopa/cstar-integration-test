@@ -20,13 +20,7 @@ let cfList = new SharedArray('cfList', function() {
 
 const services = JSON.parse(open('../../services/environments.json'))
 
-let retrieveStageNumber
-if(__ENV.STAGE_NUMBER_ENV > 3){
-    retrieveStageNumber = __ENV.STAGE_NUMBER_ENV
-} else {
-    retrieveStageNumber = 3
-}
-const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, retrieveStageNumber)
+const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
 
 let scenarios = {
     rampingArrivalRate: {
@@ -102,7 +96,7 @@ export default () => {
 export function handleSummary(data){
     console.log(`TEST DETAILS: [Time to complete test: ${data.state.testRunDurationMs} ms, Environment target: ${__ENV.TARGET_ENV}, Scenario test type: ${__ENV.SCENARIO_TYPE_ENV}, Number of VUs: ${__ENV.VIRTUAL_USERS_ENV}, Request processed: ${data.metrics.http_reqs.values.count}, Request OK: ${data.metrics.http_req_failed.values.fails}, ERRORS: ${data.metrics.http_req_failed.values.passes}]`)
     if(__ENV.SCENARIO_TYPE_ENV == 'rampingArrivalRate'){
-        let stringRamping = 'Ramping points : { '
+        let stringRamping = 'Ramping iterations for stage : { '
         for(let i=0; i<customStages.length-1; i++){
             stringRamping += `${customStages[i].target}, `
         }
