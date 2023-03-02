@@ -59,14 +59,9 @@ if (__ENV.SCENARIO_TYPE_ENV) {
 }
 
 if (isEnvValid(__ENV.TARGET_ENV)) {
-//    baseUrl = services[`${__ENV.TARGET_ENV}_pdv`].baseUrl
-}
-
-if (isEnvValid(__ENV.TARGET_ENV)) {
 //    myEnv = dotenv.parse(open(`../../.env.${__ENV.TARGET_ENV}.local`))
     baseUrl = services[`${__ENV.TARGET_ENV}_pdv`].baseUrl
 }
-
 
 
 export default () => {
