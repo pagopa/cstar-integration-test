@@ -40,7 +40,7 @@ parameters:
   - name: 'PDV_APIM_SK_ENV'
     displayName: 'PDV API-Key (required for putTokenPdv script)'
     type: string
-    default: ""
+    default: 'IGNORE_IF_putTokenMockedPdv'
   - name: 'TRX_FOR_VU_ENV'
     displayName: 'Number of transactions for each virtual user'
     type: number
