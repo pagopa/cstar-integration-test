@@ -11,6 +11,7 @@ parameters:
     type: string
     values:
       - putTokenMockedPdv
+      - putTokenPdv
   - name: 'TARGET_ENV'
     displayName: 'Target Environment'
     type: string
@@ -36,6 +37,10 @@ parameters:
     displayName: 'Maximum duration in seconds for the perVuIterations-type scenario'
     type: number
     default: 600
+  - name: 'PDV_APIM_SK_ENV'
+    displayName: 'PDV API-Key (required for putTokenPdv script)'
+    type: string
+    default: ""
   - name: 'TRX_FOR_VU_ENV'
     displayName: 'Number of transactions for each virtual user'
     type: number
@@ -56,6 +61,7 @@ steps:
         -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
         -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
         -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
+        -e PDV_APIM_SK_ENV=${{ parameters.PDV_APIM_SK_ENV }} \
         grafana/k6:latest \
         run /app/test/performance/${{ parameters.SCRIPT }}.js
     displayName: Run k6 ${{ parameters.SCRIPT }}
