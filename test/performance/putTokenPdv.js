@@ -5,7 +5,6 @@ import {
     } from '../common/api/pdv.js'
 import { assert, statusOk, } from '../common/assertions.js'
 import { isEnvValid, DEV, UAT, PROD } from '../common/envs.js'
-//import dotenv from 'k6/x/dotenv'
 import { getFCList } from '../common/utils.js'
 import {vu} from 'k6/execution'
 import { SharedArray } from 'k6/data'
@@ -46,8 +45,7 @@ export let options = {
     scenarios: {} ,
     thresholds: {
         http_req_failed: [{threshold:'rate<0.01', abortOnFail: false, delayAbortEval: '10s'},], // http errors should be less than 1%
-//        http_req_duration: [{threshold:'p(90)<500', abortOnFail: false, delayAbortEval: '10s'},], // 90% of requests should be below 200ms
-    http_reqs: [{threshold: `count<=${__ENV.VIRTUAL_USERS_ENV}`, abortOnFail: false, delayAbortEval: '10s'},]
+        http_reqs: [{threshold: `count<=${__ENV.VIRTUAL_USERS_ENV}`, abortOnFail: false, delayAbortEval: '10s'},]
     },
     
 }
@@ -59,7 +57,6 @@ if (__ENV.SCENARIO_TYPE_ENV) {
 }
 
 if (isEnvValid(__ENV.TARGET_ENV)) {
-//    myEnv = dotenv.parse(open(`../../.env.${__ENV.TARGET_ENV}.local`))
     baseUrl = services[`${__ENV.TARGET_ENV}_pdv`].baseUrl
 }
 
@@ -75,7 +72,6 @@ export default () => {
             headers:  { 
                 'Content-Type' : 'application/json',
                 'Ocp-Apim-Trace': 'true',
-//                'x-api-key':`${myEnv.APIM_SK}`,
                 'x-api-key':`${__ENV.PDV_APIM_SK_ENV}`,
             },
             body: {
