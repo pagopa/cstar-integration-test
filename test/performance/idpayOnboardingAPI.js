@@ -9,10 +9,11 @@ import {
 import { loginFullUrl } from '../common/api/bpdIoLogin.js'
 import { assert, statusNoContent, statusAccepted, statusOk, bodyJsonSelectorValue } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT, PROD } from '../common/envs.js'
-import dotenv from 'k6/x/dotenv'
 import { getFCList } from '../common/utils.js'
 import {exec, vu} from 'k6/execution'
 import { SharedArray } from 'k6/data'
+import { jUnit, textSummary } from 'https://jslib.k6.io/k6-summary/0.0.2/index.js';
+import { setStages } from '../common/stageUtils.js';
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
@@ -24,33 +25,40 @@ let cfList = new SharedArray('cfList', function() {
     return getFCList()
 })
 
+const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
 
-export let options = {
-    scenarios: {
-            /* per_vu_iterations: {
-                executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
-                timeUnit: '1s', //period of time to apply the iteration
-                startRate: 100, //Number of iterations to execute each timeUnit period at test start.
-                preAllocatedVUs: 500,
-                stages: [
-                    { duration: '1s', target: 100 },
-                    { duration: '1s', target: 100 },
-                    { duration: '1s', target: 100 },
-                    
-                ]
-        } */
-          scenario_uno: {
-            executor: 'per-vu-iterations',
-            vus: 50,
-            iterations: 1,
-            startTime: '0s',
-            maxDuration: '1m',
-        }, 
+let scenarios = {
+    rampingArrivalRate: {
+        executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
+        timeUnit: '1s', //period of time to apply the iteration
+        preAllocatedVUs: __ENV.VIRTUAL_USERS_ENV,
+        maxVUs: __ENV.VIRTUAL_USERS_ENV,
+        stages: customStages
     },
+    perVuIterations: {
+        executor: 'per-vu-iterations',
+        vus: __ENV.VIRTUAL_USERS_ENV,
+        iterations: 1,
+        startTime: '0s',
+        maxDuration: `${__ENV.DURATION_PER_VU_ITERATION}s`,
+    },
+};
+export let options = {
+    scenarios: {} ,
+    thresholds: {
+        http_req_failed: [{threshold:'rate<0.01', abortOnFail: false, delayAbortEval: '10s'},], // http errors should be less than 1%
+        http_reqs: [{threshold: `count<=${__ENV.VIRTUAL_USERS_ENV}`, abortOnFail: false, delayAbortEval: '10s'},]
+    },
+
+}
+
+if (__ENV.SCENARIO_TYPE_ENV) {
+    options.scenarios[__ENV.SCENARIO_TYPE_ENV] = scenarios[__ENV.SCENARIO_TYPE_ENV]; // Use just a single scenario if ` -e SCENARIO_TYPE_ENV` is used
+} else {
+    options.scenarios = scenarios; // Use all scenrios
 }
 
 if (isEnvValid(__ENV.TARGET_ENV)) {
-    myEnv = dotenv.parse(open(`../../.env.${__ENV.TARGET_ENV}.local`))
     baseUrl = services[`${__ENV.TARGET_ENV}_io`].baseUrl
 }
 
@@ -84,7 +92,7 @@ export default () => {
 
     
     if (checked){
-        const serviceId = "<SERVICEID>"
+        const serviceId = `${myEnv.SERVICEID}`
         const params = {
             headers: {
                 'Content-Type': 'application/json',
@@ -199,4 +207,19 @@ export default () => {
         })
     })
     sleep(1)
+}
+
+export function handleSummary(data){
+    console.log(`TEST DETAILS: [Time to complete test: ${data.state.testRunDurationMs} ms, Environment target: ${__ENV.TARGET_ENV}, Scenario test type: ${__ENV.SCENARIO_TYPE_ENV}, Number of VUs: ${__ENV.VIRTUAL_USERS_ENV}, Request processed: ${data.metrics.http_reqs.values.count}, Request OK: ${data.metrics.http_req_failed.values.fails}, ERRORS: ${data.metrics.http_req_failed.values.passes}]`)
+    if(__ENV.SCENARIO_TYPE_ENV == 'rampingArrivalRate'){
+        let stringRamping = 'Ramping iterations for stage : { '
+        for(let i=0; i<customStages.length-1; i++){
+            stringRamping += `${customStages[i].target}, `
+        }
+        console.log(stringRamping+ `${customStages[customStages.length-1].target} } `)
+    }
+    return {
+            'stdout': textSummary(data, { indent: ' ', enableColors: true}),
+            './performancetest-result.xml': jUnit(data),
+    }
 }
