@@ -21,7 +21,7 @@ export function getToken(baseUrl, userId, headers) {
 
 export function upsertMockToken(body, headers) {
     const res = http.put(
-        `https://api-io.dev.cstar.pagopa.it/mock/pdv/tokens`,
+        `${baseUrl}/mock/pdv/tokens`,
         body,
         headers
     )

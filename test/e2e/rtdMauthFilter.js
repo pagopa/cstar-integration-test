@@ -1,7 +1,7 @@
 import { group } from 'k6'
 import exec from 'k6/execution'
 import { createRtdSas } from '../common/api/rtdCsvTransaction.js'
-import { assert, statusCreated, statusForbidden } from '../common/assertions.js'
+import { assert, statusCreated, statusUnauthorized } from '../common/assertions.js'
 import {
     isEnvValid,
     isTestEnabledOnEnv,
@@ -51,7 +51,7 @@ export default () => {
             assert(createRtdSas(baseUrl_acq, params), [statusCreated()])
         )
         group('Should NOT create RTD SAS uri when called on IO listener', () =>
-            assert(createRtdSas(baseUrl_io, params), [statusForbidden()])
+            assert(createRtdSas(baseUrl_io, params), [statusUnauthorized()])
         )
     })
 }

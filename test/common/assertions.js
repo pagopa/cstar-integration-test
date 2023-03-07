@@ -34,9 +34,15 @@ export function statusNoContent() {
     }
 }
 
-export function statusForbidden() {
+export function statusUnauthorized() {
     return function doCheck(res) {
         check(res, { 'HTTP status is 401': (r) => r.status === 401 })
+    }
+}
+
+export function statusForbidden() {
+    return function doCheck(res) {
+        check(res, { 'HTTP status is 403': (r) => r.status === 403 })
     }
 }
 
