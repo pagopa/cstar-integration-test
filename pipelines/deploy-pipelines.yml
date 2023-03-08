@@ -67,6 +67,11 @@ steps:
     inputs:
       secureFile: 'Centrostella-BPD-PM-TEST_0xE7D22349_public_uat.asc'
   - script: |
+      echo $(pwd)
+      echo $(rtd_cert_pem.secureFilePath)
+      echo $(rtd_cert_key.secureFilePath)
+      echo $(bpd_pm_test.secureFilePath)
+  - script: |
       apt-get -y update && apt-get -y upgrade
       apt install -y python3-pip
       curl -sSL https://install.python-poetry.org | python3 -
