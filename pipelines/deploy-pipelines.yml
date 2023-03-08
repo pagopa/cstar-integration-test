@@ -53,6 +53,9 @@ steps:
     displayName: 'Fiscal Code/PgPan File'
     inputs:
       secureFile: 'fc_pgpans.csv'
+  - script: |
+      echo $(fc_pgpans.secureFilePath)
+      echo $(pwd)
   - task: DownloadSecureFile@1
     name: fc_iban
     displayName: 'Fiscal Code/IBAN File'
@@ -79,7 +82,7 @@ steps:
         -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
         -e PDV_APIM_SK_ENV=${{ parameters.PDV_APIM_SK_ENV }} \
         -e SERVICEID=${{ parameters.SERVICEID }} \
-        -e FC_FILE=/app/test/performance \
+        -e FC_FILE=/app/test/performance/ \
         -e FC_IBAN_FILE=$(fc_iban.secureFilePath) \
         grafana/k6:latest \
         run /app/test/performance/${{ parameters.SCRIPT }}.js
