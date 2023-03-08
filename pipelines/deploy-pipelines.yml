@@ -41,8 +41,31 @@ parameters:
     displayName: 'PDV API-Key (required for putTokenPdv script)'
     type: string
     default: 'IGNORE_IF_putTokenMockedPdv'
+  - name: 'TRX_FOR_VU'
+    displayName: 'Number of transaction for VUs'
+    type: number
+    default: 1
+  - name: 'RTD_API_KEY'
+    displayName: 'RTD API-Key'
+    type: string
+    default: 'IGNORE_IF_NOT_NECESSARY'
 
 steps:
+  - task: DownloadSecureFile@1
+    name: rtd_cert_pem
+    displayName: 'Download MAUTH pem'
+    inputs:
+      secureFile: 'rtd-uat-acquirer-mauth.pem'
+  - task: DownloadSecureFile@1
+      name: rtd_cert_key
+      displayName: 'Download MAUTH key'
+      inputs:
+        secureFile: 'rtd-uat-acquirer-mauth.key'
+  - task: DownloadSecureFile@1
+      name: bpd_pm_test
+      displayName: 'Download BPD PM public uat'
+      inputs:
+        secureFile: 'Centrostella-BPD-PM-TEST_0xE7D22349_public_uat.asc'
   - script: |
       apt-get -y update && apt-get -y upgrade
       apt install -y python3-pip
@@ -54,16 +77,21 @@ steps:
       pip install --force-reinstall src/cstar-cli-core
       pip install --no-deps --force-reinstall src/cstar-cli
     displayName: Set environment
+  #TODO set date time parameters
   - script: |
       cd cstar-cli-main/src/cstar-cli
       python3 cst idpay idpaydataset \
               --action dataset_and_transactions \
               --env ${{ parameters.TARGET_ENV }} \
-              --out-dir .\generated  \
-              --num-fc 10 \
-              --trx-per-fc 1 \
-              --start-datetime 2023-02-27T20:30:00.000Z \
+              --out-dir ./assets  \
+              --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} \
+              --trx-per-fc ${{ parameters.VIRTUAL_USERS_ENV }} \
+              --start-datetime 2023-03-10T20:30:00.000Z \ 
               --mcc 1234 \
+              --api-key ${{ parameters.RTD_API_KEY }}\
+              --cert $(rtd_cert_pem.resourceFilePath) \
+              --key $(rtd_cert_key.resourceFilePath) \
+              --PM-pubk $(bpd_pm_test.resourceFilePath)
               --PM-salt SALT123
       ls -lrt
       cd ../../../
