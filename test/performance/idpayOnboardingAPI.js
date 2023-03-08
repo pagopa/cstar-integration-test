@@ -80,7 +80,7 @@ function auth(fiscalCode) {
 
 export default () => {
     let checked = true
-    const cf = auth(cfList[vu.idInTest-1].CF)
+    const cf = auth(cfList[vu.idInTest-1].FC)
 
 
     if (
