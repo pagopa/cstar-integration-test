@@ -63,7 +63,7 @@ steps:
       secureFile: 'fc_iban.csv'
   - task: CopyFiles@2
     inputs:
-      SourceFolder: $(fc_pgpans.secureFilePath)
+      SourceFolder: $(fc_pgpans)
       Contents: fc_pgpans.csv
       TargetFolder: $(pwd)/assets
   - script: |
