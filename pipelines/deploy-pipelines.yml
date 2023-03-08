@@ -53,7 +53,7 @@ steps:
     displayName: 'Fiscal Code File'
     inputs:
       secureFile: 'fc_pgpans.csv'
-  - task: DownloadSecureFile@2
+  - task: DownloadSecureFile@1
     name: fc_iban
     displayName: 'Fiscal Code File'
     inputs:
