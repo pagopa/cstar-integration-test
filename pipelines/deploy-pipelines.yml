@@ -58,9 +58,13 @@ steps:
     displayName: 'Fiscal Code/IBAN File'
     inputs:
       secureFile: 'fc_iban.csv'
-  - task: CheckFileExists@1
-      inputs:
-        file: $(fc_pgpans.secureFilePath)
+  - script: |
+      if [ -f $(fc_pgpans.secureFilePath)]; then
+            echo "File exists"
+          else
+            echo "File does not exist"
+          fi
+        displayName: Check if file exists
   - script: |
        docker pull grafana/k6:latest
     displayName: Pull k6 image
