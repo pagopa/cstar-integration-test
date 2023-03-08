@@ -67,6 +67,10 @@ steps:
       Contents: fc_pgpans.csv
       TargetFolder: $(pwd)/assets
   - script: |
+      echo $(pwd)/assets
+      cd $(pwd)/assets
+      ls -lrt
+  - script: |
        docker pull grafana/k6:latest
     displayName: Pull k6 image
   - script: |
