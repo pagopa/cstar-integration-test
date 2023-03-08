@@ -8,7 +8,7 @@ import {
     assert,
     statusOk,
     statusCreated,
-    statusForbidden,
+    statusUnauthorized,
     bodyPgpPublicKey,
 } from '../common/assertions.js'
 import {
@@ -69,7 +69,7 @@ export default () => {
             assert(createRtdSas(baseUrl, params), [statusCreated()])
         )
         group('Should not get public key through IO listener', () =>
-            assert(getPublicKey(baseUrl_io, params), [statusForbidden()])
+            assert(getPublicKey(baseUrl_io, params), [statusUnauthorized()])
         )
     })
 }

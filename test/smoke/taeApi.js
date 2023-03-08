@@ -2,7 +2,7 @@ import { group } from 'k6'
 import {
     assert,
     statusOk,
-    statusForbidden,
+    statusUnauthorized,
     bodyJsonSelectorValue,
 } from '../common/assertions.js'
 import {
@@ -73,7 +73,7 @@ export default () => {
         group('Should not retrieve file report, missing API key association on Sender Auth', () => {
             params.headers['Ocp-Apim-Subscription-Key'] = myEnv.APIM_RTDPRODUCT_SK_UNREGISTERED_ON_SENDER_AUTH
             let res = getFileReport(baseUrl, params)
-            assert(res, [statusForbidden()])
+            assert(res, [statusUnauthorized()])
         })
     })
 }

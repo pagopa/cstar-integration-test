@@ -7,18 +7,22 @@ import {
     UAT,
     PROD,
 } from '../common/envs.js'
+import { loginFullUrl } from '../common/api/bpdIoLogin.js'
 import dotenv from 'k6/x/dotenv'
 import {exec, vu} from 'k6/execution'
-import {
-    putEnrollInstrumentIssuer
-   } from '../common/api/idpayWallet.js'
-import { getFCPanList } from '../common/utils.js'
-import { SharedArray } from 'k6/data'
+import {putEnrollIban} from '../common/api/idpayWallet.js'
+   import { getFCList, getFCIbanList } from '../common/utils.js'
+   import { SharedArray } from 'k6/data'
+   
 
-   let cfPanList = new SharedArray('cfPanList', function() {
-    return getFCPanList()
+let cfList = new SharedArray('cfList', function() {
+    return getFCList()
 })
-
+let cfIbanList = new SharedArray('cfIbanList', function() {
+    return getFCIbanList()
+})
+let baseUrl
+let myEnv
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
@@ -40,12 +44,26 @@ export let options = {
         }
     }
 }
-let baseUrl
-let myEnv
+
 
 if (isEnvValid(__ENV.TARGET_ENV)) {
     myEnv = dotenv.parse(open(`../../.env.${__ENV.TARGET_ENV}.local`))
     baseUrl = services[`${__ENV.TARGET_ENV}_io`].baseUrl
+}
+
+function auth(fiscalCode) {
+    const authToken = loginFullUrl(
+        `${baseUrl}/bpd/pagopa/api/v1/login`,
+        fiscalCode
+    )
+    return {
+        headers: {
+            Authorization: `Bearer ${authToken}`,
+            'Content-Type': 'application/json',
+            'Ocp-Apim-Subscription-Key': `${myEnv.APIM_SK}`,
+            'Ocp-Apim-Trace': 'true'
+        },
+    }
 }
 
 
@@ -56,49 +74,34 @@ if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
     exec.test.abort()
 }
 
-export default () => {
-    const cf = cfPanList[vu.idInTest-1].cf
-    const pgpan = cfPanList[vu.idInTest-1].pan
 
-    group('Payment Instrument API', () => {
-        group('Should enroll pgpan', () =>{
+export default () => {
+    const cf = auth(cfIbanList[vu.idInTest-1].cf)
+    const iban = cfIbanList[vu.idInTest-1].iban
+
+    group('Iban API', () => {
+        group('Should enroll iban', () =>{
 
         let initiativeId = `${myEnv.INITIATIVE_ID}`
-        const params= {
-            headers:  {
-                'Content-Type' : 'application/json',
-                'Ocp-Apim-Subscription-Key':`${myEnv.APIM_SK}`,
-                'Ocp-Apim-Trace':'true',
-                'Accept-Language':'it_IT',
-                'Fiscal-Code': cf,
-            },
-            body: {
-                "brand": `${myEnv.BRAND}`,
-                "type": `${myEnv.TYPE}`,
-                "pgpPan": pgpan,
-                "expireMonth": `${myEnv.EXPIRE_MONTH}`,
-                "expireYear": `${myEnv.EXPIRE_YEAR}`,
-                "issuerAbiCode": `${myEnv.ISSUER_ABI_CODE}`,
-                "holder": `${myEnv.HOLDER}`
-            }
+        let body= {
+            "iban": iban,
+            "description": `conto cointestato`
         }
 
-        let res = putEnrollInstrumentIssuer(
+        let res = putEnrollIban(
             baseUrl,
-            JSON.stringify(params.body).replace(/\\\\/g, "\\"),
-            params.headers,
-            initiativeId)
+            initiativeId,
+            cf,
+            JSON.stringify(body))
 
         if(res.status != 200){
-            console.error('Enrollment Carte-> '+JSON.stringify(res))
+            console.error('Enrollment IBAN-> '+JSON.stringify(res))
             return
         }
 
-        assert(res,
-            [statusOk()])
+        assert(res, [statusOk()])
 
-    })
+        })
     })
     sleep(1)
-
 }
