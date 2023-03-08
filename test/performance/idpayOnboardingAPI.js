@@ -72,7 +72,7 @@ function auth(fiscalCode) {
         headers: {
             Authorization: `Bearer ${authToken}`,
             'Content-Type': 'application/json',
-            'Ocp-Apim-Subscription-Key': `${myEnv.APIM_SK}`,
+            'Ocp-Apim-Subscription-Key': `${__ENV.PDV_APIM_SK_ENV}`,
             'Ocp-Apim-Trace': 'true'
         },
     }
@@ -80,7 +80,7 @@ function auth(fiscalCode) {
 
 export default () => {
     let checked = true
-    const cf = auth(cfList[vu.idInTest-1].cf)
+    const cf = auth(cfList[vu.idInTest-1].CF)
 
 
     if (
@@ -92,7 +92,7 @@ export default () => {
 
     
     if (checked){
-        const serviceId = `${myEnv.SERVICEID}`
+        const serviceId = `${__ENV.SERVICEID}`
         const params = {
             headers: {
                 'Content-Type': 'application/json',
