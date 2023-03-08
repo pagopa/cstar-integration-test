@@ -85,7 +85,7 @@ steps:
   #TODO set date time parameters
   - script: |
       cd cstar-cli-main/src/cstar-cli
-      python3 cst idpay idpaydataset --action dataset_and_transactions --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} --trx-per-fc ${{ parameters.VIRTUAL_USERS_ENV }} --start-datetime 2023-03-10T20:30:00.000Z --mcc 1234 --out-dir $(pwd)/assets --env ${{ parameters.TARGET_ENV }} --api-key ${{ parameters.RTD_API_KEY }} --key $(rtd_cert_key.secureFilePath) --cert $(rtd_cert_pem.secureFilePath) --PM-pubk $(bpd_pm_test.secureFilePath) --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} --PM-salt SALT123
+      cst idpay idpaydataset --action dataset_and_transactions --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} --trx-per-fc ${{ parameters.VIRTUAL_USERS_ENV }} --start-datetime 2023-03-10T20:30:00.000Z --mcc 1234 --out-dir $(pwd)/assets --env ${{ parameters.TARGET_ENV }} --api-key ${{ parameters.RTD_API_KEY }} --key $(rtd_cert_key.secureFilePath) --cert $(rtd_cert_pem.secureFilePath) --PM-pubk $(bpd_pm_test.secureFilePath) --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} --PM-salt SALT123
       ls -lrt
       cd ../../../
     displayName: Retrieve resource from cstar-cli
