@@ -38,14 +38,14 @@ export function chooseRandomPanFromList(panList) {
 }
 
 export function getFCList() {
-    return papaparse.parse(open(`${FC_FILE}`), { header: true }).data;
+    return papaparse.parse(open(`${__ENV.FC_FILE}`), { header: true }).data;
 }
 
 export function getFCPanList() {
-    return papaparse.parse(open(`${FC_FILE}`), { header: true }).data;
+    return papaparse.parse(open(`${__ENV.FC_FILE}`), { header: true }).data;
 }
 export function getFCIbanList() {
-    return papaparse.parse(open(`${FC_IBAN_FILE}`), { header: true }).data;
+    return papaparse.parse(open(`${__ENV.FC_IBAN_FILE}`), { header: true }).data;
 }
 
 function getFiscalCodeMonth(month) {
