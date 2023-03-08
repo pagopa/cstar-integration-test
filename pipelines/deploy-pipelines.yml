@@ -11,6 +11,7 @@ parameters:
     type: string
     values:
       - putTokenMockedPdv
+      - putTokenPdv
   - name: 'TARGET_ENV'
     displayName: 'Target Environment'
     type: string
@@ -18,6 +19,28 @@ parameters:
     values:
       - 'dev'
       - 'uat'
+  - name: 'SCENARIO_TYPE_ENV'
+    displayName: 'Scenario type'
+    type: string
+    default: 'rampingArrivalRate'
+    values:
+      - 'rampingArrivalRate'
+      - 'perVuIterations'
+  - name: 'VIRTUAL_USERS_ENV'
+    displayName: 'Number of virtual users (1 - 100 000)'
+    type: number
+  - name: 'STAGE_NUMBER_ENV'
+    displayName: 'Number of ramping stages (min: 3)'
+    type: number
+    default: 3
+  - name: 'DURATION_PER_VU_ITERATION'
+    displayName: 'Maximum duration in seconds for the perVuIterations-type scenario'
+    type: number
+    default: 600
+  - name: 'PDV_APIM_SK_ENV'
+    displayName: 'PDV API-Key (required for putTokenPdv script)'
+    type: string
+    default: 'IGNORE_IF_putTokenMockedPdv'
 
 steps:
   - script: |
@@ -55,6 +78,11 @@ steps:
         -v $(pwd):/app \
         --workdir "/app" \
         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
+        -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
+        -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
+        -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
+        -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
+        -e PDV_APIM_SK_ENV=${{ parameters.PDV_APIM_SK_ENV }} \
         grafana/k6:latest \
         run /app/test/performance/${{ parameters.SCRIPT }}.js
     displayName: Run k6 ${{ parameters.SCRIPT }}
