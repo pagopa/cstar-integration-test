@@ -88,15 +88,15 @@ steps:
       python3 cst idpay idpaydataset \
               --action dataset_and_transactions \
               --env ${{ parameters.TARGET_ENV }} \
-              --out-dir ./assets  \
+              --api-key ${{ parameters.RTD_API_KEY }} \
+              --key $(rtd_cert_key.secureFilePath) \
+              --cert $(rtd_cert_pem.secureFilePath) \
+              --PM-pubk $(bpd_pm_test.secureFilePath) \
+              --out-dir $(pwd)/assets  \
               --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} \
               --trx-per-fc ${{ parameters.VIRTUAL_USERS_ENV }} \
               --start-datetime 2023-03-10T20:30:00.000Z \ 
               --mcc 1234 \
-              --api-key ${{ parameters.RTD_API_KEY }} \
-              --cert $(rtd_cert_pem.secureFilePath) \
-              --key $(rtd_cert_key.secureFilePath) \
-              --PM-pubk $(bpd_pm_test.secureFilePath) \
               --PM-salt SALT123
       ls -lrt
       cd ../../../
