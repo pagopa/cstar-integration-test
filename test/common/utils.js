@@ -38,7 +38,7 @@ export function chooseRandomPanFromList(panList) {
 }
 
 export function getFCList() {
-    return papaparse.parse(open('app/assets/fc_pgpans.csv'), { header: true }).data;
+    return papaparse.parse(open('../../assets/fc_pgpans.csv'), { header: true }).data;
 }
 
 export function getFCPanList() {

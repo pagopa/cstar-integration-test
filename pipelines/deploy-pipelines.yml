@@ -65,7 +65,7 @@ steps:
     inputs:
       SourceFolder: /home/vsts/work/_temp
       Contents: fc_pgpans.csv
-      TargetFolder: $(pwd)/assets
+      TargetFolder: $(pwd)/assets/fc_pgpans.csv
   - script: |
       echo $(pwd)/assets
       cd $(pwd)/assets
