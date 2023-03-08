@@ -58,13 +58,11 @@ steps:
     displayName: 'Fiscal Code/IBAN File'
     inputs:
       secureFile: 'fc_iban.csv'
-  - script: |
-      if [ -f $(fc_pgpans.secureFilePath)]; then
-            echo "File exists"
-          else
-            echo "File does not exist"
-          fi
-        displayName: Check if file exists
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: $(fc_pgpans.secureFilePath)
+      Contents: fc_pgpans.csv
+      TargetFolder: /app/test/performance
   - script: |
        docker pull grafana/k6:latest
     displayName: Pull k6 image
@@ -81,7 +79,7 @@ steps:
         -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
         -e PDV_APIM_SK_ENV=${{ parameters.PDV_APIM_SK_ENV }} \
         -e SERVICEID=${{ parameters.SERVICEID }} \
-        -e FC_FILE=$(fc_pgpans.secureFilePath) \
+        -e FC_FILE=/app/test/performance \
         -e FC_IBAN_FILE=$(fc_iban.secureFilePath) \
         grafana/k6:latest \
         run /app/test/performance/${{ parameters.SCRIPT }}.js
