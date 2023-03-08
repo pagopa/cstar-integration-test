@@ -75,6 +75,7 @@ steps:
         -e PDV_APIM_SK_ENV=${{ parameters.PDV_APIM_SK_ENV }} \
         -e SERVICEID=${{ parameters.SERVICEID }} \
         -e FC_FILE=$(fc_pgpans.secureFilePath) \
+        -e FC_IBAN_FILE=$(fc_iban.secureFilePath) \
         grafana/k6:latest \
         run /app/test/performance/${{ parameters.SCRIPT }}.js
     displayName: Run k6 ${{ parameters.SCRIPT }}
