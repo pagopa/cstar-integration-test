@@ -61,11 +61,13 @@ steps:
     displayName: 'Fiscal Code/IBAN File'
     inputs:
       secureFile: 'fc_iban.csv'
-  - task: CopyFiles@2
-    inputs:
-      SourceFolder: /home/vsts/work/_temp
-      Contents: fc_pgpans.csv
-      TargetFolder: $(pwd)/assets/fc_pgpans.csv
+#  - task: CopyFiles@2
+#    inputs:
+#      SourceFolder: /home/vsts/work/_temp
+#      Contents: fc_pgpans.csv
+#      TargetFolder: $(pwd)/assets
+  - script: |
+      cp /home/vsts/work/_temp/fc_pgpans.csv $(pwd)/assets/fc_pgpans.csv
   - script: |
       echo $(pwd)/assets
       cd $(pwd)/assets
