@@ -57,15 +57,15 @@ steps:
     inputs:
       secureFile: 'rtd-uat-acquirer-mauth.pem'
   - task: DownloadSecureFile@1
-      name: rtd_cert_key
-      displayName: 'Download MAUTH key'
-      inputs:
-        secureFile: 'rtd-uat-acquirer-mauth.key'
+    name: rtd_cert_key
+    displayName: 'Download MAUTH key'
+    inputs:
+      secureFile: 'rtd-uat-acquirer-mauth.key'
   - task: DownloadSecureFile@1
-      name: bpd_pm_test
-      displayName: 'Download BPD PM public uat'
-      inputs:
-        secureFile: 'Centrostella-BPD-PM-TEST_0xE7D22349_public_uat.asc'
+    name: bpd_pm_test
+    displayName: 'Download BPD PM public uat'
+    inputs:
+      secureFile: 'Centrostella-BPD-PM-TEST_0xE7D22349_public_uat.asc'
   - script: |
       apt-get -y update && apt-get -y upgrade
       apt install -y python3-pip
