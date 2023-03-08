@@ -50,14 +50,17 @@ parameters:
 steps:
   - task: DownloadSecureFile@1
     name: fc_pgpans
-    displayName: 'Fiscal Code File'
+    displayName: 'Fiscal Code/PgPan File'
     inputs:
       secureFile: 'fc_pgpans.csv'
   - task: DownloadSecureFile@1
     name: fc_iban
-    displayName: 'Fiscal Code File'
+    displayName: 'Fiscal Code/IBAN File'
     inputs:
       secureFile: 'fc_iban.csv'
+  - task: CheckFileExists@1
+      inputs:
+        file: $(fc_pgpans.secureFilePath)
   - script: |
        docker pull grafana/k6:latest
     displayName: Pull k6 image
