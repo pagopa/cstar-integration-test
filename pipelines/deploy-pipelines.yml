@@ -3,11 +3,11 @@
 trigger: none
 
 pool:
-  vmImage: ubuntu-20.04
+  vmImage: ubuntu-22.04
 
 variables:
-  # Python version: 3.6
-  pythonVersion: '3.6'
+  # Python version: 3.10
+  pythonVersion: '3.10'
 
   # Folder name of this sub-repository
   working-dir: '.'
@@ -102,8 +102,8 @@ steps:
       ls -lrt
       cd cstar-cli-main 
       ls -lrt
-      ../.venv/lib/python3.6/site-packages/poetry install
-      ../.venv/lib/python3.6/site-packages/poetry shell
+      poetry install
+      poetry shell
       ./install.sh
     displayName: Set environment
   #TODO set date time parameters
