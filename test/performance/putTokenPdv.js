@@ -72,7 +72,7 @@ export default () => {
             headers:  { 
                 'Content-Type' : 'application/json',
                 'Ocp-Apim-Trace': 'true',
-                'x-api-key':`${__ENV.PDV_APIM_SK_ENV}`,
+                'x-api-key':`${__ENV.APIM_SK}`,
             },
             body: {
                 "pii": uniqueCF,

@@ -7,7 +7,6 @@ import {
     UAT,
     PROD,
 } from '../common/envs.js'
-import dotenv from 'k6/x/dotenv'
 import {exec, vu} from 'k6/execution'
 import {
     putEnrollInstrumentIssuer
@@ -15,71 +14,85 @@ import {
 import { getFCPanList } from '../common/utils.js'
 import { SharedArray } from 'k6/data'
 
-   let cfPanList = new SharedArray('cfPanList', function() {
-    return getFCPanList()
-})
-
-
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
 const services = JSON.parse(open('../../services/environments.json'))
-export let options = {
-    scenarios: {
-        per_vu_iterations: {
-            executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
-            timeUnit: '10s', //period of time to apply the iteration
-            startRate: 20, //Number of iterations to execute each timeUnit period at test start.
-            preAllocatedVUs: 60,
-            stages: [
-                { duration: '5s', target: 10 },
-                { duration: '5s', target: 10 },
-                { duration: '5s', target: 10 },
-                { duration: '5s', target: 10 },
-
-            ]
-        }
-    }
-}
 let baseUrl
 let myEnv
+let cfPanList = new SharedArray('cfPanList', function() {
+    return getFCPanList()
+})
+
+const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
+
+
+let scenarios = {
+    rampingArrivalRate: {
+        executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
+        timeUnit: '1s', //period of time to apply the iteration
+        preAllocatedVUs: __ENV.VIRTUAL_USERS_ENV,
+        maxVUs: __ENV.VIRTUAL_USERS_ENV,
+        stages: customStages
+    },
+    perVuIterations: {
+        executor: 'per-vu-iterations',
+        vus: __ENV.VIRTUAL_USERS_ENV,
+        iterations: 1,
+        startTime: '0s',
+        maxDuration: `${__ENV.DURATION_PER_VU_ITERATION}s`,
+    },
+};
+export let options = {
+    scenarios: {} ,
+    thresholds: {
+        http_req_failed: [{threshold:'rate<0.01', abortOnFail: false, delayAbortEval: '10s'},], // http errors should be less than 1%
+        http_reqs: [{threshold: `count<=${__ENV.VIRTUAL_USERS_ENV}`, abortOnFail: false, delayAbortEval: '10s'},]
+    },
+
+}
+
+if (__ENV.SCENARIO_TYPE_ENV) {
+    options.scenarios[__ENV.SCENARIO_TYPE_ENV] = scenarios[__ENV.SCENARIO_TYPE_ENV]; // Use just a single scenario if ` -e SCENARIO_TYPE_ENV` is used
+} else {
+    options.scenarios = scenarios; // Use all scenrios
+}
 
 if (isEnvValid(__ENV.TARGET_ENV)) {
-    myEnv = dotenv.parse(open(`../../.env.${__ENV.TARGET_ENV}.local`))
     baseUrl = services[`${__ENV.TARGET_ENV}_io`].baseUrl
 }
 
 
-// In performance tests we shall use abort() to prevent the execution
-// of the default function, otherwise the VUs will be spawned
-if (!isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)) {
-    console.log('Test not enabled for target env')
-    exec.test.abort()
-}
-
 export default () => {
-    const cf = cfPanList[vu.idInTest-1].cf
-    const pgpan = cfPanList[vu.idInTest-1].pan
+    const cf = cfPanList[vu.idInTest-1].FC
+    const pgpan = cfPanList[vu.idInTest-1].PGPAN
+
+    if (
+        !isEnvValid(__ENV.TARGET_ENV) ||
+        !isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)
+    ) {
+        exec.test.abort()
+    }
 
     group('Payment Instrument API', () => {
         group('Should enroll pgpan', () =>{
 
-        let initiativeId = `${myEnv.INITIATIVE_ID}`
+        let initiativeId = `${__ENV.INITIATIVE_ID}`
         const params= {
             headers:  {
                 'Content-Type' : 'application/json',
-                'Ocp-Apim-Subscription-Key':`${myEnv.APIM_SK}`,
+                'Ocp-Apim-Subscription-Key':`${__ENV.APIM_SK}`,
                 'Ocp-Apim-Trace':'true',
                 'Accept-Language':'it_IT',
                 'Fiscal-Code': cf,
             },
             body: {
-                "brand": `${myEnv.BRAND}`,
-                "type": `${myEnv.TYPE}`,
+                "brand": "VISA",
+                "type": "DEB",
                 "pgpPan": pgpan,
-                "expireMonth": `${myEnv.EXPIRE_MONTH}`,
-                "expireYear": `${myEnv.EXPIRE_YEAR}`,
-                "issuerAbiCode": `${myEnv.ISSUER_ABI_CODE}`,
-                "holder": `${myEnv.HOLDER}`
+                "expireMonth": "08",
+                "expireYear": "2028",
+                "issuerAbiCode": "03069",
+                "holder": "TEST"
             }
         }
 
@@ -94,11 +107,25 @@ export default () => {
             return
         }
 
-        assert(res,
-            [statusOk()])
+        assert(res,[statusOk()])
 
-    })
+        })
     })
     sleep(1)
 
+}
+
+export function handleSummary(data){
+    console.log(`TEST DETAILS: [Time to complete test: ${data.state.testRunDurationMs} ms, Environment target: ${__ENV.TARGET_ENV}, Scenario test type: ${__ENV.SCENARIO_TYPE_ENV}, Number of VUs: ${__ENV.VIRTUAL_USERS_ENV}, Request processed: ${data.metrics.http_reqs.values.count}, Request OK: ${data.metrics.http_req_failed.values.fails}, ERRORS: ${data.metrics.http_req_failed.values.passes}]`)
+    if(__ENV.SCENARIO_TYPE_ENV == 'rampingArrivalRate'){
+        let stringRamping = 'Ramping iterations for stage : { '
+        for(let i=0; i<customStages.length-1; i++){
+            stringRamping += `${customStages[i].target}, `
+        }
+        console.log(stringRamping+ `${customStages[customStages.length-1].target} } `)
+    }
+    return {
+            'stdout': textSummary(data, { indent: ' ', enableColors: true}),
+            './performancetest-result.xml': jUnit(data),
+    }
 }

@@ -72,7 +72,7 @@ function auth(fiscalCode) {
         headers: {
             Authorization: `Bearer ${authToken}`,
             'Content-Type': 'application/json',
-            'Ocp-Apim-Subscription-Key': `${__ENV.PDV_APIM_SK_ENV}`,
+            'Ocp-Apim-Subscription-Key': `${__ENV.APIM_SK}`,
             'Ocp-Apim-Trace': 'true'
         },
     }
@@ -82,7 +82,6 @@ export default () => {
     let checked = true
     const cf = auth(cfList[vu.idInTest-1].FC)
 
-
     if (
         !isEnvValid(__ENV.TARGET_ENV) ||
         !isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)
@@ -90,9 +89,8 @@ export default () => {
         exec.test.abort()
     }
 
-    
     if (checked){
-        const serviceId = `${__ENV.SERVICEID}`
+        const serviceId = `${__ENV.SERVICE_ID}`
         const params = {
             headers: {
                 'Content-Type': 'application/json',
