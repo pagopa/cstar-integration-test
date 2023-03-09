@@ -3,7 +3,11 @@
 trigger: none
 
 pool:
-  vmImage: ubuntu-20.04
+  vmImage: 'ubuntu-latest'
+
+variables:
+  # Python version: 3.6
+  pythonVersion: '3.6'
 
 parameters:
   - name: 'SCRIPT'
@@ -71,15 +75,29 @@ steps:
       echo $(rtd_cert_pem.secureFilePath)
       echo $(rtd_cert_key.secureFilePath)
       echo $(bpd_pm_test.secureFilePath)
+
+  - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(pythonVersion)'
+      displayName: 'Use Python $(pythonVersion)'
+
   - script: |
-      apt-get -y update && apt-get -y upgrade
-      apt install software-properties-common
-      add-apt-repository ppa:deadsnakes/ppa
-      apt update
-      apt install python3.6 -y
-      python3.6 -V
-      apt install -y python3-pip
-      curl -sSL https://install.python-poetry.org | python3.6 -
+      python -m venv .venv
+      source .venv/bin/activate
+      python -m pip install --upgrade pip
+      pip install -r requirements.txt
+    workingDirectory: $(projectRoot)
+    displayName: "Install requirements"
+
+  - script: |
+#      apt-get -y update && apt-get -y upgrade
+#      apt install software-properties-common
+#      add-apt-repository ppa:deadsnakes/ppa
+#      apt update
+#      apt install python3.6 -y
+#      python3.6 -V
+#      apt install -y python3-pip
+      curl -sSL https://install.python-poetry.org | python3 -
       curl -L https://github.com/pagopa/cstar-cli/archive/refs/heads/main.zip -o cstar-cli.zip
       unzip cstar-cli.zip
       ls -lrt
