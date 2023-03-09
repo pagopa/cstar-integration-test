@@ -102,6 +102,7 @@ steps:
       ls -lrt
       cd cstar-cli-main
       pip install cryptography
+      pip install PGPy
       pip install --force-reinstall src/cstar-cli-core
       pip install --no-deps --force-reinstall src/cstar-cli
     displayName: Set environment
