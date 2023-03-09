@@ -96,17 +96,13 @@ steps:
 
   - script: |
       apt-get -y update && apt-get -y upgrade
-      curl -sSL https://install.python-poetry.org | python -
       curl -L https://github.com/pagopa/cstar-cli/archive/refs/heads/main.zip -o cstar-cli.zip
       unzip cstar-cli.zip
       ls -lrt
       cd cstar-cli-main
-      pip install cryptography
-      pip install numpy
-      pip install pandas
-      pip install PGPy
-      pip install --force-reinstall src/cstar-cli-core
-      pip install --no-deps --force-reinstall src/cstar-cli
+      poetry install
+      poetry shell
+      ./install.sh
     displayName: Set environment
   #TODO set date time parameters
   - script: |
