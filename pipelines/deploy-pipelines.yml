@@ -73,6 +73,11 @@ steps:
       echo $(bpd_pm_test.secureFilePath)
   - script: |
       apt-get -y update && apt-get -y upgrade
+      apt install software-properties-common
+      add-apt-repository ppa:deadsnakes/ppa
+      apt update
+      apt install python3.6 -y
+      python3.6 -V
       apt install -y python3-pip
       curl -sSL https://install.python-poetry.org | python3.6 -
       curl -L https://github.com/pagopa/cstar-cli/archive/refs/heads/main.zip -o cstar-cli.zip
