@@ -66,17 +66,17 @@ steps:
     inputs:
       secureFile: 'fc_iban.csv'
   - task: DownloadSecureFile@1
-    name: CSTAR.IDPAY.TRNLOG.20230313.223000.001.01
+    name: trx_file
     displayName: 'Transactions File'
     inputs:
       secureFile: 'CSTAR.IDPAY.TRNLOG.20230313.223000.001.01.csv.pgp'
   - task: DownloadSecureFile@1
-    name: rtd-uat-acquirer-mauth-pem
+    name: rtd_uat_acquirer_mauth_pem
     displayName: 'RTD Certification File'
     inputs:
       secureFile: 'rtd-uat-acquirer-mauth.pem'
   - task: DownloadSecureFile@1
-    name: rtd-uat-acquirer-mauth-key
+    name: rtd_uat_acquirer_mauth_key
     displayName: 'RTD Key File'
     inputs:
       secureFile: 'rtd-uat-acquirer-mauth.key'
