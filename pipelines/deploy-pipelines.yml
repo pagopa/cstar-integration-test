@@ -73,13 +73,20 @@ steps:
       echo $(bpd_pm_test.secureFilePath)
   - script: |
       apt-get -y update && apt-get -y upgrade
+      cd /temp
+      curl –O https://repo.anaconda.com/archive/Anaconda3-2020.02-Linux-x86_64.sh
+      sha256sum Anaconda3–2020.02–Linux–x86_64.sh
+      yes '' | bash Anaconda3-2020.02-Linux-x86_64.sh
+      source ~/.bashrc
+      conda info
+      conda create ––name test_environment python=3.5
+      conda activate test_environment
       apt install -y python3-pip
       curl -sSL https://install.python-poetry.org | python3 -
       curl -L https://github.com/pagopa/cstar-cli/archive/refs/heads/main.zip -o cstar-cli.zip
       unzip cstar-cli.zip
       ls -lrt
       cd cstar-cli-main
-      pip install cryptography==2.2.2
       pip install --force-reinstall src/cstar-cli-core
       pip install --no-deps --force-reinstall src/cstar-cli
     displayName: Set environment
