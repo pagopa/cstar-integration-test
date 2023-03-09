@@ -103,7 +103,6 @@ steps:
       ls -lrt
       ls -lrt /opt/hostedtoolcache/Python/3.10.10/x64/lib/python3.10/site-packages
       curl -sSL https://install.python-poetry.org | python3
-      export PATH="$PATH:$HOME/.poetry/bin"
       poetry install
       poetry shell
       ./install.sh
