@@ -91,6 +91,7 @@ steps:
       python -m venv .venv
       source .venv/bin/activate
       python -m pip install --upgrade pip
+      ./intall.sh
     workingDirectory: $(projectRoot)
     displayName: "Install requirements"
 
@@ -105,7 +106,6 @@ steps:
       curl -sSL https://install.python-poetry.org | python3
       poetry install
       poetry shell
-      ../install.sh
     displayName: Set environment
   #TODO set date time parameters
   - script: |
