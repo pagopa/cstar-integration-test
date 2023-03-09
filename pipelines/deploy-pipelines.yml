@@ -91,8 +91,8 @@ steps:
       python -m venv .venv
       source .venv/bin/activate
       python -m pip install --upgrade pip
-      .venv/bin/pip install poetry
-      .venv/bin/pip install cryptography
+      python -m pip install poetry
+      python -m pip install cryptography
     workingDirectory: $(projectRoot)
     displayName: "Install requirements"
 
