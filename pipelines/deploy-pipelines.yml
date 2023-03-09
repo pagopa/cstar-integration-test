@@ -92,8 +92,6 @@ steps:
       source .venv/bin/activate
       python -m pip install --upgrade pip
       pip install poetry
-      pip install cryptography
-      echo .venv
     workingDirectory: $(projectRoot)
     displayName: "Install requirements"
 
@@ -104,8 +102,8 @@ steps:
       ls -lrt
       cd cstar-cli-main 
       ls -lrt
-      poetry install
-      poetry shell
+      ../.venv/lib/python3.6/site-packages/poetry install
+      ../.venv/lib/python3.6/site-packages/poetry shell
       ./install.sh
     displayName: Set environment
   #TODO set date time parameters
