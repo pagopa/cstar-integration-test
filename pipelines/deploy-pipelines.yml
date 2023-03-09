@@ -101,9 +101,10 @@ steps:
       unzip cstar-cli.zip
       ls -lrt
       cd cstar-cli-main
-      pip install cryptography
-      pip install PGPy
+      pip install numpy
       pip install pandas
+      pip install --force-reinstall src/cstar-cli-core
+      pip install --no-deps --force-reinstall src/cstar-cli
       pip install --force-reinstall src/cstar-cli-core
       pip install --no-deps --force-reinstall src/cstar-cli
     displayName: Set environment
