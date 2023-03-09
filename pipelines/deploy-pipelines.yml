@@ -9,6 +9,12 @@ variables:
   # Python version: 3.6
   pythonVersion: '3.6'
 
+  # Folder name of this sub-repository
+  working-dir: '.'
+
+  # Project root folder
+  projectRoot: $(System.DefaultWorkingDirectory)/$(working-dir)
+
 parameters:
   - name: 'SCRIPT'
     displayName: 'Script name'
@@ -77,9 +83,9 @@ steps:
       echo $(bpd_pm_test.secureFilePath)
 
   - task: UsePythonVersion@0
-      inputs:
-        versionSpec: '$(pythonVersion)'
-      displayName: 'Use Python $(pythonVersion)'
+    inputs:
+      versionSpec: '$(pythonVersion)'
+    displayName: 'Use Python $(pythonVersion)'
 
   - script: |
       python -m venv .venv
