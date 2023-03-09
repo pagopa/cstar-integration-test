@@ -100,7 +100,8 @@ steps:
       curl -L https://github.com/pagopa/cstar-cli/archive/refs/heads/main.zip -o cstar-cli.zip
       unzip cstar-cli.zip
       ls -lrt
-      cd cstar-cli-main
+      cd cstar-cli-main 
+      ls -lrt
       poetry install
       poetry shell
       ./install.sh
