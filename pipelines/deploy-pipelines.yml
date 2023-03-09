@@ -73,14 +73,6 @@ steps:
       echo $(bpd_pm_test.secureFilePath)
   - script: |
       apt-get -y update && apt-get -y upgrade
-      cd /temp
-      curl –O https://repo.anaconda.com/archive/Anaconda3-2020.02-Linux-x86_64.sh
-      sha256sum Anaconda3–2020.02–Linux–x86_64.sh
-      yes '' | bash Anaconda3-2020.02-Linux-x86_64.sh
-      source ~/.bashrc
-      conda info
-      conda create ––name test_environment python=3.5
-      conda activate test_environment
       apt install -y python3-pip
       curl -sSL https://install.python-poetry.org | python3 -
       curl -L https://github.com/pagopa/cstar-cli/archive/refs/heads/main.zip -o cstar-cli.zip
@@ -93,7 +85,7 @@ steps:
   #TODO set date time parameters
   - script: |
       cd cstar-cli-main/src/cstar-cli
-      python cst idpay idpaydataset --action dataset_and_transactions --env ${{ parameters.TARGET_ENV }} --api-key ${{ parameters.RTD_API_KEY }} --key $(rtd_cert_key.secureFilePath) --cert $(rtd_cert_pem.secureFilePath) --PM-pubk $(bpd_pm_test.secureFilePath) --out-dir ./generated --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} --trx-per-fc 1 --start-datetime 2023-02-06T20:30:00.000Z --mcc 1234 --PM-salt SALT123
+      python3 cst idpay idpaydataset --action dataset_and_transactions --env ${{ parameters.TARGET_ENV }} --api-key ${{ parameters.RTD_API_KEY }} --key $(rtd_cert_key.secureFilePath) --cert $(rtd_cert_pem.secureFilePath) --PM-pubk $(bpd_pm_test.secureFilePath) --out-dir ./generated --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} --trx-per-fc 1 --start-datetime 2023-02-06T20:30:00.000Z --mcc 1234 --PM-salt SALT123
       ls -lrt
       cd ../../../
     displayName: Retrieve resource from cstar-cli
