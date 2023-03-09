@@ -53,25 +53,13 @@ steps:
     displayName: 'Fiscal Code/PgPan File'
     inputs:
       secureFile: 'fc_pgpans.csv'
-  - script: |
-      echo $(fc_pgpans.secureFilePath)
-      echo $(pwd)
   - task: DownloadSecureFile@1
     name: fc_iban
     displayName: 'Fiscal Code/IBAN File'
     inputs:
       secureFile: 'fc_iban.csv'
-#  - task: CopyFiles@2
-#    inputs:
-#      SourceFolder: /home/vsts/work/_temp
-#      Contents: fc_pgpans.csv
-#      TargetFolder: $(pwd)/assets
   - script: |
       cp /home/vsts/work/_temp/fc_pgpans.csv $(pwd)/assets/fc_pgpans.csv
-  - script: |
-      echo $(pwd)/assets
-      cd $(pwd)/assets
-      ls -lrt
   - script: |
        docker pull grafana/k6:latest
     displayName: Pull k6 image

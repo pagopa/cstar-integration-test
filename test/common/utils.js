@@ -45,7 +45,7 @@ export function getFCPanList() {
     return papaparse.parse(open('../../assets/fc_pgpans.csv'), { header: true }).data;
 }
 export function getFCIbanList() {
-    return papaparse.parse(open(`${__ENV.FC_IBAN_FILE}`), { header: true }).data;
+    return papaparse.parse(open('../../assets/fc_iban.csv'), { header: true }).data;
 }
 
 function getFiscalCodeMonth(month) {
