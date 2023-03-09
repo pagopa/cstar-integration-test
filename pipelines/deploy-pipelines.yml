@@ -102,7 +102,7 @@ steps:
       ls -lrt
       cd cstar-cli-main 
       ls -lrt
-      curl -sSL https://install.python-poetry.org | python3 -
+      curl -sSL https://install.python-poetry.org | POETRY_HOME=/etc/poetry python3 -
       poetry install
       poetry shell
       ./install.sh
