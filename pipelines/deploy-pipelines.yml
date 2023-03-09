@@ -91,7 +91,6 @@ steps:
       python -m venv .venv
       source .venv/bin/activate
       python -m pip install --upgrade pip
-      pip install poetry
     workingDirectory: $(projectRoot)
     displayName: "Install requirements"
 
@@ -103,7 +102,9 @@ steps:
       cd cstar-cli-main 
       ls -lrt
       ls -lrt /opt/hostedtoolcache/Python/3.10.10/x64/lib/python3.10/site-packages
-      ls -lrt ../.venv/lib/python3.10/site-packages/poetry
+      ls -lrt ~/.poetry/bin
+      curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python    
+      export PATH=$PATH:$HOME/.poetry/bin
       ../.venv/lib/python3.10/site-packages/poetry install
       ../.venv/lib/python3.10/site-packages/poetry shell
       ./install.sh
