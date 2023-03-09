@@ -13,6 +13,8 @@ import {
    } from '../common/api/idpayWallet.js'
 import { getFCPanList } from '../common/utils.js'
 import { SharedArray } from 'k6/data'
+import { jUnit, textSummary } from 'https://jslib.k6.io/k6-summary/0.0.2/index.js';
+import { setStages } from '../common/stageUtils.js';
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
