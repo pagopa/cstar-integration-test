@@ -15,6 +15,7 @@ parameters:
       - idpayOnboardingAPI
       - ioPutEnrollInstrumentIssuer
       - ioPutEnrollIban
+      - rtdTransactionsFile
   - name: 'TARGET_ENV'
     displayName: 'Target Environment'
     type: string
