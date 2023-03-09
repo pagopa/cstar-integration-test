@@ -91,6 +91,7 @@ steps:
       python -m venv .venv
       source .venv/bin/activate
       python -m pip install --upgrade pip
+      .venv/bin/pip install poetry
       pip install cryptography
     workingDirectory: $(projectRoot)
     displayName: "Install requirements"
@@ -102,8 +103,6 @@ steps:
       ls -lrt
       cd cstar-cli-main 
       ls -lrt
-      curl -sSL https://install.python-poetry.org | python -
-      export PATH="~/.local/share/pypoetry/venv/bin/poetry:$PATH"
       poetry install
       poetry shell
       ./install.sh
