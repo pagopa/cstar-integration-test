@@ -14,6 +14,7 @@ parameters:
       - putTokenPdv
       - idpayOnboardingAPI
       - ioPutEnrollInstrumentIssuer
+      - ioPutEnrollIban
   - name: 'TARGET_ENV'
     displayName: 'Target Environment'
     type: string
@@ -40,17 +41,17 @@ parameters:
     type: number
     default: 600
   - name: 'APIM_SK'
-    displayName: 'API-Key (required for putTokenPdv and idpayOnboardingAPI script)'
+    displayName: 'API-Key \n (NOT required for putTokenMockedPdv script)'
     type: string
     default: 'IGNORE_IF_putTokenMockedPdv'
   - name: 'SERVICE_ID'
-    displayName: 'ServiceId (required for idpayOnboardingAPI script)'
+    displayName: 'ServiceId \n (required for idpayOnboardingAPI script)'
     type: string
     default: 'IGNORE_IF_NOT_idpayOnboardingAPI'
   - name: 'INITIATIVE_ID'
-    displayName: 'InitiativeId (required for ioPutEnrollInstrumentIssuer script)'
+    displayName: 'InitiativeId \n (required for ioPutEnrollInstrumentIssuer and ioPutEnrollIban script)'
     type: string
-    default: 'IGNORE_IF_NOT_ioPutEnrollInstrumentIssuer'
+    default: 'IGNORE_IF_NOT_ioPutEnrollInstrumentIssuer_and_ioPutEnrollIban'
 
 steps:
   - task: DownloadSecureFile@1
@@ -66,6 +67,9 @@ steps:
   - script: |
       cp /home/vsts/work/_temp/fc_pgpans.csv $(pwd)/assets/fc_pgpans.csv
     displayName: Copy FiscalCode/PgPan File
+  - script: |
+      cp /home/vsts/work/_temp/fc_iban.csv $(pwd)/assets/fc_iban.csv
+    displayName: Copy FiscalCode/IBAN File
   - script: |
        docker pull grafana/k6:latest
     displayName: Pull k6 image
@@ -83,7 +87,6 @@ steps:
         -e APIM_SK=${{ parameters.APIM_SK }} \
         -e SERVICE_ID=${{ parameters.SERVICE_ID }} \
         -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
-        -e FC_IBAN_FILE=$(fc_iban.secureFilePath) \
         grafana/k6:latest \
         run /app/test/performance/${{ parameters.SCRIPT }}.js
     displayName: Run k6 ${{ parameters.SCRIPT }}
