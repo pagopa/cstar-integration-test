@@ -102,6 +102,7 @@ steps:
       ls -lrt
       cd cstar-cli-main 
       ls -lrt
+      curl -sSL https://install.python-poetry.org | python3 -
       poetry install
       poetry shell
       ./install.sh
