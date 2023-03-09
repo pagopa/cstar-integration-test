@@ -103,7 +103,7 @@ steps:
       cd cstar-cli-main 
       ls -lrt
       ls -lrt /opt/hostedtoolcache/Python/3.10.10/x64/lib/python3.10/site-packages
-      ls -lrt ../.venv/lib/python3.10/site-packages
+      ls -lrt ../.venv/lib/python3.10/site-packages/poetry
       ../.venv/lib/python3.10/site-packages/poetry install
       ../.venv/lib/python3.10/site-packages/poetry shell
       ./install.sh
