@@ -105,8 +105,8 @@ steps:
       ls -lrt ~/.poetry/bin
       curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python    
       export PATH=$PATH:$HOME/.poetry/bin
-      ../.venv/lib/python3.10/site-packages/poetry install
-      ../.venv/lib/python3.10/site-packages/poetry shell
+      poetry install
+      poetry shell
       ./install.sh
     displayName: Set environment
   #TODO set date time parameters
