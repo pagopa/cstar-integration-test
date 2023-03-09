@@ -103,6 +103,7 @@ steps:
       cd cstar-cli-main
       pip install numpy
       pip install pandas
+      pip install requests
       pip install --force-reinstall src/cstar-cli-core
       pip install --no-deps --force-reinstall src/cstar-cli
       pip install --force-reinstall src/cstar-cli-core
