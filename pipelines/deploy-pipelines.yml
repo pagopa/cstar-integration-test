@@ -60,6 +60,7 @@ steps:
       secureFile: 'fc_iban.csv'
   - script: |
       cp /home/vsts/work/_temp/fc_pgpans.csv $(pwd)/assets/fc_pgpans.csv
+    displayName: Copy FiscalCode/PgPan File
   - script: |
        docker pull grafana/k6:latest
     displayName: Pull k6 image
