@@ -104,8 +104,8 @@ steps:
       ls -lrt
       ls -lrt /opt/hostedtoolcache/Python/3.10.10/x64/lib/python3.10/site-packages
       ls -lrt ../.venv/lib/python3.10/site-packages
-      /opt/hostedtoolcache/Python/3.10.10/x64/lib/python3.10/site-packages/poetry install
-      poetry shell
+      ../.venv/lib/python3.10/site-packages/poetry install
+      ../.venv/lib/python3.10/site-packages/poetry shell
       ./install.sh
     displayName: Set environment
   #TODO set date time parameters
