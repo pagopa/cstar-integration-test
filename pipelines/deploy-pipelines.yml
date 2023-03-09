@@ -103,8 +103,8 @@ steps:
       cd cstar-cli-main 
       ls -lrt
       ls -lrt /opt/hostedtoolcache/Python/3.10.10/x64/lib/python3.10/site-packages
-      ls -lrt ../.venv/lib/python3.10/site-packages (22.3.1)
-      poetry install
+      ls -lrt ../.venv/lib/python3.10/site-packages
+      /opt/hostedtoolcache/Python/3.10.10/x64/lib/python3.10/site-packages/poetry install
       poetry shell
       ./install.sh
     displayName: Set environment
