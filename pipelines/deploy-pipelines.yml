@@ -104,6 +104,7 @@ steps:
       pip install cryptography
       pip install numpy
       pip install pandas
+      pip install PGPy
       pip install --force-reinstall src/cstar-cli-core
       pip install --no-deps --force-reinstall src/cstar-cli
     displayName: Set environment
