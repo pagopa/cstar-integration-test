@@ -6,8 +6,8 @@ pool:
   vmImage: ubuntu-20.04
 
 variables:
-  # Python version: 3.6
-  pythonVersion: '3.6'
+  # Python version: 3.7
+  pythonVersion: '3.7'
 
   # Folder name of this sub-repository
   working-dir: '.'
