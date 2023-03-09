@@ -41,15 +41,15 @@ parameters:
     type: number
     default: 600
   - name: 'APIM_SK'
-    displayName: 'API-Key \n (NOT required for putTokenMockedPdv script)'
+    displayName: 'API-Key (NOT required for putTokenMockedPdv script)'
     type: string
     default: 'IGNORE_IF_putTokenMockedPdv'
   - name: 'SERVICE_ID'
-    displayName: 'ServiceId \n (required for idpayOnboardingAPI script)'
+    displayName: 'ServiceId (required for idpayOnboardingAPI script)'
     type: string
     default: 'IGNORE_IF_NOT_idpayOnboardingAPI'
   - name: 'INITIATIVE_ID'
-    displayName: 'InitiativeId \n (required for ioPutEnrollInstrumentIssuer and ioPutEnrollIban script)'
+    displayName: 'InitiativeId (required for ioPutEnrollInstrumentIssuer and ioPutEnrollIban script)'
     type: string
     default: 'IGNORE_IF_NOT_ioPutEnrollInstrumentIssuer_and_ioPutEnrollIban'
 

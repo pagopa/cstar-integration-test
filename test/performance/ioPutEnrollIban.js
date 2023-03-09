@@ -21,8 +21,9 @@ let cfIbanList = new SharedArray('cfIbanList', function() {
     return getFCIbanList()
 })
 let baseUrl
-let myEnv
 const services = JSON.parse(open('../../services/environments.json'))
+
+const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
 
 
 let scenarios = {
