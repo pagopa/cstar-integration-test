@@ -91,6 +91,7 @@ steps:
     displayName: Copy Transaction File
   - script: |
       mkdir $(pwd)/certs
+    displayName: Create Certs Folder
   - script: |
       cp /home/vsts/work/_temp/rtd-uat-acquirer-mauth.pem $(pwd)/certs/rtd-uat-acquirer-mauth.pem
     displayName: Copy RTD PEM File
