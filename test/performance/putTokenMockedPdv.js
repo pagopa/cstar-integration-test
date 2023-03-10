@@ -55,7 +55,7 @@ if (__ENV.SCENARIO_TYPE_ENV) {
 }
 
 if (isEnvValid(__ENV.TARGET_ENV)) {
-    baseUrl = services[`${__ENV.TARGET_ENV}_pdv`].baseUrl
+    baseUrl = services[`${__ENV.TARGET_ENV}_pdv_mock`].baseUrl
 }
 
 export default () => {

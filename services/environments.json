@@ -28,5 +28,11 @@
   },
   "uat_pdv":{
     "baseUrl" : "https://api.uat.tokenizer.pdv.pagopa.it"
+  },
+  "dev_pdv_mock":{
+    "baseUrl" : "https://api-io.dev.cstar.pagopa.it"
+  },
+  "uat_pdv_mock":{
+    "baseUrl" : "https://api-io.uat.cstar.pagopa.it"
   }
 }
