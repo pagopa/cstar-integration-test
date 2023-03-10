@@ -14,6 +14,7 @@ import {exec, vu} from 'k6/execution'
 import { SharedArray } from 'k6/data'
 import { jUnit, textSummary } from 'https://jslib.k6.io/k6-summary/0.0.2/index.js';
 import { setStages } from '../common/stageUtils.js';
+import { open, write } from 'k6/fs';
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
@@ -107,7 +108,7 @@ export default () => {
         if(res.status != 200){
             const logMessage = 'GetInitiative -> ' + JSON.stringify(res)
             console.error(logMessage)
-            logFile.write(`${logMessage}\n`)
+            write(`${logMessage}\n`, logFile)
             checked = false
             return
         }
