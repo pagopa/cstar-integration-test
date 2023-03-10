@@ -20,7 +20,7 @@ pip install tomli
 pip install urllib3
 pip install black
 pip install Faker
-pip install PGPy
+pip install PGPy==0.6.0
 pip install psycopg-binarypip
 pip install pandas
 pip install requests
