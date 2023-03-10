@@ -23,6 +23,7 @@ let init
 let cfList = new SharedArray('cfList', function() {
     return getFCList()
 })
+const logFile = open('../../assets/log.txt', 'a+')
 
 const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
 
@@ -104,7 +105,9 @@ export default () => {
         )
             
         if(res.status != 200){
-            console.error('GetInitiative -> '+JSON.stringify(res))
+            const logMessage = 'GetInitiative -> ' + JSON.stringify(res)
+            console.error(logMessage)
+            logFile.write(`${logMessage}\n`)
             checked = false
             return
         }
