@@ -1,5 +1,6 @@
-import { group, sleep } from 'k6'
-import { assert, statusOk} from '../common/assertions.js'
+import { group } from 'k6'
+import { createRtdSas, putPgpFile } from '../common/api/rtdCsvTransaction.js'
+import { assert, statusCreated } from '../common/assertions.js'
 import {
     isEnvValid,
     isTestEnabledOnEnv,
@@ -7,25 +8,25 @@ import {
     UAT,
     PROD,
 } from '../common/envs.js'
-import {exec, vu} from 'k6/execution'
-import {
-    putEnrollInstrumentIssuer
-   } from '../common/api/idpayWallet.js'
-import { getFCPanList } from '../common/utils.js'
-import { SharedArray } from 'k6/data'
+import {exec} from 'k6/execution'
 import { jUnit, textSummary } from 'https://jslib.k6.io/k6-summary/0.0.2/index.js';
 import { setStages } from '../common/stageUtils.js';
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
 const services = JSON.parse(open('../../services/environments.json'))
-let baseUrl
-let cfPanList = new SharedArray('cfPanList', function() {
-    return getFCPanList()
-})
-
 const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
 
+let params = {}
+let param = {}
+let baseUrl
+let myEnv
+let sas
+let authorizedContainer
+let gpgFile
+
+
+let fileName = "CSTAR.IDPAY.TRNLOG.20230313.223000.001.01.csv.pgp"
 
 let scenarios = {
     rampingArrivalRate: {
@@ -47,7 +48,7 @@ export let options = {
     scenarios: {} ,
     thresholds: {
         http_req_failed: [{threshold:'rate<0.01', abortOnFail: false, delayAbortEval: '10s'},], // http errors should be less than 1%
-        http_reqs: [{threshold: `count<=${__ENV.VIRTUAL_USERS_ENV}`, abortOnFail: false, delayAbortEval: '10s'},]
+        http_reqs: [{threshold: `count<=${parseInt(__ENV.VIRTUAL_USERS_ENV) * 2}`, abortOnFail: false, delayAbortEval: '10s'},]
     },
 
 }
@@ -59,14 +60,32 @@ if (__ENV.SCENARIO_TYPE_ENV) {
 }
 
 if (isEnvValid(__ENV.TARGET_ENV)) {
-    baseUrl = services[`${__ENV.TARGET_ENV}_io`].baseUrl
+    baseUrl = services[`${__ENV.TARGET_ENV}_issuer`].baseUrl
+    gpgFile = open(`../../assets/${fileName}`, 'b')
+
+    options.tlsAuth = [
+        {
+            domains: [baseUrl],
+            cert: open(`../../certs/rtd-uat-acquirer-mauth.pem`),
+            key: open(`../../certs/rtd-uat-acquirer-mauth.key`),
+        },
+    ]
+
+    params.headers = {
+        'Ocp-Apim-Trace': 'true',
+        'Ocp-Apim-Subscription-Key': __ENV.APIM_SK,
+    }
+
+    param.headers = {
+        'Ocp-Apim-Subscription-Key': __ENV.APIM_SK,
+        'x-ms-blob-type': 'BlockBlob',
+        'x-ms-version': '2020-12-06',
+        'Content-Type': 'text/csv'
+    }
 }
 
 
 export default () => {
-    const cf = cfPanList[vu.idInTest-1].FC
-    const pgpan = cfPanList[vu.idInTest-1].PGPAN
-
     if (
         !isEnvValid(__ENV.TARGET_ENV) ||
         !isTestEnabledOnEnv(__ENV.TARGET_ENV, REGISTERED_ENVS)
@@ -74,46 +93,38 @@ export default () => {
         exec.test.abort()
     }
 
-    group('Payment Instrument API', () => {
-        group('Should enroll pgpan', () =>{
+    group('CSV Transaction API', () => {
+        const res = createRtdSas(
+            baseUrl, 
+            params)
 
-        let initiativeId = `${__ENV.INITIATIVE_ID}`
-        const params= {
-            headers:  {
-                'Content-Type' : 'application/json',
-                'Ocp-Apim-Subscription-Key':`${__ENV.APIM_SK}`,
-                'Ocp-Apim-Trace':'true',
-                'Accept-Language':'it_IT',
-                'Fiscal-Code': cf,
-            },
-            body: {
-                "brand": "VISA",
-                "type": "DEB",
-                "pgpPan": pgpan,
-                "expireMonth": "08",
-                "expireYear": "2028",
-                "issuerAbiCode": "03069",
-                "holder": "TEST"
-            }
-        }
+        assert(res,[statusCreated()])
 
-        let res = putEnrollInstrumentIssuer(
-            baseUrl,
-            JSON.stringify(params.body).replace(/\\\\/g, "\\"),
-            params.headers,
-            initiativeId)
-
-        if(res.status != 200){
-            console.error('Enrollment Carte-> '+JSON.stringify(res))
+        if(res.status==201){
+        const bodyObj = JSON.parse(res.body)
+        sas = bodyObj.sas
+        authorizedContainer = bodyObj.authorizedContainer
+        }else{
+            console.error('Get Token SAS -> '+JSON.stringify(res))
             return
         }
 
-        assert(res,[statusOk()])
+        group('Should put file pgp', () =>{
 
+            const rest = putPgpFile(
+                baseUrl,
+                gpgFile,
+                param,
+                authorizedContainer,
+                fileName,
+                sas)
+                
+            assert(rest, [statusCreated()])
+            if(rest.status != 201){
+                console.error('Put pgp file -> '+ JSON.stringify(rest))
+            }
         })
     })
-    sleep(1)
-
 }
 
 export function handleSummary(data){

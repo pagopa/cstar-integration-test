@@ -22,6 +22,10 @@ parameters:
     values:
       - putTokenMockedPdv
       - putTokenPdv
+      - idpayOnboardingAPI
+      - ioPutEnrollInstrumentIssuer
+      - ioPutEnrollIban
+      - rtdTransactionsFile
   - name: 'TARGET_ENV'
     displayName: 'Target Environment'
     type: string
@@ -47,10 +51,18 @@ parameters:
     displayName: 'Maximum duration in seconds for the perVuIterations-type scenario'
     type: number
     default: 600
-  - name: 'PDV_APIM_SK_ENV'
-    displayName: 'PDV API-Key (required for putTokenPdv script)'
+  - name: 'APIM_SK'
+    displayName: 'API-Key (NOT required for putTokenMockedPdv script)'
     type: string
     default: 'IGNORE_IF_putTokenMockedPdv'
+  - name: 'SERVICE_ID'
+    displayName: 'ServiceId (required for idpayOnboardingAPI script)'
+    type: string
+    default: 'IGNORE_IF_NOT_idpayOnboardingAPI'
+  - name: 'INITIATIVE_ID'
+    displayName: 'InitiativeId (required for ioPutEnrollInstrumentIssuer and ioPutEnrollIban script)'
+    type: string
+    default: 'IGNORE_IF_NOT_ioPutEnrollInstrumentIssuer_and_ioPutEnrollIban'
   - name: 'TRX_FOR_VU'
     displayName: 'Number of transaction for VUs'
     type: number
@@ -61,6 +73,49 @@ parameters:
     default: 'IGNORE_IF_NOT_NECESSARY'
 
 steps:
+  - task: DownloadSecureFile@1
+    name: fc_pgpans
+    displayName: 'Fiscal Code/PgPan File'
+    inputs:
+      secureFile: 'fc_pgpans.csv'
+  - task: DownloadSecureFile@1
+    name: fc_iban
+    displayName: 'Fiscal Code/IBAN File'
+    inputs:
+      secureFile: 'fc_iban.csv'
+  - task: DownloadSecureFile@1
+    name: trx_file
+    displayName: 'Transactions File'
+    inputs:
+      secureFile: 'CSTAR.IDPAY.TRNLOG.20230313.223000.001.01.csv.pgp'
+  - task: DownloadSecureFile@1
+    name: rtd_uat_acquirer_mauth_pem
+    displayName: 'RTD Certification File'
+    inputs:
+      secureFile: 'rtd-uat-acquirer-mauth.pem'
+  - task: DownloadSecureFile@1
+    name: rtd_uat_acquirer_mauth_key
+    displayName: 'RTD Key File'
+    inputs:
+      secureFile: 'rtd-uat-acquirer-mauth.key'
+  - script: |
+      cp /home/vsts/work/_temp/fc_pgpans.csv $(pwd)/assets/fc_pgpans.csv
+    displayName: Copy FiscalCode/PgPan File
+  - script: |
+      cp /home/vsts/work/_temp/fc_iban.csv $(pwd)/assets/fc_iban.csv
+    displayName: Copy FiscalCode/IBAN File
+  - script: |
+      cp /home/vsts/work/_temp/CSTAR.IDPAY.TRNLOG.20230313.223000.001.01.csv.pgp $(pwd)/assets/CSTAR.IDPAY.TRNLOG.20230313.223000.001.01.csv.pgp
+    displayName: Copy Transaction File
+  - script: |
+      mkdir $(pwd)/certs
+    displayName: Create Certs Folder
+  - script: |
+      cp /home/vsts/work/_temp/rtd-uat-acquirer-mauth.pem $(pwd)/certs/rtd-uat-acquirer-mauth.pem
+    displayName: Copy RTD PEM File
+  - script: |
+      cp /home/vsts/work/_temp/rtd-uat-acquirer-mauth.key $(pwd)/certs/rtd-uat-acquirer-mauth.key
+    displayName: Copy RTD Key File
   - task: DownloadSecureFile@1
     name: rtd_cert_pem
     displayName: 'Download MAUTH pem'
@@ -122,7 +177,9 @@ steps:
         -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
         -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
         -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
-        -e PDV_APIM_SK_ENV=${{ parameters.PDV_APIM_SK_ENV }} \
+        -e APIM_SK=${{ parameters.APIM_SK }} \
+        -e SERVICE_ID=${{ parameters.SERVICE_ID }} \
+        -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
         grafana/k6:latest \
         run /app/test/performance/${{ parameters.SCRIPT }}.js
     displayName: Run k6 ${{ parameters.SCRIPT }}
