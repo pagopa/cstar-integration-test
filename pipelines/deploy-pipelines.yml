@@ -99,9 +99,6 @@ steps:
       cp /home/vsts/work/_temp/rtd-uat-acquirer-mauth.key $(pwd)/certs/rtd-uat-acquirer-mauth.key
     displayName: Copy RTD Key File
   - script: |
-      cp $(pwd)/assets/log.txt $(pwd)/certs/log.txt
-    displayName: Copy log.txt
-  - script: |
        docker pull grafana/k6:latest
     displayName: Pull k6 image
   - script: |
@@ -121,6 +118,9 @@ steps:
         grafana/k6:latest \
         run /app/test/performance/${{ parameters.SCRIPT }}.js
     displayName: Run k6 ${{ parameters.SCRIPT }}
+  - script: |
+      cp $(pwd)/assets/log.txt $(pwd)/certs/log.txt
+    displayName: Copy log.txt
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: 'JUnit'
