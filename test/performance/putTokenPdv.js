@@ -62,7 +62,7 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
 
 
 export default () => {
-    const uniqueCF = cfList[vu.idInTest-1].cf
+    const uniqueCF = cfList[vu.idInTest-1].FC
 
     //UPSERT TOKEN
     group('Should onboard Citizen', () => {

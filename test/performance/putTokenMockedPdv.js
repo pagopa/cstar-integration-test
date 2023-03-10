@@ -63,7 +63,7 @@ export default () => {
     group('Should pdv put a cf', () => {
         group('Returns a token', () => {
 
-        const uniqueCF = cfList[vu.idInTest-1].cf
+        const uniqueCF = cfList[vu.idInTest-1].FC
             
         const params= {
             headers:  { 
