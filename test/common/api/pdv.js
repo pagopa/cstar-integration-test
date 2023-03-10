@@ -19,7 +19,7 @@ export function getToken(baseUrl, userId, headers) {
     return res
 }
 
-export function upsertMockToken(body, headers) {
+export function upsertMockToken(baseUrl, body, headers) {
     const res = http.put(
         `${baseUrl}/mock/pdv/tokens`,
         body,
