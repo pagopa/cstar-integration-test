@@ -125,6 +125,7 @@ steps:
        docker pull grafana/k6:latest
     displayName: Pull k6 image
   - script: |
+      ls -lrt $(pwd)
       docker run -i \
         --name ksixtests \
         --user $UID \
