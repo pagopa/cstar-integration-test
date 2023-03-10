@@ -107,7 +107,8 @@ steps:
       cst idpay idpaydataset --action dataset_and_transactions --env ${{ parameters.TARGET_ENV }} --api-key ${{ parameters.RTD_API_KEY }} --key $(rtd_cert_key.secureFilePath) --cert $(rtd_cert_pem.secureFilePath) --PM-pubk $(bpd_pm_test.secureFilePath) --out-dir ./generated --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} --trx-per-fc 1 --start-datetime 2023-02-06T20:30:00.000Z --mcc 1234 --PM-salt SALT123
       ls -lrt
       ls -lrt ./generated/**
-      cp -R ./generated/** $(pwd)/assets
+      cp ./generated/**/fc_pgpans.csv $(pwd)/assets/fc_pgpans.csv
+      cp ./generated/**/fc_iban.csv $(pwd)/assets/fc_iban.csv
       ls -lrt ./assets
     displayName: Retrieve resource from cstar-cli
   - script: |
