@@ -26,7 +26,7 @@ let authorizedContainer
 let gpgFile
 
 
-let fileName = "CSTAR.IDPAY.TRNLOG.20230313.223000.001.01.csv.pgp"
+let fileName = "CSTAR.IDPAY.TRNLOG.csv.pgp"
 
 let scenarios = {
     rampingArrivalRate: {
