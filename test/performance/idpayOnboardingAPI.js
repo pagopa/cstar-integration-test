@@ -23,7 +23,7 @@ let init
 let cfList = new SharedArray('cfList', function() {
     return getFCList()
 })
-const logFile = open('log.txt', 'a+')
+const logFile = open('../../assets/log.txt', 'a+')
 
 const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
 

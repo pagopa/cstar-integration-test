@@ -119,7 +119,7 @@ steps:
         run /app/test/performance/${{ parameters.SCRIPT }}.js
     displayName: Run k6 ${{ parameters.SCRIPT }}
   - script: |
-      cp $(pwd)/log.txt $(pwd)/certs/log.txt
+      cp $(pwd)/assets/log.txt $(pwd)/certs/log.txt
     displayName: Copy log.txt
   - task: PublishTestResults@2
     inputs:
