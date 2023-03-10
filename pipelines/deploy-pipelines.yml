@@ -109,6 +109,7 @@ steps:
     displayName: "Install CLI requirements"
   - script: |
       apt-get -y update && apt-get -y upgrade
+      apt install rename
       curl -L https://github.com/pagopa/cstar-cli/archive/refs/heads/main.zip -o cstar-cli.zip
       unzip cstar-cli.zip
       cd cstar-cli-main 
@@ -122,7 +123,7 @@ steps:
       ls -lrt ./assets
       cd ./assets
       ls -lrt
-      mv -n 's/(CSTAR.IDPAY.TRNLOG.)(\d{8}).(\d{6}).(\d{3}).(\d{8})(.csv.pgp)' CSTAR.IDPAY.TRNLOG.csv.pgp
+      rename -n 's/(CSTAR.IDPAY.TRNLOG.)(\d{8}).(\d{6}).(\d{3}).(\d{8})(.csv.pgp)' CSTAR.IDPAY.TRNLOG.csv.pgp
     displayName: Retrieve resource from cstar-cli
   - script: |
        docker pull grafana/k6:latest
