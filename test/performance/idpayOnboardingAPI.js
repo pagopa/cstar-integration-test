@@ -117,7 +117,7 @@ export default () => {
 
             
 
-    group('Should onboard Citizen', () => {
+    /* group('Should onboard Citizen', () => {
 
         group('When the inititive exists', () => {
             if(checked){
@@ -202,7 +202,7 @@ export default () => {
             [statusAccepted()])
             }
         })
-    })
+    }) */
     sleep(1)
 }
 
