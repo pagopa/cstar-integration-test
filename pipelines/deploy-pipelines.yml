@@ -73,21 +73,10 @@ parameters:
     default: 'IGNORE_IF_NOT_NECESSARY'
 
 steps:
-  - task: DownloadSecureFile@1
-    name: fc_pgpans
-    displayName: 'Fiscal Code/PgPan File'
+  - task: UsePythonVersion@0
     inputs:
-      secureFile: 'fc_pgpans.csv'
-  - task: DownloadSecureFile@1
-    name: fc_iban
-    displayName: 'Fiscal Code/IBAN File'
-    inputs:
-      secureFile: 'fc_iban.csv'
-  - task: DownloadSecureFile@1
-    name: trx_file
-    displayName: 'Transactions File'
-    inputs:
-      secureFile: 'CSTAR.IDPAY.TRNLOG.20230313.223000.001.01.csv.pgp'
+      versionSpec: '$(pythonVersion)'
+    displayName: 'Use Python $(pythonVersion)'
   - task: DownloadSecureFile@1
     name: rtd_uat_acquirer_mauth_pem
     displayName: 'RTD Certification File'
@@ -98,15 +87,11 @@ steps:
     displayName: 'RTD Key File'
     inputs:
       secureFile: 'rtd-uat-acquirer-mauth.key'
-  - script: |
-      cp /home/vsts/work/_temp/fc_pgpans.csv $(pwd)/assets/fc_pgpans.csv
-    displayName: Copy FiscalCode/PgPan File
-  - script: |
-      cp /home/vsts/work/_temp/fc_iban.csv $(pwd)/assets/fc_iban.csv
-    displayName: Copy FiscalCode/IBAN File
-  - script: |
-      cp /home/vsts/work/_temp/CSTAR.IDPAY.TRNLOG.20230313.223000.001.01.csv.pgp $(pwd)/assets/CSTAR.IDPAY.TRNLOG.20230313.223000.001.01.csv.pgp
-    displayName: Copy Transaction File
+  - task: DownloadSecureFile@1
+    name: bpd_pm_test
+    displayName: 'Download BPD PM public uat'
+    inputs:
+      secureFile: 'Centrostella-BPD-PM-TEST_0xE7D22349_public_uat.asc'
   - script: |
       mkdir $(pwd)/certs
     displayName: Create Certs Folder
@@ -116,39 +101,12 @@ steps:
   - script: |
       cp /home/vsts/work/_temp/rtd-uat-acquirer-mauth.key $(pwd)/certs/rtd-uat-acquirer-mauth.key
     displayName: Copy RTD Key File
-  - task: DownloadSecureFile@1
-    name: rtd_cert_pem
-    displayName: 'Download MAUTH pem'
-    inputs:
-      secureFile: 'rtd-uat-acquirer-mauth.pem'
-  - task: DownloadSecureFile@1
-    name: rtd_cert_key
-    displayName: 'Download MAUTH key'
-    inputs:
-      secureFile: 'rtd-uat-acquirer-mauth.key'
-  - task: DownloadSecureFile@1
-    name: bpd_pm_test
-    displayName: 'Download BPD PM public uat'
-    inputs:
-      secureFile: 'Centrostella-BPD-PM-TEST_0xE7D22349_public_uat.asc'
-  - script: |
-      echo $(pwd)
-      echo $(rtd_cert_pem.secureFilePath)
-      echo $(rtd_cert_key.secureFilePath)
-      echo $(bpd_pm_test.secureFilePath)
-
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(pythonVersion)'
-    displayName: 'Use Python $(pythonVersion)'
-
   - script: |
       python -m venv .venv
       source .venv/bin/activate
       python -m pip install --upgrade pip
     workingDirectory: $(projectRoot)
-    displayName: "Install requirements"
-
+    displayName: "Install CLI requirements"
   - script: |
       apt-get -y update && apt-get -y upgrade
       curl -L https://github.com/pagopa/cstar-cli/archive/refs/heads/main.zip -o cstar-cli.zip
@@ -159,7 +117,7 @@ steps:
     displayName: Set environment
   #TODO set date time parameters
   - script: |
-      cst idpay idpaydataset --action dataset_and_transactions --env ${{ parameters.TARGET_ENV }} --api-key ${{ parameters.RTD_API_KEY }} --key $(rtd_cert_key.secureFilePath) --cert $(rtd_cert_pem.secureFilePath) --PM-pubk $(bpd_pm_test.secureFilePath) --out-dir ./generated --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} --trx-per-fc 1 --start-datetime 2023-02-06T20:30:00.000Z --mcc 1234 --PM-salt SALT123
+      cst idpay idpaydataset --action dataset_and_transactions --env ${{ parameters.TARGET_ENV }} --api-key ${{ parameters.RTD_API_KEY }} --key $(rtd_uat_acquirer_mauth_key.secureFilePath) --cert $(rtd_uat_acquirer_mauth_pem.secureFilePath) --PM-pubk $(bpd_pm_test.secureFilePath) --out-dir ./generated --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} --trx-per-fc 1 --start-datetime 2023-02-06T20:30:00.000Z --mcc 1234 --PM-salt SALT123
       cp ./generated/*/* ./assets
       ls -lrt ./assets
     displayName: Retrieve resource from cstar-cli
