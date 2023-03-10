@@ -122,7 +122,7 @@ steps:
       ls -lrt ./assets
       cd ./assets
       ls -lrt
-      rename -n 's/(CSTAR.IDPAY.TRNLOG.)(\d{8}).(\d{6}).(\d{3}).(\d{8})(.csv.pgp)' CSTAR.IDPAY.TRNLOG.csv.pgp
+      mv -n 's/(CSTAR.IDPAY.TRNLOG.)(\d{8}).(\d{6}).(\d{3}).(\d{8})(.csv.pgp)' CSTAR.IDPAY.TRNLOG.csv.pgp
     displayName: Retrieve resource from cstar-cli
   - script: |
        docker pull grafana/k6:latest
