@@ -118,9 +118,6 @@ steps:
         grafana/k6:latest \
         run /app/test/performance/${{ parameters.SCRIPT }}.js
     displayName: Run k6 ${{ parameters.SCRIPT }}
-  - script: |
-      cp $(pwd)/assets/log.txt $(pwd)/certs/log.txt
-    displayName: Copy log.txt
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: 'JUnit'
