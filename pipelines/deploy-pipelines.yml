@@ -137,10 +137,6 @@ steps:
         echo $FileName
         echo "##vso[task.setvariable variable=trx_file_name]$FileName"
   - script: |
-      cd ./assets
-      $rtd_trx_file = dir | Where-Object {$_.extension -eq ".pgp"}
-      Write-Host "##vso[task.setvariable variable=trx_file_name;]$rtd_trx_file.Name"
-  - script: |
        docker pull grafana/k6:latest
     displayName: Pull k6 image
   - script: |
