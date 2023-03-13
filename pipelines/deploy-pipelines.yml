@@ -127,6 +127,15 @@ steps:
       ls -lrt ./assets
       cd ./assets
     displayName: Retrieve resource from cstar-cli
+  - task: Bash@3
+    inputs:
+      targetType: 'inline'
+      script: |
+        WantedFile=$( find . -name "*.pgp")
+        BaseName=$(basename $WantedFile)
+        FileName=$(echo $BaseName| cut -d . -f1)
+        echo $FileName
+        echo "##vso[task.setvariable variable=trx_file_name]$FileName"
   - script: |
       cd ./assets
       $rtd_trx_file = dir | Where-Object {$_.extension -eq ".pgp"}
