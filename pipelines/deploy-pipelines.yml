@@ -133,10 +133,8 @@ steps:
       script: |
         WantedFile=$( find . -name "*.pgp")
         BaseName=$(basename $WantedFile)
-        FileName=$(echo $BaseName| cut -d . -f1)
         echo $BaseName
-        echo $FileName
-        echo "##vso[task.setvariable variable=trx_file_name]$BaseName"
+        echo "##vso[task.setvariable variable=trxFileName]$BaseName"
   - script: |
        docker pull grafana/k6:latest
     displayName: Pull k6 image
@@ -155,7 +153,7 @@ steps:
         -e APIM_SK=${{ parameters.APIM_SK }} \
         -e SERVICE_ID=${{ parameters.SERVICE_ID }} \
         -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
-        -e TRX_FILE_NAME = $(trx_file_name) \
+        -e TRX_FILE_NAME = $(trxFileName) \
         grafana/k6:latest \
         run /app/test/performance/${{ parameters.SCRIPT }}.js
     displayName: Run k6 ${{ parameters.SCRIPT }}
