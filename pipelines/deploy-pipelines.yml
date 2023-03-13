@@ -134,8 +134,9 @@ steps:
         WantedFile=$( find . -name "*.pgp")
         BaseName=$(basename $WantedFile)
         FileName=$(echo $BaseName| cut -d . -f1)
+        echo $BaseName
         echo $FileName
-        echo "##vso[task.setvariable variable=trx_file_name]$FileName"
+        echo "##vso[task.setvariable variable=trx_file_name]$BaseName"
   - script: |
        docker pull grafana/k6:latest
     displayName: Pull k6 image
