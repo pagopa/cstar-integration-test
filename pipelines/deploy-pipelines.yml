@@ -112,7 +112,6 @@ steps:
     workingDirectory: $(projectRoot)
     displayName: "Install CLI requirements"
   - script: |
-      sudo apt install rename
       curl -L https://github.com/pagopa/cstar-cli/archive/refs/heads/main.zip -o cstar-cli.zip
       unzip cstar-cli.zip
       cd cstar-cli-main 
@@ -124,9 +123,11 @@ steps:
       cst idpay idpaydataset --action dataset_and_transactions --env ${{ parameters.TARGET_ENV }} --api-key ${{ parameters.RTD_API_KEY }} --key $(rtd_uat_acquirer_mauth_key.secureFilePath) --cert $(rtd_uat_acquirer_mauth_pem.secureFilePath) --PM-pubk $(bpd_pm_test.secureFilePath) --out-dir ./generated --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} --trx-per-fc 1 --start-datetime ${{ parameters.TRX_DATE }} --mcc 1234 --PM-salt SALT123
       cp ./generated/*/* ./assets
       ls -lrt ./assets
-      cd ./assets
-      rename -v 's/(\.\d+)+\.csv\.pgp/\.csv\.pgp/' *
     displayName: Retrieve resource from cstar-cli
+  - script: |
+      cd ./assets
+      $rtd_trx_file = dir | Where-Object {$_.extension -eq ".pgp"}
+      Write-Host "##vso[task.setvariable variable=trx_file_name;]$rtd_trx_file.Name"
   - script: |
        docker pull grafana/k6:latest
     displayName: Pull k6 image
@@ -145,6 +146,7 @@ steps:
         -e APIM_SK=${{ parameters.APIM_SK }} \
         -e SERVICE_ID=${{ parameters.SERVICE_ID }} \
         -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
+        -e TRX_FILE_NAME = $(trx_file_name) \
         grafana/k6:latest \
         run /app/test/performance/${{ parameters.SCRIPT }}.js
     displayName: Run k6 ${{ parameters.SCRIPT }}
