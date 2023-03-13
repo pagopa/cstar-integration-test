@@ -123,7 +123,7 @@ steps:
     displayName: Retrieve resource from cstar-cli
   - script: |
       cd ./assets
-      rename -v 's/(\.\d+)+//.pgp' *.pgp
+      rename -v 's/(\.\d+)+\.csv\.pgp/\.csv\.pgp/' *
       ls -lrt
   - script: |
        docker pull grafana/k6:latest
