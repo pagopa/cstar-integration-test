@@ -131,7 +131,7 @@ steps:
     inputs:
       targetType: 'inline'
       script: |
-        WantedFile=$( find . -name "*.pgp")
+        WantedFile=$( find . -name "^(CSTAR\.IDPAY\.TRNLOG)\..*(\.csv\.pgp)$")
         BaseName=$(basename $WantedFile)
         echo $BaseName
         echo "##vso[task.setvariable variable=trxFileName]$BaseName"
