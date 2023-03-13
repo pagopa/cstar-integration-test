@@ -16,7 +16,7 @@ variables:
   projectRoot: $(System.DefaultWorkingDirectory)/$(working-dir)
   
   # Start date pipeline
-  currentDate: $[format("yyyy-MM-dd'T'HH:mm:ss.fffK", pipeline.startTime)]
+  currentDate: $[format("yyyy-MM-ddTHH:mm:ss.SSSK", pipeline.startTime)]
 
 parameters:
   - name: 'SCRIPT'
