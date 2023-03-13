@@ -116,6 +116,7 @@ steps:
     displayName: Set environment
   #TODO set date time parameters
   - script: |
+      sudo apt install rename
       cst idpay idpaydataset --action dataset_and_transactions --env ${{ parameters.TARGET_ENV }} --api-key ${{ parameters.RTD_API_KEY }} --key $(rtd_uat_acquirer_mauth_key.secureFilePath) --cert $(rtd_uat_acquirer_mauth_pem.secureFilePath) --PM-pubk $(bpd_pm_test.secureFilePath) --out-dir ./generated --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} --trx-per-fc 1 --start-datetime 2023-02-06T20:30:00.000Z --mcc 1234 --PM-salt SALT123
       cp ./generated/*/* ./assets
       ls -lrt ./assets
