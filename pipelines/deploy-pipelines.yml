@@ -14,9 +14,6 @@ variables:
 
   # Project root folder
   projectRoot: $(System.DefaultWorkingDirectory)/$(working-dir)
-  
-  # Start date pipeline
-  currentDate: $[format('yyyy-MM-ddTHH:mm:ss.SSSK', pipeline.startTime)]
 
 parameters:
   - name: 'SCRIPT'
@@ -70,6 +67,10 @@ parameters:
     displayName: 'Number of transaction for VUs'
     type: number
     default: 1
+  - name: 'TRX_DATE'
+    displayName: 'Number of transaction for VUs'
+    type: string
+    default: '1970-01-01T00:00:00.000Z'
   - name: 'RTD_API_KEY'
     displayName: 'RTD API-Key'
     type: string
@@ -120,7 +121,7 @@ steps:
     displayName: Set environment
   #TODO set date time parameters
   - script: |
-      cst idpay idpaydataset --action dataset_and_transactions --env ${{ parameters.TARGET_ENV }} --api-key ${{ parameters.RTD_API_KEY }} --key $(rtd_uat_acquirer_mauth_key.secureFilePath) --cert $(rtd_uat_acquirer_mauth_pem.secureFilePath) --PM-pubk $(bpd_pm_test.secureFilePath) --out-dir ./generated --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} --trx-per-fc 1 --start-datetime $(currentDate) --mcc 1234 --PM-salt SALT123
+      cst idpay idpaydataset --action dataset_and_transactions --env ${{ parameters.TARGET_ENV }} --api-key ${{ parameters.RTD_API_KEY }} --key $(rtd_uat_acquirer_mauth_key.secureFilePath) --cert $(rtd_uat_acquirer_mauth_pem.secureFilePath) --PM-pubk $(bpd_pm_test.secureFilePath) --out-dir ./generated --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} --trx-per-fc 1 --start-datetime ${{ parameters.TRX_DATE }} --mcc 1234 --PM-salt SALT123
       cp ./generated/*/* ./assets
       ls -lrt ./assets
       cd ./assets
