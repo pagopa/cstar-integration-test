@@ -14,7 +14,6 @@ import {exec, vu} from 'k6/execution'
 import { SharedArray } from 'k6/data'
 import { jUnit, textSummary } from 'https://jslib.k6.io/k6-summary/0.0.2/index.js';
 import { setStages } from '../common/stageUtils.js';
-import { open, write } from 'k6/fs';
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
@@ -24,7 +23,6 @@ let init
 let cfList = new SharedArray('cfList', function() {
     return getFCList()
 })
-const logFile = open('../../assets/log.txt', 'a+')
 
 const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
 
@@ -106,9 +104,7 @@ export default () => {
         )
             
         if(res.status != 200){
-            const logMessage = 'GetInitiative -> ' + JSON.stringify(res)
-            console.error(logMessage)
-            write(`${logMessage}\n`, logFile)
+            console.error('GetInitiative -> '+JSON.stringify(res))
             checked = false
             return
         }
@@ -119,9 +115,7 @@ export default () => {
         init = bodyObj.initiativeId
     }
 
-            
-
-    /* group('Should onboard Citizen', () => {
+     group('Should onboard Citizen', () => {
 
         group('When the inititive exists', () => {
             if(checked){
@@ -206,7 +200,7 @@ export default () => {
             [statusAccepted()])
             }
         })
-    }) */
+    })
     sleep(1)
 }
 
