@@ -41,7 +41,7 @@ parameters:
       - 'rampingArrivalRate'
       - 'perVuIterations'
   - name: 'VIRTUAL_USERS_ENV'
-    displayName: 'Number of virtual users (1 - 100 000)'
+    displayName: 'Number of virtual users'
     type: number
   - name: 'STAGE_NUMBER_ENV'
     displayName: 'Number of ramping stages (min: 3)'
@@ -122,8 +122,9 @@ steps:
       ls -lrt ./assets
     displayName: Retrieve resource from cstar-cli
   - script: |
+      cd ./assets
       rename -v 's/(\.\d+)+//.pgp' *.pgp
-      ls -lrt ./assets
+      ls -lrt
   - script: |
        docker pull grafana/k6:latest
     displayName: Pull k6 image
