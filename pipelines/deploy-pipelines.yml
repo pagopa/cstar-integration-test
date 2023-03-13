@@ -108,8 +108,6 @@ steps:
     workingDirectory: $(projectRoot)
     displayName: "Install CLI requirements"
   - script: |
-      apt-get -y update && apt-get -y upgrade
-      apt-get install rename
       curl -L https://github.com/pagopa/cstar-cli/archive/refs/heads/main.zip -o cstar-cli.zip
       unzip cstar-cli.zip
       cd cstar-cli-main 
