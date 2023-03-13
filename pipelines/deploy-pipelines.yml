@@ -153,7 +153,7 @@ steps:
         -e APIM_SK=${{ parameters.APIM_SK }} \
         -e SERVICE_ID=${{ parameters.SERVICE_ID }} \
         -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
-        -e TRX_FILE_NAME = $(trxFileName) \
+        -e TRX_FILE_NAME=$(trxFileName) \
         grafana/k6:latest \
         run /app/test/performance/${{ parameters.SCRIPT }}.js
     displayName: Run k6 ${{ parameters.SCRIPT }}
