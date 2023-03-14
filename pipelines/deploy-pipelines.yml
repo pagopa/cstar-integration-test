@@ -219,7 +219,7 @@ steps:
         grafana/k6:latest \
         run /app/test/performance/ioPutEnrollInstrumentIssuer.js
     displayName: Run k6 Enroll Instrument Issuer
-    condition: eq('${{parameters.SCRIPT }}', 'ioPutEnrollInstrumentIssuer', 'rtdTransactionsFile')
+    condition: in('${{parameters.SCRIPT }}', 'ioPutEnrollInstrumentIssuer', 'rtdTransactionsFile')
   - script: |
       ls -lrt $(pwd)
       docker run -i \
@@ -238,7 +238,7 @@ steps:
         grafana/k6:latest \
         run /app/test/performance/ioPutEnrollIban.js
     displayName: Run k6 Enroll Iban
-    condition: eq('${{parameters.SCRIPT }}', 'ioPutEnrollIban', 'rtdTransactionsFile')
+    condition: in('${{parameters.SCRIPT }}', 'ioPutEnrollIban', 'rtdTransactionsFile')
 
   - script: |
       ls -lrt $(pwd)
@@ -256,7 +256,7 @@ steps:
     env:
       apimSK: 'ToBeSet'
     displayName: Run k6 ${{ parameters.SCRIPT }}
-    condition: eq('${{parameters.SCRIPT }}', 'rtdTransactionsFile')
+    condition: eq('${{ parameters.SCRIPT }}', 'rtdTransactionsFile')
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: 'JUnit'
