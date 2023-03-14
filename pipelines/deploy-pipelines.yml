@@ -139,6 +139,7 @@ steps:
        docker pull grafana/k6:latest
     displayName: Pull k6 image
   - script: |
+      chmod +rwx ./pipelines/common/scripts/runDockerK6.sh
       ./pipelines/common/scripts/runDockerK6.sh
     displayName: Run k6 ${{ parameters.SCRIPT }}
   - task: PublishTestResults@2
