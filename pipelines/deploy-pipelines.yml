@@ -146,7 +146,7 @@ steps:
   - script: |
       ls -lrt
       ls -lrt ./assets
-      cst idpay idpaydataset --action dataset_and_transactions --env ${{ parameters.TARGET_ENV }} --api-key ${{ parameters.RTD_API_KEY }} --key $(rtd_uat_acquirer_mauth_key.secureFilePath) --cert $(rtd_uat_acquirer_mauth_pem.secureFilePath) --PM-pubk $(bpd_pm_test.secureFilePath) --out-dir ./generated --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} --trx-per-fc 1 --start-datetime ${{ parameters.TRX_DATE }} --mcc 1234 --PM-salt SALT123
+      cst idpay idpaydataset --action dataset_and_transactions --env ${{ parameters.TARGET_ENV }} --api-key $(rtdSK) --key $(rtd_uat_acquirer_mauth_key.secureFilePath) --cert $(rtd_uat_acquirer_mauth_pem.secureFilePath) --PM-pubk $(bpd_pm_test.secureFilePath) --out-dir ./generated --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} --trx-per-fc 1 --start-datetime ${{ parameters.TRX_DATE }} --mcc 1234 --PM-salt SALT123
       mkdir -p assets
       cp ./generated/*/* ./assets
       ls -lrt ./assets
