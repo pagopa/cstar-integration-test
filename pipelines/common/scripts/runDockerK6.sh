@@ -8,7 +8,7 @@ docker run -i \
     -e VIRTUAL_USERS_ENV=$(virtualUsers) \
     -e STAGE_NUMBER_ENV=$(stageNumber) \
     -e DURATION_PER_VU_ITERATION=$(durationPerVuIteration) \
-    -e APIM_SK=$(targetApimSk) \
+    -e APIM_SK=$(apimSk) \
     -e SERVICE_ID=$(serviceId) \
     -e INITIATIVE_ID=$(initiativeId) \
     -e TRX_FILE_NAME=$(trxFileName) \
