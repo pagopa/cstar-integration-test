@@ -29,7 +29,7 @@ variables:
     - name: pdvApiKey
       value: $(pdv_apikey_dev)
   - ${{ else }}:
-    - name: rtdApiKey
+    - name: rtdSK
       value: $(rtd_sk_uat)
     - name: apimSK
       value: $(apim_sk_uat)
