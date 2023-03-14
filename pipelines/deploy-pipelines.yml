@@ -21,10 +21,10 @@ variables:
   #Setting Api Key
   - ${{ if eq(parameters.TARGET_ENV, 'dev') }}:
     - name: rtdApiKey
-      value: 'tobeset'
+      value: $(rtd_sk_dev)
   - ${{ else }}:
     - name: rtdApiKey
-      value: 'tobeset'
+      value: $(rtd_sk_uat)
 
 
 parameters:
