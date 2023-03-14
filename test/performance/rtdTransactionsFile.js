@@ -40,7 +40,7 @@ export let options = {
     } ,
     thresholds: {
         http_req_failed: [{threshold:'rate<0.01', abortOnFail: false, delayAbortEval: '10s'},], // http errors should be less than 1%
-        http_reqs: [{threshold: `count<=2}`, abortOnFail: false, delayAbortEval: '10s'},]
+        http_reqs: [{threshold: 'count<=2', abortOnFail: false, delayAbortEval: '10s'},]
     },
 }
 
