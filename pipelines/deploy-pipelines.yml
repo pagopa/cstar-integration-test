@@ -158,7 +158,7 @@ steps:
         grafana/k6:latest \
         run /app/test/performance/idpayOnboardingAPI.js
     displayName: Run k6 Onboardings
-    conditions: in('${{parameters.SCRIPT }}', 'ioPutEnrollInstrumentIssuer', 'ioPutEnrollIban', 'rtdTransactionsFile')
+    condition: in('${{parameters.SCRIPT }}', 'ioPutEnrollInstrumentIssuer', 'ioPutEnrollIban', 'rtdTransactionsFile')
   - script: |
       ls -lrt $(pwd)
       docker run -i \
@@ -178,7 +178,7 @@ steps:
         grafana/k6:latest \
         run /app/test/performance/ioPutEnrollInstrumentIssuer.js
     displayName: Run k6 Enroll Instrument Issuer
-    conditions: eq('${{parameters.SCRIPT }}', 'rtdTransactionsFile')
+    condition: eq('${{parameters.SCRIPT }}', 'rtdTransactionsFile')
   - script: |
       ls -lrt $(pwd)
       docker run -i \
@@ -198,7 +198,7 @@ steps:
         grafana/k6:latest \
         run /app/test/performance/ioPutEnrollIban.js
     displayName: Run k6 Enroll Iban
-    conditions: eq('${{parameters.SCRIPT }}', 'rtdTransactionsFile')
+    condition: eq('${{parameters.SCRIPT }}', 'rtdTransactionsFile')
 
   - script: |
       ls -lrt $(pwd)
