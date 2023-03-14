@@ -77,9 +77,11 @@ parameters:
     default: 'IGNORE_IF_NOT_NECESSARY'
 
 stages:
-  - stage: Set Environment
+  - stage: Set_environment
+    displayName: Set_environment
     jobs:
-      - job:
+      - job: Set_environment
+        displayName: Set_environment
         steps:
           - task: UsePythonVersion@0
             inputs:
@@ -109,9 +111,11 @@ stages:
           - script: |
               cp /home/vsts/work/_temp/rtd-uat-acquirer-mauth.key $(pwd)/certs/rtd-uat-acquirer-mauth.key
             displayName: Copy RTD Key File
-  - stage: Integration CLI
-    jobs:
-      - job:
+  - stage: Integration_CLI
+    displayName: Integration_CLI
+    jobs: 
+      - job: Integration_CLI
+        displayName: Integration_CLI
         steps:
           - script: |
               python -m venv .venv
@@ -134,9 +138,11 @@ stages:
               cp ./generated/*/* ./assets
               ls -lrt ./assets
             displayName: Retrieve resource from cstar-cli
-  - stage: Script execution
+  - stage: Script_execution
+    displayName: Script_execution
     jobs:
-      - job:
+      - job: Script_execution
+        displayName: Script_execution
         steps:
           - task: Bash@3
             inputs:
