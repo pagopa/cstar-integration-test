@@ -7,13 +7,25 @@ pool:
 
 variables:
   # Python version: 3.10
-  pythonVersion: '3.10'
+  - name: pythonVersion
+    value: '3.10'
 
   # Folder name of this sub-repository
-  working-dir: '.'
+  - name: working-dir
+    value: '.'
 
   # Project root folder
-  projectRoot: $(System.DefaultWorkingDirectory)/$(working-dir)
+  - name: projectRoot 
+    value: $(System.DefaultWorkingDirectory)/$(working-dir)
+  
+  #Setting Api Key
+  - ${{ if eq(parameters.TARGET_ENV, 'dev') }}:
+    - name: rtdApiKey
+      value: 'tobeset'
+  - ${{ else }}:
+    - name: rtdApiKey
+      value: 'tobeset'
+
 
 parameters:
   - name: 'SCRIPT'
