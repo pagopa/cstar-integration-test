@@ -154,7 +154,6 @@ steps:
        docker pull grafana/k6:latest
     displayName: Pull k6 image
   - script: |
-      ls -lrt $(pwd)
       docker run -i \
         --user $UID \
         -v $(pwd):/app \
@@ -169,7 +168,6 @@ steps:
     displayName: Run k6 PDV Mocked
     condition: eq('${{parameters.SCRIPT }}', 'putTokenMockedPdv')
   - script: |
-      ls -lrt $(pwd)
       docker run -i \
         --user $UID \
         -v $(pwd):/app \
@@ -182,10 +180,9 @@ steps:
         -e APIM_SK=$(pdvApiKey) \
         grafana/k6:latest \
         run /app/test/performance/putTokenPdv.js
-    displayName: Run k6 PDV Mocked
+    displayName: Run k6 PDV
     condition: eq('${{parameters.SCRIPT }}', 'putTokenPdv')
   - script: |
-      ls -lrt $(pwd)
       docker run -i \
         --user $UID \
         -v $(pwd):/app \
@@ -202,7 +199,6 @@ steps:
     displayName: Run k6 Onboardings
     condition: in('${{parameters.SCRIPT }}', 'idpayOnboardingAPI', 'ioPutEnrollInstrumentIssuer', 'ioPutEnrollIban', 'rtdTransactionsFile')
   - script: |
-      ls -lrt $(pwd)
       docker run -i \
         --user $UID \
         -v $(pwd):/app \
@@ -213,9 +209,7 @@ steps:
         -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
         -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
         -e APIM_SK=$(issuerSK) \
-        -e SERVICE_ID=${{ parameters.SERVICE_ID }} \
         -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
-        -e TRX_FILE_NAME=$(trxFileName) \
         grafana/k6:latest \
         run /app/test/performance/ioPutEnrollInstrumentIssuer.js
     displayName: Run k6 Enroll Instrument Issuer
@@ -232,9 +226,7 @@ steps:
         -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
         -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
         -e APIM_SK=$(apimSK) \
-        -e SERVICE_ID=${{ parameters.SERVICE_ID }} \
         -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
-        -e TRX_FILE_NAME=$(trxFileName) \
         grafana/k6:latest \
         run /app/test/performance/ioPutEnrollIban.js
     displayName: Run k6 Enroll Iban
