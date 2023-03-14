@@ -28,35 +28,20 @@ let gpgFile
 
 let fileName = __ENV.TRX_FILE_NAME
 
-let scenarios = {
-    rampingArrivalRate: {
-        executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
-        timeUnit: '1s', //period of time to apply the iteration
-        preAllocatedVUs: __ENV.VIRTUAL_USERS_ENV,
-        maxVUs: __ENV.VIRTUAL_USERS_ENV,
-        stages: customStages
-    },
-    perVuIterations: {
-        executor: 'per-vu-iterations',
-        vus: __ENV.VIRTUAL_USERS_ENV,
-        iterations: 1,
-        startTime: '0s',
-        maxDuration: `${__ENV.DURATION_PER_VU_ITERATION}s`,
-    },
-};
 export let options = {
-    scenarios: {} ,
+    scenarios: {
+        perVuIterations: {
+                executor: 'per-vu-iterations',
+                vus: 1,
+                iterations: 1,
+                startTime: '0s',
+                maxDuration: `${__ENV.DURATION_PER_VU_ITERATION}s`,
+        }
+    } ,
     thresholds: {
         http_req_failed: [{threshold:'rate<0.01', abortOnFail: false, delayAbortEval: '10s'},], // http errors should be less than 1%
-        http_reqs: [{threshold: `count<=${parseInt(__ENV.VIRTUAL_USERS_ENV) * 2}`, abortOnFail: false, delayAbortEval: '10s'},]
+        http_reqs: [{threshold: `count<=2}`, abortOnFail: false, delayAbortEval: '10s'},]
     },
-
-}
-
-if (__ENV.SCENARIO_TYPE_ENV) {
-    options.scenarios[__ENV.SCENARIO_TYPE_ENV] = scenarios[__ENV.SCENARIO_TYPE_ENV]; // Use just a single scenario if ` -e SCENARIO_TYPE_ENV` is used
-} else {
-    options.scenarios = scenarios; // Use all scenrios
 }
 
 if (isEnvValid(__ENV.TARGET_ENV)) {
