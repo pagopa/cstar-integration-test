@@ -25,7 +25,7 @@ variables:
     - name: apimSK
       value: $(apim_sk_dev)
     - name: issuerSK
-      value: $(isuer_sk_dev)
+      value: $(issuer_sk_dev)
     - name: pdvApiKey
       value: $(pdv_apikey_dev)
   - ${{ else }}:
@@ -232,7 +232,7 @@ steps:
         -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
         -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
         -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
-        -e APIM_SK=$(apimSK) \
+        -e APIM_SK=${{ parameters.APIM_SK }} \
         -e SERVICE_ID=${{ parameters.SERVICE_ID }} \
         -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
         -e TRX_FILE_NAME=$(trxFileName) \
