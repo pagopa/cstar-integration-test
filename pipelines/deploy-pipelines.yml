@@ -165,7 +165,7 @@ steps:
         -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
         grafana/k6:latest \
         run /app/test/performance/putTokenMockedPdv.js
-    displayName: Run k6 PDV Mocked
+    displayName: Run k6 putTokenMockedPdv.js
     condition: eq('${{parameters.SCRIPT }}', 'putTokenMockedPdv')
   - script: |
       docker run -i \
@@ -180,7 +180,7 @@ steps:
         -e APIM_SK=$(pdvApiKey) \
         grafana/k6:latest \
         run /app/test/performance/putTokenPdv.js
-    displayName: Run k6 PDV
+    displayName: Run k6 putTokenPdv.js
     condition: eq('${{parameters.SCRIPT }}', 'putTokenPdv')
   - script: |
       docker run -i \
@@ -196,8 +196,8 @@ steps:
         -e SERVICE_ID=${{ parameters.SERVICE_ID }} \
         grafana/k6:latest \
         run /app/test/performance/idpayOnboardingAPI.js
-    displayName: Run k6 Onboardings
-    condition: in('${{parameters.SCRIPT }}', 'idpayOnboardingAPI', 'ioPutEnrollInstrumentIssuer', 'ioPutEnrollIban', 'rtdTransactionsFile')
+    displayName: Run k6 idpayOnboardingAPI.js
+    condition: in('${{parameters.SCRIPT }}', 'idpayOnboardingAPI', 'ioPutEnrollInstrumentIssuer', 'ioPutEnrollIban', 'rtdTransactionsFile') 
   - script: |
       docker run -i \
         --user $UID \
@@ -212,8 +212,8 @@ steps:
         -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
         grafana/k6:latest \
         run /app/test/performance/ioPutEnrollInstrumentIssuer.js
-    displayName: Run k6 Enroll Instrument Issuer
-    condition: in('${{parameters.SCRIPT }}', 'ioPutEnrollInstrumentIssuer', 'rtdTransactionsFile')
+    displayName: Run k6 ioPutEnrollInstrumentIssuer.js
+    condition: in('${{parameters.SCRIPT }}', 'ioPutEnrollInstrumentIssuer', 'rtdTransactionsFile') 
   - script: |
       ls -lrt $(pwd)
       docker run -i \
@@ -229,9 +229,8 @@ steps:
         -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
         grafana/k6:latest \
         run /app/test/performance/ioPutEnrollIban.js
-    displayName: Run k6 Enroll Iban
+    displayName: Run k6 ioPutEnrollIban.js
     condition: in('${{parameters.SCRIPT }}', 'ioPutEnrollIban', 'rtdTransactionsFile')
-
   - script: |
       ls -lrt $(pwd)
       docker run -i \
@@ -247,7 +246,7 @@ steps:
         run /app/test/performance/rtdTransactionsFile.js
     env:
       apimSK: 'ToBeSet'
-    displayName: Run k6 ${{ parameters.SCRIPT }}
+    displayName: Run k6 rtdTransactionsFile.js
     condition: eq('${{ parameters.SCRIPT }}', 'rtdTransactionsFile')
   - task: PublishTestResults@2
     inputs:
