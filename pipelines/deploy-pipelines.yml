@@ -152,10 +152,10 @@ stages:
                 BaseName=$(basename $WantedFile)
                 echo $BaseName
                 echo "##vso[task.setvariable variable=trxFileName]$BaseName"
-              displayName: Set transaction file name variable
+            displayName: Set transaction file name variable
           - script: |
               docker pull grafana/k6:latest
-              displayName: Pull k6 image
+            displayName: Pull k6 image
           - script: |
               ls -lrt $(pwd)
               docker run -i \
