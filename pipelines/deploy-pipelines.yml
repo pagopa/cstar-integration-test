@@ -164,7 +164,6 @@ steps:
         -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
         -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
         -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
-        -e APIM_SK=$(apimSK) \
         grafana/k6:latest \
         run /app/test/performance/putTokenMockedPdv.js
     displayName: Run k6 PDV Mocked
@@ -180,6 +179,7 @@ steps:
         -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
         -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
         -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
+        -e APIM_SK=$(pdvApiKey) \
         grafana/k6:latest \
         run /app/test/performance/putTokenPdv.js
     displayName: Run k6 PDV Mocked
