@@ -76,102 +76,92 @@ parameters:
     type: string
     default: 'IGNORE_IF_NOT_NECESSARY'
 
-stages:
-  - stage: Set Environment
-    jobs:
-      - job:
-        steps:
-          - task: UsePythonVersion@0
-            inputs:
-              versionSpec: '$(pythonVersion)'
-            displayName: 'Use Python $(pythonVersion)'
-          - task: DownloadSecureFile@1
-            name: rtd_uat_acquirer_mauth_pem
-            displayName: 'RTD Certification File'
-            inputs:
-              secureFile: 'rtd-uat-acquirer-mauth.pem'
-          - task: DownloadSecureFile@1
-            name: rtd_uat_acquirer_mauth_key
-            displayName: 'RTD Key File'
-            inputs:
-              secureFile: 'rtd-uat-acquirer-mauth.key'
-          - task: DownloadSecureFile@1
-            name: bpd_pm_test
-            displayName: 'Download BPD PM public uat'
-            inputs:
-              secureFile: 'Centrostella-BPD-PM-TEST_0xE7D22349_public_uat.asc'
-          - script: |
-              mkdir $(pwd)/certs
-            displayName: Create Certs Folder
-          - script: |
-              cp /home/vsts/work/_temp/rtd-uat-acquirer-mauth.pem $(pwd)/certs/rtd-uat-acquirer-mauth.pem
-            displayName: Copy RTD PEM File
-          - script: |
-              cp /home/vsts/work/_temp/rtd-uat-acquirer-mauth.key $(pwd)/certs/rtd-uat-acquirer-mauth.key
-            displayName: Copy RTD Key File
-  - stage: Integration CLI
-    jobs:
-      - job:
-        steps:
-          - script: |
-              python -m venv .venv
-              source .venv/bin/activate
-              python -m pip install --upgrade pip
-            workingDirectory: $(projectRoot)
-            displayName: "Install CLI requirements"
-          - script: |
-              curl -L https://github.com/pagopa/cstar-cli/archive/refs/heads/main.zip -o cstar-cli.zip
-              unzip cstar-cli.zip
-              cd cstar-cli-main 
-              chmod +rwx ../install.sh
-              ../install.sh
-            displayName: Set environment
-          - script: |
-              ls -lrt
-              ls -lrt ./assets
-              cst idpay idpaydataset --action dataset_and_transactions --env ${{ parameters.TARGET_ENV }} --api-key ${{ parameters.RTD_API_KEY }} --key $(rtd_uat_acquirer_mauth_key.secureFilePath) --cert $(rtd_uat_acquirer_mauth_pem.secureFilePath) --PM-pubk $(bpd_pm_test.secureFilePath) --out-dir ./generated --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} --trx-per-fc 1 --start-datetime ${{ parameters.TRX_DATE }} --mcc 1234 --PM-salt SALT123
-              mkdir -p assets
-              cp ./generated/*/* ./assets
-              ls -lrt ./assets
-            displayName: Retrieve resource from cstar-cli
-  - stage: Script execution
-    jobs:
-      - job:
-        steps:
-          - task: Bash@3
-            inputs:
-              targetType: 'inline'
-              script: |
-                WantedFile=$( find . -name "*.pgp")
-                BaseName=$(basename $WantedFile)
-                echo $BaseName
-                echo "##vso[task.setvariable variable=trxFileName]$BaseName"
-              displayName: Set transaction file name variable
-          - script: |
-              docker pull grafana/k6:latest
-              displayName: Pull k6 image
-          - script: |
-              ls -lrt $(pwd)
-              docker run -i \
-              --name ksixtests \
-              --user $UID \
-              -v $(pwd):/app \
-              --workdir "/app" \
-              -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
-              -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
-              -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
-              -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
-              -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
-              -e APIM_SK=${{ parameters.APIM_SK }} \
-              -e SERVICE_ID=${{ parameters.SERVICE_ID }} \
-              -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
-              -e TRX_FILE_NAME=$(trxFileName) \
-              grafana/k6:latest \
-              run /app/test/performance/${{ parameters.SCRIPT }}.js
-            displayName: Run k6 ${{ parameters.SCRIPT }}
-          - task: PublishTestResults@2
-            inputs:
-              testResultsFormat: 'JUnit'
-              testResultsFiles: '**/performancetest-result.xml'
-              searchFolder: '$(System.DefaultWorkingDirectory)'
-              failTaskOnFailedTests: true
+steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(pythonVersion)'
+    displayName: 'Use Python $(pythonVersion)'
+  - task: DownloadSecureFile@1
+    name: rtd_uat_acquirer_mauth_pem
+    displayName: 'RTD Certification File'
+    inputs:
+      secureFile: 'rtd-uat-acquirer-mauth.pem'
+  - task: DownloadSecureFile@1
+    name: rtd_uat_acquirer_mauth_key
+    displayName: 'RTD Key File'
+    inputs:
+      secureFile: 'rtd-uat-acquirer-mauth.key'
+  - task: DownloadSecureFile@1
+    name: bpd_pm_test
+    displayName: 'Download BPD PM public uat'
+    inputs:
+      secureFile: 'Centrostella-BPD-PM-TEST_0xE7D22349_public_uat.asc'
+  - script: |
+      mkdir $(pwd)/certs
+    displayName: Create Certs Folder
+  - script: |
+      cp /home/vsts/work/_temp/rtd-uat-acquirer-mauth.pem $(pwd)/certs/rtd-uat-acquirer-mauth.pem
+    displayName: Copy RTD PEM File
+  - script: |
+      cp /home/vsts/work/_temp/rtd-uat-acquirer-mauth.key $(pwd)/certs/rtd-uat-acquirer-mauth.key
+    displayName: Copy RTD Key File
+  - script: |
+      python -m venv .venv
+      source .venv/bin/activate
+      python -m pip install --upgrade pip
+    workingDirectory: $(projectRoot)
+    displayName: "Install CLI requirements"
+  - script: |
+      curl -L https://github.com/pagopa/cstar-cli/archive/refs/heads/main.zip -o cstar-cli.zip
+      unzip cstar-cli.zip
+      cd cstar-cli-main 
+      chmod +rwx ../install.sh
+      ../install.sh
+    displayName: Set environment
+  #TODO set date time parameters
+  - script: |
+      ls -lrt
+      ls -lrt ./assets
+      cst idpay idpaydataset --action dataset_and_transactions --env ${{ parameters.TARGET_ENV }} --api-key ${{ parameters.RTD_API_KEY }} --key $(rtd_uat_acquirer_mauth_key.secureFilePath) --cert $(rtd_uat_acquirer_mauth_pem.secureFilePath) --PM-pubk $(bpd_pm_test.secureFilePath) --out-dir ./generated --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} --trx-per-fc 1 --start-datetime ${{ parameters.TRX_DATE }} --mcc 1234 --PM-salt SALT123
+      mkdir -p assets
+      cp ./generated/*/* ./assets
+      ls -lrt ./assets
+    displayName: Retrieve resource from cstar-cli
+  - task: Bash@3
+    inputs:
+      targetType: 'inline'
+      script: |
+        WantedFile=$( find . -name "*.pgp")
+        BaseName=$(basename $WantedFile)
+        echo $BaseName
+        echo "##vso[task.setvariable variable=trxFileName]$BaseName"
+    displayName: Set environment
+  - script: |
+       docker pull grafana/k6:latest
+    displayName: Pull k6 image
+  - script: |
+      ls -lrt $(pwd)
+      docker run -i \
+        --name ksixtests \
+        --user $UID \
+        -v $(pwd):/app \
+        --workdir "/app" \
+        -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
+        -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
+        -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
+        -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
+        -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
+        -e APIM_SK=${{ parameters.APIM_SK }} \
+        -e SERVICE_ID=${{ parameters.SERVICE_ID }} \
+        -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
+        -e TRX_FILE_NAME=$(trxFileName) \
+        grafana/k6:latest \
+        run /app/test/performance/${{ parameters.SCRIPT }}.js
+    displayName: Run k6 ${{ parameters.SCRIPT }}
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '**/performancetest-result.xml'
+      searchFolder: '$(System.DefaultWorkingDirectory)'
+      failTaskOnFailedTests: true
+
