@@ -74,10 +74,6 @@ parameters:
     displayName: 'Maximum duration in seconds for the perVuIterations-type scenario'
     type: number
     default: 600
-  - name: 'APIM_SK'
-    displayName: 'API-Key (NOT required for putTokenMockedPdv script)'
-    type: string
-    default: 'IGNORE_IF_putTokenMockedPdv'
   - name: 'SERVICE_ID'
     displayName: 'ServiceId (required for idpayOnboardingAPI script)'
     type: string
@@ -94,10 +90,6 @@ parameters:
     displayName: 'Number of transaction for VUs'
     type: string
     default: '1970-01-01T00:00:00.000Z'
-  - name: 'RTD_API_KEY'
-    displayName: 'RTD API-Key'
-    type: string
-    default: 'IGNORE_IF_NOT_NECESSARY'
 
 steps:
   - task: UsePythonVersion@0
@@ -161,7 +153,37 @@ steps:
   - script: |
        docker pull grafana/k6:latest
     displayName: Pull k6 image
-
+  - script: |
+      ls -lrt $(pwd)
+      docker run -i \
+        --user $UID \
+        -v $(pwd):/app \
+        --workdir "/app" \
+        -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
+        -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
+        -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
+        -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
+        -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
+        -e APIM_SK=$(apimSK) \
+        grafana/k6:latest \
+        run /app/test/performance/putTokenMockedPdv.js
+    displayName: Run k6 PDV Mocked
+    condition: eq('${{parameters.SCRIPT }}', 'putTokenMockedPdv')
+  - script: |
+      ls -lrt $(pwd)
+      docker run -i \
+        --user $UID \
+        -v $(pwd):/app \
+        --workdir "/app" \
+        -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
+        -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
+        -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
+        -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
+        -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
+        grafana/k6:latest \
+        run /app/test/performance/putTokenPdv.js
+    displayName: Run k6 PDV Mocked
+    condition: eq('${{parameters.SCRIPT }}', 'putTokenPdv')
   - script: |
       ls -lrt $(pwd)
       docker run -i \
@@ -175,12 +197,10 @@ steps:
         -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
         -e APIM_SK=$(apimSK) \
         -e SERVICE_ID=${{ parameters.SERVICE_ID }} \
-        -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
-        -e TRX_FILE_NAME=$(trxFileName) \
         grafana/k6:latest \
         run /app/test/performance/idpayOnboardingAPI.js
     displayName: Run k6 Onboardings
-    condition: in('${{parameters.SCRIPT }}', 'ioPutEnrollInstrumentIssuer', 'ioPutEnrollIban', 'rtdTransactionsFile')
+    condition: in('${{parameters.SCRIPT }}', 'idpayOnboardingAPI', 'ioPutEnrollInstrumentIssuer', 'ioPutEnrollIban', 'rtdTransactionsFile')
   - script: |
       ls -lrt $(pwd)
       docker run -i \
@@ -199,7 +219,7 @@ steps:
         grafana/k6:latest \
         run /app/test/performance/ioPutEnrollInstrumentIssuer.js
     displayName: Run k6 Enroll Instrument Issuer
-    condition: eq('${{parameters.SCRIPT }}', 'rtdTransactionsFile')
+    condition: eq('${{parameters.SCRIPT }}', 'ioPutEnrollInstrumentIssuer', 'rtdTransactionsFile')
   - script: |
       ls -lrt $(pwd)
       docker run -i \
@@ -218,7 +238,7 @@ steps:
         grafana/k6:latest \
         run /app/test/performance/ioPutEnrollIban.js
     displayName: Run k6 Enroll Iban
-    condition: eq('${{parameters.SCRIPT }}', 'rtdTransactionsFile')
+    condition: eq('${{parameters.SCRIPT }}', 'ioPutEnrollIban', 'rtdTransactionsFile')
 
   - script: |
       ls -lrt $(pwd)
@@ -228,19 +248,15 @@ steps:
         -v $(pwd):/app \
         --workdir "/app" \
         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
-        -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
-        -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
-        -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
         -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
-        -e APIM_SK=${{ parameters.APIM_SK }} \
-        -e SERVICE_ID=${{ parameters.SERVICE_ID }} \
-        -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
+        -e APIM_SK=$(rtdSK) \
         -e TRX_FILE_NAME=$(trxFileName) \
         grafana/k6:latest \
-        run /app/test/performance/${{ parameters.SCRIPT }}.js
+        run /app/test/performance/rtdTransactionsFile.js
     env:
       apimSK: 'ToBeSet'
     displayName: Run k6 ${{ parameters.SCRIPT }}
+    condition: eq('${{parameters.SCRIPT }}', 'rtdTransactionsFile')
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: 'JUnit'
