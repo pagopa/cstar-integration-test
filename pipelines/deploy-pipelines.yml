@@ -38,6 +38,22 @@ variables:
     - name: pdvApiKey
       value: $(pdv_apikey_uat)
 
+  # Set parameters into variables for support external script
+  - name: targetEnv
+    value: ${{ parameters.TARGET_ENV }}
+  - name: scenarioType
+    value: ${{ parameters.SCENARIO_TYPE_ENV }}
+  - name: virtualUsers
+    value: ${{ parameters.VIRTUAL_USERS_ENV }}
+  - name: stageNumber
+    value: ${{ parameters.STAGE_NUMBER_ENV }}
+  - name: durationPerVuIteration
+    value: ${{ parameters.DURATION_PER_VU_ITERATION }}
+  - name: serviceId
+    value: ${{ parameters.SERVICE_ID }}
+  - name: initiativeId
+    value: ${{ parameters.INITIATIVE_ID }}
+
 parameters:
   - name: 'SCRIPT'
     displayName: 'Script name'
@@ -127,6 +143,7 @@ steps:
     workingDirectory: $(projectRoot)
     displayName: "Install CLI requirements"
   - script: |
+      chmod +rwx ./pipelines/common/scripts/runDockerK6.sh
       curl -L https://github.com/pagopa/cstar-cli/archive/refs/heads/main.zip -o cstar-cli.zip
       unzip cstar-cli.zip
       cd cstar-cli-main 
@@ -154,20 +171,12 @@ steps:
        docker pull grafana/k6:latest
     displayName: Pull k6 image
   - script: |
-      ls -lrt $(pwd)
-      docker run -i \
-        --user $UID \
-        -v $(pwd):/app \
-        --workdir "/app" \
-        -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
-        -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
-        -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
-        -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
-        -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
-        grafana/k6:latest \
-        run /app/test/performance/putTokenMockedPdv.js
-    displayName: Run k6 PDV Mocked
-    condition: eq('${{parameters.SCRIPT }}', 'putTokenMockedPdv')
+      ./pipelines/common/scripts/runDockerK6.sh
+    displayName: Run k6 PDV Mocked Script
+    env:
+      targetScript: ${{ parameters.SCRIPT }}
+      targetApimSk: ''
+    condition: eq('${{ parameters.SCRIPT }}', 'putTokenMockedPdv')
   - script: |
       ls -lrt $(pwd)
       docker run -i \
@@ -182,7 +191,7 @@ steps:
         -e APIM_SK=$(pdvApiKey) \
         grafana/k6:latest \
         run /app/test/performance/putTokenPdv.js
-    displayName: Run k6 PDV Mocked
+    displayName: Run k6 PDV Test
     condition: eq('${{parameters.SCRIPT }}', 'putTokenPdv')
   - script: |
       ls -lrt $(pwd)
@@ -199,7 +208,7 @@ steps:
         -e SERVICE_ID=${{ parameters.SERVICE_ID }} \
         grafana/k6:latest \
         run /app/test/performance/idpayOnboardingAPI.js
-    displayName: Run k6 Onboardings
+    displayName: Run k6 Onboarding Test
     condition: in('${{parameters.SCRIPT }}', 'idpayOnboardingAPI', 'ioPutEnrollInstrumentIssuer', 'ioPutEnrollIban', 'rtdTransactionsFile')
   - script: |
       ls -lrt $(pwd)
@@ -218,7 +227,7 @@ steps:
         -e TRX_FILE_NAME=$(trxFileName) \
         grafana/k6:latest \
         run /app/test/performance/ioPutEnrollInstrumentIssuer.js
-    displayName: Run k6 Enroll Instrument Issuer
+    displayName: Run k6 Enroll Instrument Issuer Test
     condition: in('${{parameters.SCRIPT }}', 'ioPutEnrollInstrumentIssuer', 'rtdTransactionsFile')
   - script: |
       ls -lrt $(pwd)
@@ -237,7 +246,7 @@ steps:
         -e TRX_FILE_NAME=$(trxFileName) \
         grafana/k6:latest \
         run /app/test/performance/ioPutEnrollIban.js
-    displayName: Run k6 Enroll Iban
+    displayName: Run k6 Enroll Iban Test
     condition: in('${{parameters.SCRIPT }}', 'ioPutEnrollIban', 'rtdTransactionsFile')
 
   - script: |
@@ -255,7 +264,7 @@ steps:
         run /app/test/performance/rtdTransactionsFile.js
     env:
       apimSK: 'ToBeSet'
-    displayName: Run k6 ${{ parameters.SCRIPT }}
+    displayName: Run k6 Transaction Test
     condition: eq('${{ parameters.SCRIPT }}', 'rtdTransactionsFile')
   - task: PublishTestResults@2
     inputs:
