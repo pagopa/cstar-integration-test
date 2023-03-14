@@ -142,7 +142,6 @@ steps:
   - script: |
       ls -lrt $(pwd)
       docker run -i \
-        --name ksixtests \
         --user $UID \
         -v $(pwd):/app \
         --workdir "/app" \
@@ -162,7 +161,6 @@ steps:
   - script: |
       ls -lrt $(pwd)
       docker run -i \
-        --name ksixtests \
         --user $UID \
         -v $(pwd):/app \
         --workdir "/app" \
@@ -182,7 +180,6 @@ steps:
   - script: |
       ls -lrt $(pwd)
       docker run -i \
-        --name ksixtests \
         --user $UID \
         -v $(pwd):/app \
         --workdir "/app" \
