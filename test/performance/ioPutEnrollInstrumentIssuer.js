@@ -65,7 +65,7 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
 
 export default () => {
     const cf = cfPanList[vu.idInTest-1].FC
-    const pgpan = cfPanList[vu.idInTest-1].PGPAN
+    const pgpan = cfPanList[vu.idInTest-1].PGPPAN
 
     if (
         !isEnvValid(__ENV.TARGET_ENV) ||
