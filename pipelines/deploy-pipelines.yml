@@ -100,7 +100,7 @@ steps:
     name: rtd_uat_acquirer_mauth_pem
     displayName: 'RTD Certification File'
     inputs:
-      secureFile: 'rtd-uat-acquirer-mauth.pem'
+      secureFile: 'rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.pem'
   - task: DownloadSecureFile@1
     name: rtd_uat_acquirer_mauth_key
     displayName: 'RTD Key File'
