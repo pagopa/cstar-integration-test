@@ -97,28 +97,28 @@ steps:
       versionSpec: '$(pythonVersion)'
     displayName: 'Use Python $(pythonVersion)'
   - task: DownloadSecureFile@1
-    name: rtd_uat_acquirer_mauth_pem
+    name: rtd_acquirer_mauth_pem
     displayName: 'RTD Certification File'
     inputs:
       secureFile: 'rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.pem'
   - task: DownloadSecureFile@1
-    name: rtd_uat_acquirer_mauth_key
+    name: rtd_acquirer_mauth_key
     displayName: 'RTD Key File'
     inputs:
       secureFile: 'rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.key'
   - task: DownloadSecureFile@1
-    name: bpd_pm_test
+    name: bpd_pm
     displayName: 'Download BPD PM public uat'
     inputs:
-      secureFile: 'Centrostella-BPD-PM-TEST_0xE7D22349_public_uat.asc'
+      secureFile: 'bpd-pm-${{ parameters.TARGET_ENV }}.asc'
   - script: |
       mkdir $(pwd)/certs
     displayName: Create Certs Folder
   - script: |
-      cp /home/vsts/work/_temp/rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.pem $(pwd)/certs/rtd-uat-acquirer-mauth.pem
+      cp /home/vsts/work/_temp/rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.pem $(pwd)/certs/rtd-acquirer-mauth.pem
     displayName: Copy RTD PEM File
   - script: |
-      cp /home/vsts/work/_temp/rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.key $(pwd)/certs/rtd-uat-acquirer-mauth.key
+      cp /home/vsts/work/_temp/rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.key $(pwd)/certs/rtd-acquirer-mauth.key
     displayName: Copy RTD Key File
   - script: |
       python -m venv .venv
@@ -136,7 +136,7 @@ steps:
   - script: |
       ls -lrt
       ls -lrt ./assets
-      cst idpay idpaydataset --action dataset_and_transactions --env ${{ parameters.TARGET_ENV }} --api-key $(rtdSK) --key $(rtd_uat_acquirer_mauth_key.secureFilePath) --cert $(rtd_uat_acquirer_mauth_pem.secureFilePath) --PM-pubk $(bpd_pm_test.secureFilePath) --out-dir ./generated --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} --trx-per-fc 1 --start-datetime ${{ parameters.TRX_DATE }} --mcc 1234 --PM-salt SALT123
+      cst idpay idpaydataset --action dataset_and_transactions --env ${{ parameters.TARGET_ENV }} --api-key $(rtdSK) --key $(rtd_acquirer_mauth_key.secureFilePath) --cert $(rtd_acquirer_mauth_pem.secureFilePath) --PM-pubk $(bpd_pm.secureFilePath) --out-dir ./generated --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} --trx-per-fc 1 --start-datetime ${{ parameters.TRX_DATE }} --mcc 1234 --PM-salt SALT123
       mkdir -p assets
       cp ./generated/*/* ./assets
       ls -lrt ./assets

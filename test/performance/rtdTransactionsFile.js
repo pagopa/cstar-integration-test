@@ -49,8 +49,8 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
     options.tlsAuth = [
         {
             domains: [baseUrl],
-            cert: open(`../../certs/rtd-uat-acquirer-mauth.pem`),
-            key: open(`../../certs/rtd-uat-acquirer-mauth.key`),
+            cert: open(`../../certs/rtd-acquirer-mauth.pem`),
+            key: open(`../../certs/rtd-acquirer-mauth.key`),
         },
     ]
 
