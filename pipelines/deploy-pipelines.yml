@@ -34,7 +34,7 @@ variables:
     - name: apimSK
       value: $(apim_sk_uat)
     - name: issuerSK
-      value: $(isuer_sk_uat)
+      value: $(issuer_sk_uat)
     - name: pdvApiKey
       value: $(pdv_apikey_uat)
 
