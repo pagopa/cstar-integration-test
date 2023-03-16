@@ -138,6 +138,7 @@ steps:
       ls -lrt ./assets
       cst idpay idpaydataset --action dataset_and_transactions --env ${{ parameters.TARGET_ENV }} --api-key $(rtdSK) --key $(rtd_acquirer_mauth_key.secureFilePath) --cert $(rtd_acquirer_mauth_pem.secureFilePath) --PM-pubk $(bpd_pm.secureFilePath) --out-dir ./generated --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} --trx-per-fc 1 --start-datetime ${{ parameters.TRX_DATE }} --mcc 1234 --PM-salt SALT123
       mkdir -p assets
+      mkdir -p results
       cp ./generated/*/* ./assets
       ls -lrt ./assets
     displayName: Retrieve resource from cstar-cli
