@@ -115,11 +115,9 @@ export default () => {
         init = bodyObj.initiativeId
     }
 
-            
+     group('Should onboard Citizen', () => {
 
-    group('Should onboard Citizen', () => {
-
-        group('When the inititive exists', () => {
+        group('When the inititive exists, put t&c', () => {
             if(checked){
             
             const body = {
@@ -139,7 +137,7 @@ export default () => {
             }
   
         })
-        group('When inititive exists', () => {
+        group('Check accepted status', () => {
             if(checked){
             const params = init
             let res = getStatus(
@@ -159,7 +157,7 @@ export default () => {
         
         })
 
-        group('When the TC consent exists', () => {
+        group('When the TC consent exists, check the prerequisites', () => {
             if(checked){
             const body = {
                 initiativeId: init
@@ -181,7 +179,7 @@ export default () => {
             
         })
 
-        group('When the inititive and consents exist', () => {
+        group('When the inititive and consents exist, save consent', () => {
             if(checked){
             const body = {
                 initiativeId: init,
