@@ -259,10 +259,10 @@ steps:
       searchFolder: '$(System.DefaultWorkingDirectory)'
       failTaskOnFailedTests: true
   - task: PublishPipelineArtifact@1
-      displayName: 'Publishing results of k6 tests in folder: results'
-      condition: true
-      inputs:
-        artifact: 'results'
-        targetPath: 'results'
-        publishLocation: 'pipeline'
+    displayName: 'Publishing results of k6 tests in folder: results'
+    condition: true
+    inputs:
+      artifact: 'results'
+      targetPath: 'results'
+      publishLocation: 'pipeline'
 
