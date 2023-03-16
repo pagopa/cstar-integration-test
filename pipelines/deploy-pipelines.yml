@@ -255,7 +255,7 @@ steps:
     condition: true
     inputs:
       testResultsFormat: 'JUnit'
-        testResultsFiles: 'results/*-result.xml'
-        searchFolder: '$(System.DefaultWorkingDirectory)'
-        failTaskOnFailedTests: true
+      testResultsFiles: 'results/*-result.xml'
+      searchFolder: '$(System.DefaultWorkingDirectory)'
+      failTaskOnFailedTests: true
 
