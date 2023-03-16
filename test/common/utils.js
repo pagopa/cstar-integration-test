@@ -65,3 +65,7 @@ function getFiscalCodeMonth(month) {
     }
     return monthDict[month]
 }
+
+export function coalesce(o1, o2) {
+    return o1 !== undefined && o1 !== null ? o1 : o2
+}

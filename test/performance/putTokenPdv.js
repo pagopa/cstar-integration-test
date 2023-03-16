@@ -10,6 +10,7 @@ import {vu} from 'k6/execution'
 import { SharedArray } from 'k6/data'
 import { jUnit, textSummary } from 'https://jslib.k6.io/k6-summary/0.0.2/index.js';
 import { setStages } from '../common/stageUtils.js';
+import defaultHandleSummaryBuilder from '../common/handleSummaryBuilder.js'
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
@@ -98,17 +99,6 @@ export default () => {
     sleep(1)
 }
 
-export function handleSummary(data){
-    console.log(`TEST DETAILS: [Time to complete test: ${data.state.testRunDurationMs} ms, Environment target: ${__ENV.TARGET_ENV}, Scenario test type: ${__ENV.SCENARIO_TYPE_ENV}, Number of VUs: ${__ENV.VIRTUAL_USERS_ENV}, Request processed: ${data.metrics.http_reqs.values.count}, Request OK: ${data.metrics.http_req_failed.values.fails}, ERRORS: ${data.metrics.http_req_failed.values.passes}]`)
-    if(__ENV.SCENARIO_TYPE_ENV == 'rampingArrivalRate'){
-        let stringRamping = 'Ramping iterations for stage : { '
-        for(let i=0; i<customStages.length-1; i++){
-            stringRamping += `${customStages[i].target}, `
-        }
-        console.log(stringRamping+ `${customStages[customStages.length-1].target} } `)
-    }
-    return {
-            'stdout': textSummary(data, { indent: ' ', enableColors: true}),
-            './performancetest-result.xml': jUnit(data),
-    }
-}
+export const handleSummary = defaultHandleSummaryBuilder(
+    'putTokenPdv'
+)

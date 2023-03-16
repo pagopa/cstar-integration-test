@@ -10,6 +10,7 @@ import {
 } from '../common/envs.js'
 import {exec} from 'k6/execution'
 import { jUnit, textSummary } from 'https://jslib.k6.io/k6-summary/0.0.2/index.js';
+import defaultHandleSummaryBuilder from '../common/handleSummaryBuilder.js'
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
@@ -110,10 +111,6 @@ export default () => {
     })
 }
 
-export function handleSummary(data){
-    console.log(`TEST DETAILS: [Time to complete test: ${data.state.testRunDurationMs} ms, Environment target: ${__ENV.TARGET_ENV}, Request processed: ${data.metrics.http_reqs.values.count}, Request OK: ${data.metrics.http_req_failed.values.fails}, ERRORS: ${data.metrics.http_req_failed.values.passes}]`)
-    return {
-            'stdout': textSummary(data, { indent: ' ', enableColors: true}),
-            './performancetest-result.xml': jUnit(data),
-    }
-}
+export const handleSummary = defaultHandleSummaryBuilder(
+    'rtdTransactionsFile'
+)

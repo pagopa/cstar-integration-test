@@ -158,6 +158,7 @@ steps:
         --user $UID \
         -v $(pwd):/app \
         --workdir "/app" \
+        -e RESULTS_DIR=/app \
         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
         -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
         -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
@@ -172,6 +173,7 @@ steps:
         --user $UID \
         -v $(pwd):/app \
         --workdir "/app" \
+        -e RESULTS_DIR=/app \
         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
         -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
         -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
@@ -187,6 +189,7 @@ steps:
         --user $UID \
         -v $(pwd):/app \
         --workdir "/app" \
+        -e RESULTS_DIR=/app \
         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
         -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
         -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
@@ -203,6 +206,7 @@ steps:
         --user $UID \
         -v $(pwd):/app \
         --workdir "/app" \
+        -e RESULTS_DIR=/app \
         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
         -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
         -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
@@ -220,6 +224,7 @@ steps:
         --user $UID \
         -v $(pwd):/app \
         --workdir "/app" \
+        -e RESULTS_DIR=/app \
         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
         -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
         -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
@@ -237,6 +242,7 @@ steps:
         --user $UID \
         -v $(pwd):/app \
         --workdir "/app" \
+        -e RESULTS_DIR=/app \
         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
         -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
         -e APIM_SK=$(rtdSK) \
@@ -246,9 +252,10 @@ steps:
     displayName: Run k6 rtdTransactionsFile.js
     condition: eq('${{ parameters.SCRIPT }}', 'rtdTransactionsFile')
   - task: PublishTestResults@2
+    condition: true
     inputs:
       testResultsFormat: 'JUnit'
-      testResultsFiles: '**/performancetest-result.xml'
-      searchFolder: '$(System.DefaultWorkingDirectory)'
-      failTaskOnFailedTests: true
+        testResultsFiles: 'results/${{ testFolder }}/*-result.xml'
+        searchFolder: '$(System.DefaultWorkingDirectory)'
+        failTaskOnFailedTests: true
 
