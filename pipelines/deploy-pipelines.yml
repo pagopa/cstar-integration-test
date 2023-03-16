@@ -262,7 +262,7 @@ steps:
       displayName: 'Publishing results of k6 tests in folder: results'
       condition: true
       inputs:
-        artifact: results
+        artifact: 'results'
         targetPath: 'results'
         publishLocation: 'pipeline'
 
