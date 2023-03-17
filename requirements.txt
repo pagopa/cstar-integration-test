@@ -25,5 +25,3 @@ psycopg-binarypip
 pandas
 requests
 schwifty
---force-reinstall src/cstar-cli-core
---no-deps --force-reinstall src/cstar-cli
