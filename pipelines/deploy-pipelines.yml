@@ -124,13 +124,13 @@ steps:
       python -m venv .venv
       source .venv/bin/activate
       python -m pip install --upgrade pip
-      pip install -r requirements.txt
     workingDirectory: $(projectRoot)
     displayName: "Install CLI requirements"
   - script: |
       curl -L https://github.com/pagopa/cstar-cli/archive/refs/heads/main.zip -o cstar-cli.zip
       unzip cstar-cli.zip
       cd cstar-cli-main 
+      pip install -r ../requirements.txt
       pip install --force-reinstall src/cstar-cli-core
       pip install --no-deps --force-reinstall src/cstar-cli
     displayName: Set environment
