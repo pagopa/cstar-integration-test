@@ -21,7 +21,7 @@ urllib3
 black
 Faker
 PGPy==0.6.0
-psycopg-binarypip
+psycopg-binary
 pandas
 requests
 schwifty
