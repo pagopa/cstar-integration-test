@@ -143,6 +143,7 @@ steps:
       cp ./generated/*/* ./assets
       ls -lrt ./assets
     displayName: Retrieve resource from cstar-cli
+    timeoutInMinutes: 0
   - task: Bash@3
     inputs:
       targetType: 'inline'
@@ -170,6 +171,7 @@ steps:
         run /app/test/performance/putTokenMockedPdv.js
     displayName: Run k6 putTokenMockedPdv.js
     condition: eq('${{parameters.SCRIPT }}', 'putTokenMockedPdv')
+    timeoutInMinutes: 0
   - script: |
       docker run -i \
         --user $UID \
@@ -186,6 +188,7 @@ steps:
         run /app/test/performance/putTokenPdv.js
     displayName: Run k6 putTokenPdv.js
     condition: eq('${{parameters.SCRIPT }}', 'putTokenPdv')
+    timeoutInMinutes: 0
   - script: |
       docker run -i \
         --user $UID \
@@ -203,6 +206,7 @@ steps:
         run /app/test/performance/idpayOnboardingAPI.js
     displayName: Run k6 idpayOnboardingAPI.js
     condition: in('${{parameters.SCRIPT }}', 'idpayOnboardingAPI', 'ioPutEnrollInstrumentIssuer', 'ioPutEnrollIban', 'rtdTransactionsFile') 
+    timeoutInMinutes: 0
   - script: |
       docker run -i \
         --user $UID \
@@ -220,6 +224,7 @@ steps:
         run /app/test/performance/ioPutEnrollInstrumentIssuer.js
     displayName: Run k6 ioPutEnrollInstrumentIssuer.js
     condition: in('${{parameters.SCRIPT }}', 'ioPutEnrollInstrumentIssuer', 'rtdTransactionsFile') 
+    timeoutInMinutes: 0
   - script: |
       ls -lrt $(pwd)
       docker run -i \
@@ -238,6 +243,7 @@ steps:
         run /app/test/performance/ioPutEnrollIban.js
     displayName: Run k6 ioPutEnrollIban.js
     condition: in('${{parameters.SCRIPT }}', 'ioPutEnrollIban', 'rtdTransactionsFile')
+    timeoutInMinutes: 0
   - script: |
       ls -lrt $(pwd)
       docker run -i \
