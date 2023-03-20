@@ -91,186 +91,189 @@ parameters:
     type: string
     default: '1970-01-01T00:00:00.000Z'
 
-steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(pythonVersion)'
-    displayName: 'Use Python $(pythonVersion)'
-  - task: DownloadSecureFile@1
-    name: rtd_acquirer_mauth_pem
-    displayName: 'RTD Certification File'
-    inputs:
-      secureFile: 'rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.pem'
-  - task: DownloadSecureFile@1
-    name: rtd_acquirer_mauth_key
-    displayName: 'RTD Key File'
-    inputs:
-      secureFile: 'rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.key'
-  - task: DownloadSecureFile@1
-    name: bpd_pm
-    displayName: 'Download BPD PM public uat'
-    inputs:
-      secureFile: 'bpd-pm-${{ parameters.TARGET_ENV }}.asc'
-  - script: |
-      mkdir $(pwd)/certs
-    displayName: Create Certs Folder
-  - script: |
-      cp /home/vsts/work/_temp/rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.pem $(pwd)/certs/rtd-acquirer-mauth.pem
-    displayName: Copy RTD PEM File
-  - script: |
-      cp /home/vsts/work/_temp/rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.key $(pwd)/certs/rtd-acquirer-mauth.key
-    displayName: Copy RTD Key File
-  - script: |
-      python -m venv .venv
-      source .venv/bin/activate
-      python -m pip install --upgrade pip
-    workingDirectory: $(projectRoot)
-    displayName: "Install CLI requirements"
-  - script: |
-      curl -L https://github.com/pagopa/cstar-cli/archive/refs/heads/main.zip -o cstar-cli.zip
-      unzip cstar-cli.zip
-      cd cstar-cli-main 
-      pip install -r ../requirements.txt
-      pip install --force-reinstall src/cstar-cli-core
-      pip install --no-deps --force-reinstall src/cstar-cli
-    displayName: Set environment
-  - script: |
-      ls -lrt
-      ls -lrt ./assets
-      cst idpay idpaydataset --action dataset_and_transactions --env ${{ parameters.TARGET_ENV }} --api-key $(rtdSK) --key $(rtd_acquirer_mauth_key.secureFilePath) --cert $(rtd_acquirer_mauth_pem.secureFilePath) --PM-pubk $(bpd_pm.secureFilePath) --out-dir ./generated --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} --trx-per-fc 1 --start-datetime ${{ parameters.TRX_DATE }} --mcc 1234 --PM-salt SALT123
-      mkdir -p assets
-      mkdir -p results
-      cp ./generated/*/* ./assets
-      ls -lrt ./assets
-    displayName: Retrieve resource from cstar-cli
+jobs:
+  - job:
     timeoutInMinutes: 0
-  - task: Bash@3
-    inputs:
-      targetType: 'inline'
-      script: |
-        WantedFile=$( find . -name "*.pgp")
-        BaseName=$(basename $WantedFile)
-        echo $BaseName
-        echo "##vso[task.setvariable variable=trxFileName]$BaseName"
-    displayName: Set variable trxFileName
-  - script: |
-       docker pull grafana/k6:latest
-    displayName: Pull k6 image
-  - script: |
-      docker run -i \
-        --user $UID \
-        -v $(pwd):/app \
-        --workdir "/app" \
-        -e RESULTS_DIR=/app \
-        -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
-        -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
-        -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
-        -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
-        -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
-        grafana/k6:latest \
-        run /app/test/performance/putTokenMockedPdv.js
-    displayName: Run k6 putTokenMockedPdv.js
-    condition: eq('${{parameters.SCRIPT }}', 'putTokenMockedPdv')
-    timeoutInMinutes: 0
-  - script: |
-      docker run -i \
-        --user $UID \
-        -v $(pwd):/app \
-        --workdir "/app" \
-        -e RESULTS_DIR=/app \
-        -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
-        -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
-        -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
-        -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
-        -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
-        -e APIM_SK=$(pdvApiKey) \
-        grafana/k6:latest \
-        run /app/test/performance/putTokenPdv.js
-    displayName: Run k6 putTokenPdv.js
-    condition: eq('${{parameters.SCRIPT }}', 'putTokenPdv')
-    timeoutInMinutes: 0
-  - script: |
-      docker run -i \
-        --user $UID \
-        -v $(pwd):/app \
-        --workdir "/app" \
-        -e RESULTS_DIR=/app \
-        -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
-        -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
-        -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
-        -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
-        -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
-        -e APIM_SK=$(apimSK) \
-        -e SERVICE_ID=${{ parameters.SERVICE_ID }} \
-        grafana/k6:latest \
-        run /app/test/performance/idpayOnboardingAPI.js
-    displayName: Run k6 idpayOnboardingAPI.js
-    condition: in('${{parameters.SCRIPT }}', 'idpayOnboardingAPI', 'ioPutEnrollInstrumentIssuer', 'ioPutEnrollIban', 'rtdTransactionsFile') 
-    timeoutInMinutes: 0
-  - script: |
-      docker run -i \
-        --user $UID \
-        -v $(pwd):/app \
-        --workdir "/app" \
-        -e RESULTS_DIR=/app \
-        -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
-        -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
-        -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
-        -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
-        -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
-        -e APIM_SK=$(issuerSK) \
-        -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
-        grafana/k6:latest \
-        run /app/test/performance/ioPutEnrollInstrumentIssuer.js
-    displayName: Run k6 ioPutEnrollInstrumentIssuer.js
-    condition: in('${{parameters.SCRIPT }}', 'ioPutEnrollInstrumentIssuer', 'rtdTransactionsFile') 
-    timeoutInMinutes: 0
-  - script: |
-      ls -lrt $(pwd)
-      docker run -i \
-        --user $UID \
-        -v $(pwd):/app \
-        --workdir "/app" \
-        -e RESULTS_DIR=/app \
-        -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
-        -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
-        -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
-        -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
-        -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
-        -e APIM_SK=$(apimSK) \
-        -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
-        grafana/k6:latest \
-        run /app/test/performance/ioPutEnrollIban.js
-    displayName: Run k6 ioPutEnrollIban.js
-    condition: in('${{parameters.SCRIPT }}', 'ioPutEnrollIban', 'rtdTransactionsFile')
-    timeoutInMinutes: 0
-  - script: |
-      ls -lrt $(pwd)
-      docker run -i \
-        --user $UID \
-        -v $(pwd):/app \
-        --workdir "/app" \
-        -e RESULTS_DIR=/app \
-        -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
-        -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
-        -e APIM_SK=$(rtdSK) \
-        -e TRX_FILE_NAME=$(trxFileName) \
-        grafana/k6:latest \
-        run /app/test/performance/rtdTransactionsFile.js
-    displayName: Run k6 rtdTransactionsFile.js
-    condition: eq('${{ parameters.SCRIPT }}', 'rtdTransactionsFile')
-  - task: PublishTestResults@2
-    condition: true
-    inputs:
-      testResultsFormat: 'JUnit'
-      testResultsFiles: 'results/*-result.xml'
-      searchFolder: '$(System.DefaultWorkingDirectory)'
-      failTaskOnFailedTests: true
-  - task: PublishPipelineArtifact@1
-    displayName: 'Publishing results of k6 tests in folder: results'
-    condition: true
-    inputs:
-      artifact: 'results'
-      targetPath: 'results'
-      publishLocation: 'pipeline'
+    steps:
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '$(pythonVersion)'
+        displayName: 'Use Python $(pythonVersion)'
+      - task: DownloadSecureFile@1
+        name: rtd_acquirer_mauth_pem
+        displayName: 'RTD Certification File'
+        inputs:
+          secureFile: 'rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.pem'
+      - task: DownloadSecureFile@1
+        name: rtd_acquirer_mauth_key
+        displayName: 'RTD Key File'
+        inputs:
+          secureFile: 'rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.key'
+      - task: DownloadSecureFile@1
+        name: bpd_pm
+        displayName: 'Download BPD PM public uat'
+        inputs:
+          secureFile: 'bpd-pm-${{ parameters.TARGET_ENV }}.asc'
+      - script: |
+          mkdir $(pwd)/certs
+        displayName: Create Certs Folder
+      - script: |
+          cp /home/vsts/work/_temp/rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.pem $(pwd)/certs/rtd-acquirer-mauth.pem
+        displayName: Copy RTD PEM File
+      - script: |
+          cp /home/vsts/work/_temp/rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.key $(pwd)/certs/rtd-acquirer-mauth.key
+        displayName: Copy RTD Key File
+      - script: |
+          python -m venv .venv
+          source .venv/bin/activate
+          python -m pip install --upgrade pip
+        workingDirectory: $(projectRoot)
+        displayName: "Install CLI requirements"
+      - script: |
+          curl -L https://github.com/pagopa/cstar-cli/archive/refs/heads/main.zip -o cstar-cli.zip
+          unzip cstar-cli.zip
+          cd cstar-cli-main 
+          pip install -r ../requirements.txt
+          pip install --force-reinstall src/cstar-cli-core
+          pip install --no-deps --force-reinstall src/cstar-cli
+        displayName: Set environment
+      - script: |
+          ls -lrt
+          ls -lrt ./assets
+          cst idpay idpaydataset --action dataset_and_transactions --env ${{ parameters.TARGET_ENV }} --api-key $(rtdSK) --key $(rtd_acquirer_mauth_key.secureFilePath) --cert $(rtd_acquirer_mauth_pem.secureFilePath) --PM-pubk $(bpd_pm.secureFilePath) --out-dir ./generated --num-fc ${{ parameters.VIRTUAL_USERS_ENV }} --trx-per-fc 1 --start-datetime ${{ parameters.TRX_DATE }} --mcc 1234 --PM-salt SALT123
+          mkdir -p assets
+          mkdir -p results
+          cp ./generated/*/* ./assets
+          ls -lrt ./assets
+        displayName: Retrieve resource from cstar-cli
+        timeoutInMinutes: 0
+      - task: Bash@3
+        inputs:
+          targetType: 'inline'
+          script: |
+            WantedFile=$( find . -name "*.pgp")
+            BaseName=$(basename $WantedFile)
+            echo $BaseName
+            echo "##vso[task.setvariable variable=trxFileName]$BaseName"
+        displayName: Set variable trxFileName
+      - script: |
+          docker pull grafana/k6:latest
+        displayName: Pull k6 image
+      - script: |
+          docker run -i \
+            --user $UID \
+            -v $(pwd):/app \
+            --workdir "/app" \
+            -e RESULTS_DIR=/app \
+            -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
+            -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
+            -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
+            -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
+            -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
+            grafana/k6:latest \
+            run /app/test/performance/putTokenMockedPdv.js
+        displayName: Run k6 putTokenMockedPdv.js
+        condition: eq('${{parameters.SCRIPT }}', 'putTokenMockedPdv')
+        timeoutInMinutes: 0
+      - script: |
+          docker run -i \
+            --user $UID \
+            -v $(pwd):/app \
+            --workdir "/app" \
+            -e RESULTS_DIR=/app \
+            -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
+            -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
+            -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
+            -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
+            -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
+            -e APIM_SK=$(pdvApiKey) \
+            grafana/k6:latest \
+            run /app/test/performance/putTokenPdv.js
+        displayName: Run k6 putTokenPdv.js
+        condition: eq('${{parameters.SCRIPT }}', 'putTokenPdv')
+        timeoutInMinutes: 0
+      - script: |
+          docker run -i \
+            --user $UID \
+            -v $(pwd):/app \
+            --workdir "/app" \
+            -e RESULTS_DIR=/app \
+            -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
+            -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
+            -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
+            -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
+            -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
+            -e APIM_SK=$(apimSK) \
+            -e SERVICE_ID=${{ parameters.SERVICE_ID }} \
+            grafana/k6:latest \
+            run /app/test/performance/idpayOnboardingAPI.js
+        displayName: Run k6 idpayOnboardingAPI.js
+        condition: in('${{parameters.SCRIPT }}', 'idpayOnboardingAPI', 'ioPutEnrollInstrumentIssuer', 'ioPutEnrollIban', 'rtdTransactionsFile') 
+        timeoutInMinutes: 0
+      - script: |
+          docker run -i \
+            --user $UID \
+            -v $(pwd):/app \
+            --workdir "/app" \
+            -e RESULTS_DIR=/app \
+            -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
+            -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
+            -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
+            -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
+            -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
+            -e APIM_SK=$(issuerSK) \
+            -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
+            grafana/k6:latest \
+            run /app/test/performance/ioPutEnrollInstrumentIssuer.js
+        displayName: Run k6 ioPutEnrollInstrumentIssuer.js
+        condition: in('${{parameters.SCRIPT }}', 'ioPutEnrollInstrumentIssuer', 'rtdTransactionsFile') 
+        timeoutInMinutes: 0
+      - script: |
+          ls -lrt $(pwd)
+          docker run -i \
+            --user $UID \
+            -v $(pwd):/app \
+            --workdir "/app" \
+            -e RESULTS_DIR=/app \
+            -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
+            -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
+            -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
+            -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
+            -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
+            -e APIM_SK=$(apimSK) \
+            -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
+            grafana/k6:latest \
+            run /app/test/performance/ioPutEnrollIban.js
+        displayName: Run k6 ioPutEnrollIban.js
+        condition: in('${{parameters.SCRIPT }}', 'ioPutEnrollIban', 'rtdTransactionsFile')
+        timeoutInMinutes: 0
+      - script: |
+          ls -lrt $(pwd)
+          docker run -i \
+            --user $UID \
+            -v $(pwd):/app \
+            --workdir "/app" \
+            -e RESULTS_DIR=/app \
+            -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
+            -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
+            -e APIM_SK=$(rtdSK) \
+            -e TRX_FILE_NAME=$(trxFileName) \
+            grafana/k6:latest \
+            run /app/test/performance/rtdTransactionsFile.js
+        displayName: Run k6 rtdTransactionsFile.js
+        condition: eq('${{ parameters.SCRIPT }}', 'rtdTransactionsFile')
+      - task: PublishTestResults@2
+        condition: true
+        inputs:
+          testResultsFormat: 'JUnit'
+          testResultsFiles: 'results/*-result.xml'
+          searchFolder: '$(System.DefaultWorkingDirectory)'
+          failTaskOnFailedTests: true
+      - task: PublishPipelineArtifact@1
+        displayName: 'Publishing results of k6 tests in folder: results'
+        condition: true
+        inputs:
+          artifact: 'results'
+          targetPath: 'results'
+          publishLocation: 'pipeline'
 
