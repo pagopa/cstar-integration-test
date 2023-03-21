@@ -124,6 +124,9 @@ jobs:
           cp /home/vsts/work/_temp/rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.key $(pwd)/certs/rtd-acquirer-mauth.key
         displayName: Copy RTD Key File
       - script: |
+          docker info | grep -i mem
+        displayName: Display Docker Memory Info
+      - script: |
           python -m venv .venv
           source .venv/bin/activate
           python -m pip install --upgrade pip
