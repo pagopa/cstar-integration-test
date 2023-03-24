@@ -25,8 +25,7 @@ let cfList = new SharedArray('cfList', function() {
     return getFCList()
 })
 
-const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
-
+const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.DURATION_STAGES, __ENV.MAX_TARGET)
 let scenarios = {
     rampingArrivalRate: {
         executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources

@@ -1,18 +1,14 @@
 import { randomIntBetween } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js';
 
-export function setStages(tempVus, stageNumber){
-    const arr = new Array(stageNumber);
-    for (let i = stageNumber-1; i >= 0; i--) {
-        if(i == stageNumber-1){
-            arr[i] = {duration: '1s', target: 0}
-        } else if(i == 0) {
-           arr[i] = {duration: '1s', target: tempVus}
-           tempVus -= tempVus
-        } else {
-            let r = randomIntBetween(1, (tempVus/2)-1)
-            arr[i] = {duration: '1s', target: r}
-            tempVus -= r
-        }
+export function setStages(tempVus, durationStages, maxTarget){
+    const arr = new Array()
+    do {
+        let r = randomIntBetween(1, maxTarget)
+        let targetValue = tempVus<=r ? tempVus : r
+        arr.push({duration: durationStages, target: targetValue})
+        tempVus -= r
     }
+    while(tempVus != 0)
+    arr.push({duration: durationStages, target: 0})
     return arr;
 }

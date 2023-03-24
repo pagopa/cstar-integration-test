@@ -25,8 +25,7 @@ let cfPanList = new SharedArray('cfPanList', function() {
     return getFCPanList()
 })
 
-const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
-
+const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.DURATION_STAGES, __ENV.MAX_TARGET)
 
 let scenarios = {
     rampingArrivalRate: {
