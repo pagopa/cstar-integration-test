@@ -66,6 +66,10 @@ parameters:
   - name: 'VIRTUAL_USERS_ENV'
     displayName: 'Number of virtual users'
     type: number
+  - name: 'STAGE_NUMBER_ENV'
+    displayName: 'Number of ramping stages (min: 3)'
+    type: number
+    default: 3
   - name: 'DURATION_STAGES'
     displayName: 'Stage duration with time unit (second:s, minute: m). Esempio: 1s'
     type: string
@@ -175,6 +179,7 @@ jobs:
             -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
             -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
             -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
+            -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
             -e MAX_TARGET=${{ parameters.MAX_TARGET }} \
             -e DURATION_STAGES=${{ parameters.DURATION_STAGES }} \
             -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
@@ -192,6 +197,7 @@ jobs:
             -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
             -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
             -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
+            -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
             -e MAX_TARGET=${{ parameters.MAX_TARGET }} \
             -e DURATION_STAGES=${{ parameters.DURATION_STAGES }} \
             -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
@@ -210,6 +216,7 @@ jobs:
             -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
             -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
             -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
+            -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
             -e MAX_TARGET=${{ parameters.MAX_TARGET }} \
             -e DURATION_STAGES=${{ parameters.DURATION_STAGES }} \
             -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
@@ -229,6 +236,7 @@ jobs:
             -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
             -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
             -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
+            -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
             -e MAX_TARGET=${{ parameters.MAX_TARGET }} \
             -e DURATION_STAGES=${{ parameters.DURATION_STAGES }} \
             -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
@@ -249,6 +257,7 @@ jobs:
             -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
             -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
             -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
+            -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
             -e MAX_TARGET=${{ parameters.MAX_TARGET }} \
             -e DURATION_STAGES=${{ parameters.DURATION_STAGES }} \
             -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \

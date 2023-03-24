@@ -22,7 +22,7 @@ let cfList = new SharedArray('cfList', function() {
 
 const services = JSON.parse(open('../../services/environments.json'))
 
-const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.DURATION_STAGES, __ENV.MAX_TARGET)
+const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.DURATION_STAGES, __ENV.MAX_TARGET, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
 
 let scenarios = {
     rampingArrivalRate: {
