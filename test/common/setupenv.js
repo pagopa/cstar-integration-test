@@ -1,4 +1,4 @@
-import {isEnvValid} from "../common/envs.js";
+import {isEnvValid} from "./envs.js";
 import dotenv from 'k6/x/dotenv'
 
 export function setupEnvironment(environmentsPath) {

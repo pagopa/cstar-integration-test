@@ -1,7 +1,7 @@
 import { group, check } from 'k6'
 import {assert, bodyJsonReduceArray, bodyPgpPublicKey, statusOk} from '../common/assertions.js'
 import RtdTokenManagerApi from "../common/api/rtdTokenManagerApi.js";
-import {setupEnvironment} from "./setupenv.js";
+import {setupEnvironment} from "../common/setupenv.js";
 
 const {env, baseUrl} = setupEnvironment('../../services/environments.json');
 const stubTokenFile = open("stub-files/tokenFile.csv");
