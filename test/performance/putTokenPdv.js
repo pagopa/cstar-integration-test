@@ -100,5 +100,5 @@ export default () => {
 }
 
 export const handleSummary = defaultHandleSummaryBuilder(
-    'putTokenPdv'
+    'putTokenPdv', customStages
 )
