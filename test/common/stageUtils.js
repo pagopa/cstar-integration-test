@@ -8,7 +8,7 @@ export function setStages(tempVus, durationStages, maxTarget){
         arr.push({duration: durationStages, target: targetValue})
         tempVus -= r
     }
-    while(tempVus != 0)
+    while(tempVus > 0)
     arr.push({duration: durationStages, target: 0})
     return arr;
 }
