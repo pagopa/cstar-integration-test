@@ -117,5 +117,5 @@ export default () => {
 }
 
 export const handleSummary = defaultHandleSummaryBuilder(
-    'ioPutEnrollInstrumentIssuer'
+    'ioPutEnrollInstrumentIssuer', customStages
 )

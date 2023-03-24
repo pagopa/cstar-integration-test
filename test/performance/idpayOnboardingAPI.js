@@ -205,5 +205,5 @@ export default () => {
 }
 
 export const handleSummary = defaultHandleSummaryBuilder(
-    'idpayOnboardingAPI'
+    'idpayOnboardingAPI', customStages
 )

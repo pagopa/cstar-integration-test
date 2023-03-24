@@ -116,5 +116,5 @@ export default () => {
 }
 
 export const handleSummary = defaultHandleSummaryBuilder(
-    'ioPutEnrollIban'
+    'ioPutEnrollIban', customStages
 )
