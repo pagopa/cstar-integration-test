@@ -24,7 +24,7 @@ let cfList = new SharedArray('cfList', function() {
     return getFCList()
 })
 
-const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
+//const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
 
 let scenarios = {
     rampingArrivalRate: {
@@ -32,7 +32,31 @@ let scenarios = {
         timeUnit: '1s', //period of time to apply the iteration
         preAllocatedVUs: __ENV.VIRTUAL_USERS_ENV,
         maxVUs: __ENV.VIRTUAL_USERS_ENV,
-        stages: customStages
+        stages: [
+            { target: 10, duration: '1s' },
+            { target: 10, duration: '1s' },
+            { target: 10, duration: '1s' },
+            { target: 50, duration: '1s' },
+            { target: 100, duration: '1s' },
+            { target: 150, duration: '1s' },
+            { target: 200, duration: '1s' },
+            { target: 250, duration: '1s' },
+            { target: 10, duration: '1s' },
+            { target: 300, duration: '1s' },
+            { target: 100, duration: '1s' },
+            { target: 150, duration: '1s' },
+            { target: 200, duration: '1s' },
+            { target: 250, duration: '1s' },
+            { target: 300, duration: '1s' },
+            { target: 50, duration: '1s' },
+            { target: 30, duration: '1s' },
+            { target: 20, duration: '1s' },
+            { target: 100, duration: '1s' },
+            { target: 170, duration: '1s' },
+            { target: 100, duration: '1s' },
+            { target: 10, duration: '1s' },
+            { target: 0, duration: '1s' },
+        ],
     },
     perVuIterations: {
         executor: 'per-vu-iterations',
