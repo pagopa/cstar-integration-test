@@ -13,7 +13,7 @@ import { getFCList } from '../common/utils.js'
 import {exec, vu} from 'k6/execution'
 import { SharedArray } from 'k6/data'
 import { jUnit, textSummary } from 'https://jslib.k6.io/k6-summary/0.0.2/index.js';
-import { setStages } from '../common/stageUtils.js';
+import { setStages, setScenarios } from '../common/stageUtils.js';
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
@@ -25,7 +25,7 @@ let cfList = new SharedArray('cfList', function() {
 })
 
 //const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
-
+const customScenarios = setScenarios(__ENV.VIRTUAL_USERS_ENV, __ENV.VUS_MAX_ENV, `${__ENV.START_TIME_ENV}s`, `${__ENV.DURATION_PER_VU_ITERATION}s`)
 let scenarios = {
     rampingArrivalRate: {
         executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
@@ -58,13 +58,7 @@ let scenarios = {
             { target: 0, duration: '1s' },
         ],
     },
-    perVuIterations: {
-        executor: 'per-vu-iterations',
-        vus: __ENV.VIRTUAL_USERS_ENV,
-        iterations: 1,
-        startTime: '0s',
-        maxDuration: `${__ENV.DURATION_PER_VU_ITERATION}s`,
-    },
+    perVuIterations: customScenarios,
 };
 export let options = {
     scenarios: {} ,

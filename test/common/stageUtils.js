@@ -16,3 +16,53 @@ export function setStages(tempVus, stageNumber){
     }
     return arr;
 }
+export function setScenarios(vus, maxVus, startTime, maxDuration){
+    const arr = new Array()
+    do {
+        let randomVus = randomIntBetween(1, maxVus)
+        //let targetValue = tempVus<=r ? tempVus : r
+        arr.push({
+            executor: 'per-vu-iterations',
+            vus: randomVus,
+            iteration: 1, 
+            startTime: startTime, 
+            maxDuration: maxDuration
+        })
+        //tempVus -= r
+        startTime += startTime+1
+    }
+    while(vus > 0)
+        arr.push({
+            executor: 'per-vu-iterations',
+            vus: 0,
+            iteration: 1, 
+            startTime: startTime, 
+            maxDuration: maxDuration
+        })
+    return arr;
+}
+
+/* export function setScenarios(scenarioNumber, vus, maxVus, startTime, maxDuration){
+    const arr = new Array(scenarioNumber)
+    for(let i = scenarioNumber-1; i >= 0; i--){
+        if(i == scenarioNumber-1){
+            arr[i] = {
+                executor: 'per-vu-iterations',
+                vus: vus,
+                iteration: 1, 
+                startTime: startTime+'s', 
+                maxDuration: maxDuration
+            }
+        }else{
+            let randomVus = randomIntBetween(1, maxVus)
+            arr[i] = {
+                executor: 'per-vu-iterations',
+                vus: vus,
+                iteration: 1, 
+                startTime: startTime+'s', 
+                maxDuration: maxDuration
+            }
+            startTime += startTime+1
+        }
+    }
+} */

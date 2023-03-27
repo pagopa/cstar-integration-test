@@ -33,6 +33,12 @@ parameters:
   - name: 'VIRTUAL_USERS_ENV'
     displayName: 'Number of virtual users (1 - 100 000)'
     type: number
+  - name: 'VUS_MAX_ENV'
+    displayName: 'Maximum number of virtual users (1 - 300)'
+    type: number
+  - name: 'START_TIME_ENV'
+    displayName: 'Start time (number)'
+    type: number
   - name: 'STAGE_NUMBER_ENV'
     displayName: 'Number of ramping stages (min: 3)'
     type: number
@@ -110,6 +116,8 @@ steps:
         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
         -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
         -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
+        -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
+        -e VUS_START_TIME_ENV=${{ parameters.VUS_MAX_ENV }} \
         -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
         -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
         -e APIM_SK=${{ parameters.APIM_SK }} \
