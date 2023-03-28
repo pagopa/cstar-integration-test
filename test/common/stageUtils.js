@@ -27,7 +27,7 @@ export function setScenarios(vus, maxVus, startTime, maxDuration){
             executor: 'per-vu-iterations',
             vus: actualVus,
             iterations: 1,
-            startTime: startTime+'s',
+            startTime: `${startTime}s`,
             maxDuration: maxDuration
         }
         startTime++
