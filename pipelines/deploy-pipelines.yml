@@ -24,12 +24,9 @@ parameters:
       - 'dev'
       - 'uat'
   - name: 'SCENARIO_TYPE_ENV'
-    displayName: 'Scenario type'
+    displayName: 'Scenario type (ex: scenario_1)'
     type: string
     default: 'rampingArrivalRate'
-    values:
-      - 'rampingArrivalRate'
-      - 'perVuIterations'
   - name: 'VIRTUAL_USERS_ENV'
     displayName: 'Number of virtual users (1 - 100 000)'
     type: number
@@ -39,6 +36,7 @@ parameters:
   - name: 'START_TIME_ENV'
     displayName: 'Start time (number)'
     type: number
+    default: 1
   - name: 'STAGE_NUMBER_ENV'
     displayName: 'Number of ramping stages (min: 3)'
     type: number
@@ -46,7 +44,7 @@ parameters:
   - name: 'DURATION_PER_VU_ITERATION'
     displayName: 'Maximum duration in seconds for the perVuIterations-type scenario'
     type: number
-    default: 600
+    default: 30
   - name: 'APIM_SK'
     displayName: 'API-Key (NOT required for putTokenMockedPdv script)'
     type: string

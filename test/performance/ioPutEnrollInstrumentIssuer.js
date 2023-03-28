@@ -44,7 +44,7 @@ let scenarios = {
     },
 };
 export let options = {
-    scenarios: {} ,
+    scenarios: [] ,
     thresholds: {
         http_req_failed: [{threshold:'rate<0.01', abortOnFail: false, delayAbortEval: '10s'},], // http errors should be less than 1%
         http_reqs: [{threshold: `count<=${__ENV.VIRTUAL_USERS_ENV}`, abortOnFail: false, delayAbortEval: '10s'},]

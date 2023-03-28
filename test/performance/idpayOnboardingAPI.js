@@ -25,55 +25,35 @@ let cfList = new SharedArray('cfList', function() {
 })
 
 //const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
-const customScenarios = setScenarios(__ENV.VIRTUAL_USERS_ENV, __ENV.VUS_MAX_ENV, `${__ENV.START_TIME_ENV}s`, `${__ENV.DURATION_PER_VU_ITERATION}s`)
-let scenarios = {
-    rampingArrivalRate: {
-        executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
-        timeUnit: '1s', //period of time to apply the iteration
-        preAllocatedVUs: __ENV.VIRTUAL_USERS_ENV,
-        maxVUs: __ENV.VIRTUAL_USERS_ENV,
-        stages: [
-            { target: 10, duration: '1s' },
-            { target: 10, duration: '1s' },
-            { target: 10, duration: '1s' },
-            { target: 50, duration: '1s' },
-            { target: 100, duration: '1s' },
-            { target: 150, duration: '1s' },
-            { target: 200, duration: '1s' },
-            { target: 250, duration: '1s' },
-            { target: 10, duration: '1s' },
-            { target: 300, duration: '1s' },
-            { target: 100, duration: '1s' },
-            { target: 150, duration: '1s' },
-            { target: 200, duration: '1s' },
-            { target: 250, duration: '1s' },
-            { target: 300, duration: '1s' },
-            { target: 50, duration: '1s' },
-            { target: 30, duration: '1s' },
-            { target: 20, duration: '1s' },
-            { target: 100, duration: '1s' },
-            { target: 170, duration: '1s' },
-            { target: 100, duration: '1s' },
-            { target: 10, duration: '1s' },
-            { target: 0, duration: '1s' },
-        ],
-    },
-    perVuIterations: customScenarios,
-};
+const scenarios = setScenarios(__ENV.VIRTUAL_USERS_ENV, __ENV.VUS_MAX_ENV, __ENV.START_TIME_ENV, `${__ENV.DURATION_PER_VU_ITERATION}s`)
+    console.warn(JSON.stringify(scenarios))
+
+
 export let options = {
-    scenarios: {} ,
+    scenarios: {},
     thresholds: {
         http_req_failed: [{threshold:'rate<0.01', abortOnFail: false, delayAbortEval: '10s'},], // http errors should be less than 1%
         http_reqs: [{threshold: `count<=${parseInt(__ENV.VIRTUAL_USERS_ENV) * 6}`, abortOnFail: false, delayAbortEval: '10s'},]
     },
 
 }
+const scenarioNames = Object.keys(scenarios)
 
-if (__ENV.SCENARIO_TYPE_ENV) {
-    options.scenarios[__ENV.SCENARIO_TYPE_ENV] = scenarios[__ENV.SCENARIO_TYPE_ENV]; // Use just a single scenario if ` -e SCENARIO_TYPE_ENV` is used
+if (!__ENV.SCENARIO_TYPE_ENV) {
+    options.scenarios = scenarios;
 } else {
-    options.scenarios = scenarios; // Use all scenrios
+    if (scenarioNames.includes(__ENV.SCENARIO_TYPE_ENV)) {
+        options.scenarios[__ENV.SCENARIO_TYPE_ENV] = scenarios[__ENV.SCENARIO_TYPE_ENV];
+    } else {
+        console.log(`Scenario ${__ENV.SCENARIO_TYPE_ENV} not found`);
+    }
 }
+
+//if (__ENV.SCENARIO_TYPE_ENV) {
+//    options.scenarios[__ENV.SCENARIO_TYPE_ENV] = scenarios[__ENV.SCENARIO_TYPE_ENV]; // Use just a single scenario if ` -e SCENARIO_TYPE_ENV` is used
+//} else {
+//    options.scenarios = scenarios; // Use all scenrios
+//}
 
 if (isEnvValid(__ENV.TARGET_ENV)) {
     baseUrl = services[`${__ENV.TARGET_ENV}_io`].baseUrl
@@ -222,17 +202,17 @@ export default () => {
     sleep(1)
 }
 
-export function handleSummary(data){
-    console.log(`TEST DETAILS: [Time to complete test: ${data.state.testRunDurationMs} ms, Environment target: ${__ENV.TARGET_ENV}, Scenario test type: ${__ENV.SCENARIO_TYPE_ENV}, Number of VUs: ${__ENV.VIRTUAL_USERS_ENV}, Request processed: ${data.metrics.http_reqs.values.count}, Request OK: ${data.metrics.http_req_failed.values.fails}, ERRORS: ${data.metrics.http_req_failed.values.passes}]`)
-    if(__ENV.SCENARIO_TYPE_ENV == 'rampingArrivalRate'){
-        let stringRamping = 'Ramping iterations for stage : { '
-        for(let i=0; i<customStages.length-1; i++){
-            stringRamping += `${customStages[i].target}, `
-        }
-        console.log(stringRamping+ `${customStages[customStages.length-1].target} } `)
-    }
-    return {
-            'stdout': textSummary(data, { indent: ' ', enableColors: true}),
-            './performancetest-result.xml': jUnit(data),
-    }
-}
+//export function handleSummary(data){
+//    console.log(`TEST DETAILS: [Time to complete test: ${data.state.testRunDurationMs} ms, Environment target: ${__ENV.TARGET_ENV}, Scenario test type: ${__ENV.SCENARIO_TYPE_ENV}, Number of VUs: ${__ENV.VIRTUAL_USERS_ENV}, Request processed: ${data.metrics.http_reqs.values.count}, Request OK: ${data.metrics.http_req_failed.values.fails}, ERRORS: ${data.metrics.http_req_failed.values.passes}]`)
+//    if(__ENV.SCENARIO_TYPE_ENV == 'rampingArrivalRate'){
+//        let stringRamping = 'Ramping iterations for stage : { '
+//        for(let i=0; i<customStages.length-1; i++){
+//            stringRamping += `${customStages[i].target}, `
+//        }
+//        console.log(stringRamping+ `${customStages[customStages.length-1].target} } `)
+//    }
+//    return {
+//            'stdout': textSummary(data, { indent: ' ', enableColors: true}),
+//            './performancetest-result.xml': jUnit(data),
+//    }
+//}

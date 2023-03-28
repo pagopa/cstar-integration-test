@@ -17,52 +17,24 @@ export function setStages(tempVus, stageNumber){
     return arr;
 }
 export function setScenarios(vus, maxVus, startTime, maxDuration){
-    const arr = new Array()
+    let scenarios = {}
+    let counter = 1
     do {
         let randomVus = randomIntBetween(1, maxVus)
-        //let targetValue = tempVus<=r ? tempVus : r
-        arr.push({
+        let actualVus = vus<=randomVus ? vus : randomVus
+        console.log(actualVus)
+        const propertyName = `scenario_${counter}`
+        scenarios[propertyName]= {
             executor: 'per-vu-iterations',
-            vus: randomVus,
-            iteration: 1, 
-            startTime: startTime, 
+            vus: actualVus,
+            iterations: 1,
+            startTime: startTime+'s',
             maxDuration: maxDuration
-        })
-        //tempVus -= r
-        startTime += startTime+1
+        }
+        startTime++
+        counter++
+        vus -= randomVus
     }
     while(vus > 0)
-        arr.push({
-            executor: 'per-vu-iterations',
-            vus: 0,
-            iteration: 1, 
-            startTime: startTime, 
-            maxDuration: maxDuration
-        })
-    return arr;
+    return scenarios
 }
-
-/* export function setScenarios(scenarioNumber, vus, maxVus, startTime, maxDuration){
-    const arr = new Array(scenarioNumber)
-    for(let i = scenarioNumber-1; i >= 0; i--){
-        if(i == scenarioNumber-1){
-            arr[i] = {
-                executor: 'per-vu-iterations',
-                vus: vus,
-                iteration: 1, 
-                startTime: startTime+'s', 
-                maxDuration: maxDuration
-            }
-        }else{
-            let randomVus = randomIntBetween(1, maxVus)
-            arr[i] = {
-                executor: 'per-vu-iterations',
-                vus: vus,
-                iteration: 1, 
-                startTime: startTime+'s', 
-                maxDuration: maxDuration
-            }
-            startTime += startTime+1
-        }
-    }
-} */
