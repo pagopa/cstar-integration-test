@@ -26,6 +26,7 @@ parameters:
   - name: 'SCENARIO_TYPE_ENV'
     displayName: 'Scenario type (ex: rampingArrivalRate, scenario_1)'
     type: string
+    default: 'vuIterations'
   - name: 'VIRTUAL_USERS_ENV'
     displayName: 'Number of virtual users (1 - 100 000)'
     type: number

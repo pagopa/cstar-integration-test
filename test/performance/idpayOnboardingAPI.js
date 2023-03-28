@@ -39,7 +39,7 @@ export let options = {
 }
 const scenarioNames = Object.keys(scenarios)
 
-if (!__ENV.SCENARIO_TYPE_ENV) {
+if (__ENV.SCENARIO_TYPE_ENV=='vuIterations') {
     options.scenarios = scenarios;
 } else {
     if (scenarioNames.includes(__ENV.SCENARIO_TYPE_ENV)) {
