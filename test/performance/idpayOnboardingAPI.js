@@ -24,34 +24,43 @@ let cfList = new SharedArray('cfList', function() {
     return getFCList()
 })
 
-//const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
-const scenarios = setScenarios(__ENV.VIRTUAL_USERS_ENV, __ENV.VUS_MAX_ENV, __ENV.START_TIME_ENV, __ENV.DURATION_PER_VU_ITERATION)
+const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
 
-export let options = {
-    scenarios: {},
+const vuIterationsScenario = {
+    scenarios: setScenarios(__ENV.VIRTUAL_USERS_ENV, __ENV.VUS_MAX_ENV, __ENV.START_TIME_ENV, __ENV.DURATION_PER_VU_ITERATION),
     thresholds: {
-        http_req_failed: [{threshold:'rate<0.05', abortOnFail: false, delayAbortEval: '10s'},], // http errors should be less than 1%
+        http_req_failed: [{threshold:'rate<0.05', abortOnFail: false, delayAbortEval: '10s'},],
         http_reqs: [{threshold: `count<=${parseInt(__ENV.VIRTUAL_USERS_ENV) * 6}`, abortOnFail: false, delayAbortEval: '10s'},]
-    },
-
-}
-const scenarioNames = Object.keys(scenarios)
-
-if (__ENV.SCENARIO_TYPE_ENV=='vuIterations') {
-    options.scenarios = scenarios;
-} else {
-    if (scenarioNames.includes(__ENV.SCENARIO_TYPE_ENV)) {
-        options.scenarios[__ENV.SCENARIO_TYPE_ENV] = scenarios[__ENV.SCENARIO_TYPE_ENV];
-    } else {
-        console.log(`Scenario ${__ENV.SCENARIO_TYPE_ENV} not found`);
     }
 }
 
-//if (__ENV.SCENARIO_TYPE_ENV) {
-//    options.scenarios[__ENV.SCENARIO_TYPE_ENV] = scenarios[__ENV.SCENARIO_TYPE_ENV]; // Use just a single scenario if ` -e SCENARIO_TYPE_ENV` is used
-//} else {
-//    options.scenarios = scenarios; // Use all scenrios
-//}
+let customArrivalRate = {rampingArrivalRate: {
+                  executor: 'ramping-arrival-rate',
+                  timeUnit: '1s',
+                  preAllocatedVUs: __ENV.VIRTUAL_USERS_ENV,
+                  maxVUs: __ENV.VIRTUAL_USERS_ENV,
+                  stages: customStages
+                }
+}
+// Scenario configuration for rampingArrivalRate
+let rampingArrivalRateScenario = {
+    scenarios: customArrivalRate,
+    thresholds: {
+            http_req_failed: [{threshold:'rate<0.05', abortOnFail: false, delayAbortEval: '10s'},],
+            http_reqs: [{threshold: `count<=${parseInt(__ENV.VIRTUAL_USERS_ENV) * 6}`, abortOnFail: false, delayAbortEval: '10s'},]
+        }
+}
+
+let typeScenario
+if (__ENV.SCENARIO_TYPE_ENV === 'vuIterations') {
+    typeScenario = vuIterationsScenario
+} else if (__ENV.SCENARIO_TYPE_ENV === 'rampingArrivalRate') {
+    typeScenario = rampingArrivalRateScenario
+} else {
+    console.log(`Scenario ${__ENV.SCENARIO_TYPE_ENV} not found`)
+}
+
+export let options = typeScenario
 
 if (isEnvValid(__ENV.TARGET_ENV)) {
     baseUrl = services[`${__ENV.TARGET_ENV}_io`].baseUrl

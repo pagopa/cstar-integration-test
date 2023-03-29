@@ -21,7 +21,7 @@ export function setScenarios(vus, maxVus, startTime, maxDuration){
     let counter = 1
     do {
         let randomVus = randomIntBetween(1, maxVus)
-        let actualVus = vus<=randomVus ? vus : randomVus
+        let actualVus = vus <= randomVus ? vus : randomVus
         const propertyName = `scenario_${counter}`
         scenarios[propertyName]= {
             executor: 'per-vu-iterations',
