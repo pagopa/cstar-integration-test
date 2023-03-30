@@ -125,7 +125,7 @@ steps:
         -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
         grafana/k6:latest \
         run /app/test/performance/${{ parameters.SCRIPT }}.js
-        pause
+        scale --max 100
     displayName: Run k6 ${{ parameters.SCRIPT }}
   - task: PublishTestResults@2
     inputs:
