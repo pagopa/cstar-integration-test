@@ -27,6 +27,7 @@ let cfList = new SharedArray('cfList', function() {
 const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
 
 const vuIterationsScenario = {
+    discardResponseBodies: true,
     scenarios: setScenarios(__ENV.VIRTUAL_USERS_ENV, __ENV.VUS_MAX_ENV, __ENV.START_TIME_ENV, __ENV.DURATION_PER_VU_ITERATION),
     thresholds: {
         http_req_failed: [{threshold:'rate<0.05', abortOnFail: false, delayAbortEval: '10s'},],
