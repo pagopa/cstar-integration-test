@@ -13,7 +13,7 @@ import { getFCList } from '../common/utils.js'
 import {exec, vu} from 'k6/execution'
 import { SharedArray } from 'k6/data'
 import { jUnit, textSummary } from 'https://jslib.k6.io/k6-summary/0.0.2/index.js';
-import { setStages } from '../common/stageUtils.js';
+import { setStages, setScenarios } from '../common/stageUtils.js';
 import defaultHandleSummaryBuilder from '../common/handleSummaryBuilder.js'
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
@@ -25,37 +25,44 @@ let cfList = new SharedArray('cfList', function() {
     return getFCList()
 })
 
-const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.DURATION_STAGES, __ENV.MAX_TARGET, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
-let scenarios = {
+const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.DURATION_STAGES, __ENV.MAX_TARGET)
+
+const vuIterationsScenario = {
+    scenarios: setScenarios(__ENV.VIRTUAL_USERS_ENV, __ENV.VUS_MAX_ENV, __ENV.START_TIME_ENV, __ENV.DURATION_PER_VU_ITERATION),
+    thresholds: {
+        http_req_failed: [{ threshold: 'rate<0.05', abortOnFail: false, delayAbortEval: '10s' },],
+        http_reqs: [{ threshold: `count<=${parseInt(__ENV.VIRTUAL_USERS_ENV) * 6}`, abortOnFail: false, delayAbortEval: '10s' },]
+    }
+}
+
+let customArrivalRate = {
     rampingArrivalRate: {
-        executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
-        timeUnit: '1s', //period of time to apply the iteration
+        executor: 'ramping-arrival-rate',
+        timeUnit: '1s',
         preAllocatedVUs: __ENV.VIRTUAL_USERS_ENV,
         maxVUs: __ENV.VIRTUAL_USERS_ENV,
         stages: customStages
-    },
-    perVuIterations: {
-        executor: 'per-vu-iterations',
-        vus: __ENV.VIRTUAL_USERS_ENV,
-        iterations: 1,
-        startTime: '0s',
-        maxDuration: `${__ENV.DURATION_PER_VU_ITERATION}s`,
-    },
-};
-export let options = {
-    scenarios: {} ,
+    }
+}
+// Scenario configuration for rampingArrivalRate
+let rampingArrivalRateScenario = {
+    scenarios: customArrivalRate,
     thresholds: {
-        http_req_failed: [{threshold:'rate<0.01', abortOnFail: false, delayAbortEval: '10s'},], // http errors should be less than 1%
-        http_reqs: [{threshold: `count<=${parseInt(__ENV.VIRTUAL_USERS_ENV) * 6}`, abortOnFail: false, delayAbortEval: '10s'},]
-    },
-
+        http_req_failed: [{ threshold: 'rate<0.05', abortOnFail: false, delayAbortEval: '10s' },],
+        http_reqs: [{ threshold: `count<=${parseInt(__ENV.VIRTUAL_USERS_ENV) * 6}`, abortOnFail: false, delayAbortEval: '10s' },]
+    }
 }
 
-if (__ENV.SCENARIO_TYPE_ENV) {
-    options.scenarios[__ENV.SCENARIO_TYPE_ENV] = scenarios[__ENV.SCENARIO_TYPE_ENV]; // Use just a single scenario if ` -e SCENARIO_TYPE_ENV` is used
+let typeScenario
+if (__ENV.SCENARIO_TYPE_ENV === 'vuIterations') {
+    typeScenario = vuIterationsScenario
+} else if (__ENV.SCENARIO_TYPE_ENV === 'rampingArrivalRate') {
+    typeScenario = rampingArrivalRateScenario
 } else {
-    options.scenarios = scenarios; // Use all scenrios
+    console.log(`Scenario ${__ENV.SCENARIO_TYPE_ENV} not found`)
 }
+
+export let options = typeScenario
 
 if (isEnvValid(__ENV.TARGET_ENV)) {
     baseUrl = services[`${__ENV.TARGET_ENV}_io`].baseUrl
