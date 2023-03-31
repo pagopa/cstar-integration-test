@@ -24,7 +24,8 @@ export function setScenarios(vus, maxVus, startTime, maxDuration){
             vus: actualVus,
             iterations: 1,
             startTime: `${startTime}s`,
-            maxDuration: `${maxDuration}s`
+            maxDuration: `${maxDuration}s`,
+            gracefulStop: '40s'
         }
         startTime=parseInt(startTime)+parseInt(maxDuration)
         counter++
