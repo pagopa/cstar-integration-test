@@ -66,9 +66,6 @@ parameters:
   - name: 'VIRTUAL_USERS_ENV'
     displayName: 'Number of virtual users'
     type: number
-  - name: 'VUS_MAX_ENV'
-    displayName: 'Maximum number of virtual users for scenario (1 - 300)'
-    type: number
   - name: 'MAX_TARGET'
     displayName: 'Maximum target number for rampingArrivalRate scenario '
     type: number
