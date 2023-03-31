@@ -18,7 +18,7 @@ export function setStages(tempVus, stageNumber){
 }
 export function setScenarios(vus, maxVus, startTime, maxDuration){
     let scenarios = {}
-    let counter = 1
+    let counter = 0
     do {
         let randomVus = randomIntBetween(1, maxVus)
         let actualVus = vus <= randomVus ? vus : randomVus
@@ -28,8 +28,7 @@ export function setScenarios(vus, maxVus, startTime, maxDuration){
             vus: actualVus,
             iterations: 1,
             startTime: `${startTime}s`,
-            maxDuration: `${maxDuration}s`,
-            gracefulStop: '40s',
+            maxDuration: `${maxDuration}s`
         }
         startTime=parseInt(startTime)+parseInt(maxDuration)
         counter++
