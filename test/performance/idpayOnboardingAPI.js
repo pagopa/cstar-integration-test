@@ -54,7 +54,7 @@ let rampingArrivalRateScenario = {
 }
 
 let typeScenario
-if (__ENV.SCENARIO_TYPE_ENV === 'vuIterations') {
+if (__ENV.SCENARIO_TYPE_ENV === 'perVuIterations') {
     typeScenario = vuIterationsScenario
 } else if (__ENV.SCENARIO_TYPE_ENV === 'rampingArrivalRate') {
     typeScenario = rampingArrivalRateScenario
