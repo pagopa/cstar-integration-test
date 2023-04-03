@@ -7,8 +7,8 @@ import {
     UAT,
     PROD,
 } from '../common/envs.js'
-import {exec, vu} from 'k6/execution'
-import {
+import { scenario, vu} from 'k6/execution'
+import exec from 'k6/execution'import {
     putEnrollInstrumentIssuer
    } from '../common/api/idpayWallet.js'
 import { getFCPanList } from '../common/utils.js'
@@ -54,7 +54,7 @@ let rampingArrivalRateScenario = {
 }
 
 let typeScenario
-if (__ENV.SCENARIO_TYPE_ENV === 'vuIterations') {
+if (__ENV.SCENARIO_TYPE_ENV === 'perVuIterations') {
     typeScenario = vuIterationsScenario
 } else if (__ENV.SCENARIO_TYPE_ENV === 'rampingArrivalRate') {
     typeScenario = rampingArrivalRateScenario

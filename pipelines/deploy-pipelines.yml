@@ -76,7 +76,7 @@ parameters:
   - name: 'START_TIME_ENV'
     displayName: 'Start time (number)'
     type: number
-    default: 1
+    default: 0
   - name: 'DURATION_PER_VU_ITERATION'
     displayName: 'Maximum duration in seconds for the perVuIterations-type scenario Esempio: 10'
     type: number

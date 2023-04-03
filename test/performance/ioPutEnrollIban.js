@@ -8,8 +8,8 @@ import {
     PROD,
 } from '../common/envs.js'
 import { loginFullUrl } from '../common/api/bpdIoLogin.js'
-import {exec, vu, scenario} from 'k6/execution'
-import {putEnrollIban} from '../common/api/idpayWallet.js'
+import { scenario, vu} from 'k6/execution'
+import exec from 'k6/execution'import {putEnrollIban} from '../common/api/idpayWallet.js'
 import { getFCIbanList } from '../common/utils.js'
 import { SharedArray } from 'k6/data'
 import { jUnit, textSummary } from 'https://jslib.k6.io/k6-summary/0.0.2/index.js';
