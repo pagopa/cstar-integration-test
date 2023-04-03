@@ -37,3 +37,23 @@ export function setScenarios(vus, maxVus, startTime, maxDuration){
     while(vus > 0)
     return scenarios
 }
+
+function buildScenarios(options) {
+    let counter = 0
+    const scenarioBaseIndexes = {}
+
+    Object.keys(options.scenarios)
+        .filter(scenarioName => scenarioName.startsWith('scenario_'))
+        .sort()
+        .forEach(scenarioName => {
+            const singleScenario = options.scenarios[scenarioName]
+            let scenarioBaseIndex = counter
+            counter += singleScenario.vus
+            scenarioBaseIndexes[scenarioName] = scenarioBaseIndex
+        })
+    return scenarioBaseIndexes
+}
+
+function coalesce(o1, o2){
+    return o1 ? o1 : o2
+}

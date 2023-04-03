@@ -8,12 +8,12 @@ import {
     PROD,
 } from '../common/envs.js'
 import { loginFullUrl } from '../common/api/bpdIoLogin.js'
-import {exec, vu} from 'k6/execution'
+import {exec, vu, scenario} from 'k6/execution'
 import {putEnrollIban} from '../common/api/idpayWallet.js'
 import { getFCIbanList } from '../common/utils.js'
 import { SharedArray } from 'k6/data'
 import { jUnit, textSummary } from 'https://jslib.k6.io/k6-summary/0.0.2/index.js';
-import { setStages, setScenarios } from '../common/stageUtils.js';
+import { setStages, setScenarios, buildScenarios, coalesce } from '../common/stageUtils.js';
 import defaultHandleSummaryBuilder from '../common/handleSummaryBuilder.js'
    
 const REGISTERED_ENVS = [DEV, UAT, PROD]
@@ -24,7 +24,7 @@ let cfIbanList = new SharedArray('cfIbanList', function() {
 let baseUrl
 const services = JSON.parse(open('../../services/environments.json'))
 
-const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.DURATION_STAGES, __ENV.MAX_TARGET)
+const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
 
 const vuIterationsScenario = {
     scenarios: setScenarios(__ENV.VIRTUAL_USERS_ENV, __ENV.VUS_MAX_ENV, __ENV.START_TIME_ENV, __ENV.DURATION_PER_VU_ITERATION),
@@ -53,7 +53,7 @@ let rampingArrivalRateScenario = {
 }
 
 let typeScenario
-if (__ENV.SCENARIO_TYPE_ENV === 'vuIterations') {
+if (__ENV.SCENARIO_TYPE_ENV === 'perVuIterations') {
     typeScenario = vuIterationsScenario
 } else if (__ENV.SCENARIO_TYPE_ENV === 'rampingArrivalRate') {
     typeScenario = rampingArrivalRateScenario
@@ -82,10 +82,15 @@ function auth(fiscalCode) {
     }
 }
 
-
 export default () => {
-    const cf = auth(cfIbanList[vu.idInTest-1].FC)
-    const iban = cfIbanList[vu.idInTest-1].IBAN
+    let checked = true
+
+    const scenarioBaseIndex = buildScenarios(exec.test.options)
+    const cfBaseIndex = coalesce(scenarioBaseIndex[scenario.name], 0)
+    let FC = cfIbanList[cfBaseIndex+scenario.iterationInTest].FC
+    const cf = auth(FC)
+
+    let iban = cfIbanList[cfBaseIndex+scenario.iterationInTest].IBAN
 
     if (
         !isEnvValid(__ENV.TARGET_ENV) ||
