@@ -106,15 +106,9 @@ function coalesce(o1, o2){
 
 export default () => {
     let checked = true
-        console.log('test.options', JSON.stringify(exec.test.abort()))
 
     const scenarioBaseIndex = buildScenarios(exec.test.options)
-    //console.log('scenarioBaseIndex', JSON.stringify(scenarioBaseIndex))
     const cfBaseIndex = coalesce(scenarioBaseIndex[scenario.name], 0)
-
-    //console.log('cfBaseIndex', cfBaseIndex)
-    //console.log('scenario.name', scenario.name, 'cfBaseIndex', cfBaseIndex, scenario.iterationInTest)
-    //console.log('cfBaseIndex+scenario.iterationInTest', cfBaseIndex+scenario.iterationInTest)
     let FC = cfList[cfBaseIndex+scenario.iterationInTest].FC
 
     const cf = auth(FC)
