@@ -1,15 +1,19 @@
 import { randomIntBetween } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js';
 
-export function setStages(tempVus, durationStages, maxTarget){
-    const arr = new Array()
-    do {
-        let r = randomIntBetween(1, maxTarget)
-        let targetValue = tempVus<=r ? tempVus : r
-        arr.push({duration: durationStages, target: targetValue})
-        tempVus -= r
+export function setStages(tempVus, stageNumber){
+    const arr = new Array(stageNumber);
+    for (let i = stageNumber-1; i >= 0; i--) {
+        if(i == stageNumber-1){
+            arr[i] = {duration: '1s', target: 0}
+        } else if(i == 0) {
+           arr[i] = {duration: '1s', target: tempVus}
+           tempVus -= tempVus
+        } else {
+            let r = randomIntBetween(1, (tempVus/2)-1)
+            arr[i] = {duration: '1s', target: r}
+            tempVus -= r
+        }
     }
-    while(tempVus > 0)
-    arr.push({duration: durationStages, target: 0})
     return arr;
 }
 export function setScenarios(vus, maxVus, startTime, maxDuration){
@@ -24,7 +28,7 @@ export function setScenarios(vus, maxVus, startTime, maxDuration){
             vus: actualVus,
             iterations: 1,
             startTime: `${startTime}s`,
-            maxDuration: `${maxDuration}s`,
+            maxDuration: `${maxDuration}s`
         }
         startTime=parseInt(startTime)+parseInt(maxDuration)
         counter++
@@ -33,22 +37,3 @@ export function setScenarios(vus, maxVus, startTime, maxDuration){
     while(vus > 0)
     return scenarios
 }
-
-//export function setStages(tempVus, durationStages, maxTarget, stageNumber) {
-//    const arr = new Array(stageNumber);
-//    let remainingStages = stageNumber;
-//
-//    while (remainingStages > 1 && tempVus > 0) {
-//        let r = randomIntBetween(1, maxTarget)
-//        let targetValue = tempVus<=r ? tempVus : r
-//        arr[stageNumber - remainingStages] = {duration: durationStages, target: targetValue}
-//        tempVus -= r
-//        remainingStages--;
-//    }
-//
-//    arr[stageNumber - 1] = {duration: durationStages, target: 0}
-//
-//    return arr;
-//}
-
-

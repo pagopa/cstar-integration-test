@@ -22,7 +22,7 @@ let cfList = new SharedArray('cfList', function() {
 
 const services = JSON.parse(open('../../services/environments.json'))
 
-const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.DURATION_STAGES, __ENV.MAX_TARGET)
+const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
 
 const vuIterationsScenario = {
     scenarios: setScenarios(__ENV.VIRTUAL_USERS_ENV, __ENV.VUS_MAX_ENV, __ENV.START_TIME_ENV, __ENV.DURATION_PER_VU_ITERATION),
@@ -51,7 +51,7 @@ let rampingArrivalRateScenario = {
 }
 
 let typeScenario
-if (__ENV.SCENARIO_TYPE_ENV === 'vuIterations') {
+if (__ENV.SCENARIO_TYPE_ENV === 'perVuIterations') {
     typeScenario = vuIterationsScenario
 } else if (__ENV.SCENARIO_TYPE_ENV === 'rampingArrivalRate') {
     typeScenario = rampingArrivalRateScenario
@@ -65,9 +65,32 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
     baseUrl = services[`${__ENV.TARGET_ENV}_pdv`].baseUrl
 }
 
+function buildScenarios(options) {
+    let counter = 0
+    const scenarioBaseIndexes = {}
+
+    Object.keys(options.scenarios)
+        .filter(scenarioName => scenarioName.startsWith('scenario_'))
+        .sort()
+        .forEach(scenarioName => {
+            const singleScenario = options.scenarios[scenarioName]
+            let scenarioBaseIndex = counter
+            counter += singleScenario.vus
+            scenarioBaseIndexes[scenarioName] = scenarioBaseIndex
+        })
+    return scenarioBaseIndexes
+}
+
+function coalesce(o1, o2){
+    return o1 ? o1 : o2
+}
 
 export default () => {
-    const uniqueCF = cfList[vu.idInTest-1].FC
+    const scenarioBaseIndex = buildScenarios(exec.test.options)
+    const cfBaseIndex = coalesce(scenarioBaseIndex[scenario.name], 0)
+    let FC = cfList[cfBaseIndex+scenario.iterationInTest].FC
+
+    const uniqueCF = auth(FC)
 
     //UPSERT TOKEN
     group('Should onboard Citizen', () => {

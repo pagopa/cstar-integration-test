@@ -66,10 +66,6 @@ parameters:
   - name: 'VIRTUAL_USERS_ENV'
     displayName: 'Number of virtual users'
     type: number
-  - name: 'MAX_TARGET'
-    displayName: 'Maximum target number for rampingArrivalRate scenario '
-    type: number
-    default: 100
   - name: 'DURATION_STAGES'
     displayName: 'Stage duration rampingArrivalRate. Esempio: 1s or 1m'
     type: string
@@ -182,7 +178,6 @@ jobs:
             -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
             -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
             -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
-            -e MAX_TARGET=${{ parameters.MAX_TARGET }} \
             -e DURATION_STAGES=${{ parameters.DURATION_STAGES }} \
             -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
             -e START_TIME_ENV=${{ parameters.START_TIME_ENV }} \
@@ -201,7 +196,6 @@ jobs:
             -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
             -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
             -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
-            -e MAX_TARGET=${{ parameters.MAX_TARGET }} \
             -e DURATION_STAGES=${{ parameters.DURATION_STAGES }} \
             -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
             -e START_TIME_ENV=${{ parameters.START_TIME_ENV }} \
@@ -221,7 +215,6 @@ jobs:
             -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
             -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
             -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
-            -e MAX_TARGET=${{ parameters.MAX_TARGET }} \
             -e DURATION_STAGES=${{ parameters.DURATION_STAGES }} \
             -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
             -e START_TIME_ENV=${{ parameters.START_TIME_ENV }} \
@@ -242,7 +235,6 @@ jobs:
             -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
             -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
             -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
-            -e MAX_TARGET=${{ parameters.MAX_TARGET }} \
             -e DURATION_STAGES=${{ parameters.DURATION_STAGES }} \
             -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
             -e START_TIME_ENV=${{ parameters.START_TIME_ENV }} \
@@ -264,7 +256,6 @@ jobs:
             -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
             -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
             -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
-            -e MAX_TARGET=${{ parameters.MAX_TARGET }} \
             -e DURATION_STAGES=${{ parameters.DURATION_STAGES }} \
             -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
             -e START_TIME_ENV=${{ parameters.START_TIME_ENV }} \
