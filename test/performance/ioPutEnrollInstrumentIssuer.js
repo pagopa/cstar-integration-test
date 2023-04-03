@@ -14,7 +14,7 @@ import {
 import { getFCPanList } from '../common/utils.js'
 import { SharedArray } from 'k6/data'
 import { jUnit, textSummary } from 'https://jslib.k6.io/k6-summary/0.0.2/index.js';
-import { setStages, setScenarios } from '../common/stageUtils.js';
+import { setStages, setScenarios, coalesce } from '../common/stageUtils.js';
 import defaultHandleSummaryBuilder from '../common/handleSummaryBuilder.js'
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
@@ -70,8 +70,13 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
 
 
 export default () => {
-    const cf = cfPanList[vu.idInTest-1].FC
-    const pgpan = cfPanList[vu.idInTest-1].PGPPAN
+    const scenarioBaseIndex = buildScenarios(exec.test.options)
+    const cfBaseIndex = coalesce(scenarioBaseIndex[scenario.name], 0)
+    let FC = cfPanList[cfBaseIndex+scenario.iterationInTest].FC
+
+    const cf = auth(FC)
+
+    const pgpan = cfPanList[cfBaseIndex+scenario.iterationInTest].PGPPAN
 
     if (
         !isEnvValid(__ENV.TARGET_ENV) ||

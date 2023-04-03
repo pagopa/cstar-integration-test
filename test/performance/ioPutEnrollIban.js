@@ -13,7 +13,7 @@ import {putEnrollIban} from '../common/api/idpayWallet.js'
 import { getFCIbanList } from '../common/utils.js'
 import { SharedArray } from 'k6/data'
 import { jUnit, textSummary } from 'https://jslib.k6.io/k6-summary/0.0.2/index.js';
-import { setStages, setScenarios, buildScenarios, coalesce } from '../common/stageUtils.js';
+import { setStages, setScenarios, coalesce } from '../common/stageUtils.js';
 import defaultHandleSummaryBuilder from '../common/handleSummaryBuilder.js'
    
 const REGISTERED_ENVS = [DEV, UAT, PROD]
@@ -65,6 +65,22 @@ export let options = typeScenario
 
 if (isEnvValid(__ENV.TARGET_ENV)) {
     baseUrl = services[`${__ENV.TARGET_ENV}_io`].baseUrl
+}
+
+function buildScenarios(options) {
+    let counter = 0
+    const scenarioBaseIndexes = {}
+
+    Object.keys(options.scenarios)
+        .filter(scenarioName => scenarioName.startsWith('scenario_'))
+        .sort()
+        .forEach(scenarioName => {
+            const singleScenario = options.scenarios[scenarioName]
+            let scenarioBaseIndex = counter
+            counter += singleScenario.vus
+            scenarioBaseIndexes[scenarioName] = scenarioBaseIndex
+        })
+    return scenarioBaseIndexes
 }
 
 function auth(fiscalCode) {

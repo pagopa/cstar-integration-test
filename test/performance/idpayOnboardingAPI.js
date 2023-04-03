@@ -12,7 +12,7 @@ import { isEnvValid, isTestEnabledOnEnv, DEV, UAT, PROD } from '../common/envs.j
 import { getFCList } from '../common/utils.js'
 import {exec, vu, scenario} from 'k6/execution'
 import { SharedArray } from 'k6/data'
-import { setStages, setScenarios, buildScenarios, coalesce } from '../common/stageUtils.js';
+import { setStages, setScenarios, coalesce } from '../common/stageUtils.js';
 import defaultHandleSummaryBuilder from '../common/handleSummaryBuilder.js'
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
@@ -81,6 +81,22 @@ function auth(fiscalCode) {
             'Ocp-Apim-Trace': 'true'
         },
     }
+}
+
+function buildScenarios(options) {
+    let counter = 0
+    const scenarioBaseIndexes = {}
+
+    Object.keys(options.scenarios)
+        .filter(scenarioName => scenarioName.startsWith('scenario_'))
+        .sort()
+        .forEach(scenarioName => {
+            const singleScenario = options.scenarios[scenarioName]
+            let scenarioBaseIndex = counter
+            counter += singleScenario.vus
+            scenarioBaseIndexes[scenarioName] = scenarioBaseIndex
+        })
+    return scenarioBaseIndexes
 }
 
 export default () => {
