@@ -37,7 +37,3 @@ export function setScenarios(vus, maxVus, startTime, maxDuration){
     while(vus > 0)
     return scenarios
 }
-
-function coalesce(o1, o2){
-    return o1 ? o1 : o2
-}

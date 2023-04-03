@@ -9,7 +9,7 @@ import { getFCList } from '../common/utils.js'
 import {exec, vu, scenario} from 'k6/execution'
 import { SharedArray } from 'k6/data'
 import { jUnit, textSummary } from 'https://jslib.k6.io/k6-summary/0.0.2/index.js';
-import { setStages, setScenarios, coalesce } from '../common/stageUtils.js';
+import { setStages, setScenarios } from '../common/stageUtils.js';
 import defaultHandleSummaryBuilder from '../common/handleSummaryBuilder.js'
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
@@ -79,6 +79,10 @@ function buildScenarios(options) {
             scenarioBaseIndexes[scenarioName] = scenarioBaseIndex
         })
     return scenarioBaseIndexes
+}
+
+function coalesce(o1, o2){
+    return o1 ? o1 : o2
 }
 
 export default () => {
