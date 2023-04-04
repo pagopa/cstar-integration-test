@@ -1,4 +1,4 @@
-import { group, sleep } from 'k6'
+import { group, sleep} from 'k6'
 import {
      upsertToken,
      upsertMockToken
@@ -6,8 +6,8 @@ import {
 import { assert, statusOk, } from '../common/assertions.js'
 import { isEnvValid, DEV, UAT, PROD } from '../common/envs.js'
 import { getFCList } from '../common/utils.js'
-import { scenario, vu} from 'k6/execution'
-import exec from 'k6/execution'import { SharedArray } from 'k6/data'
+import { vu } from 'k6/execution'
+import { SharedArray } from 'k6/data'
 import { jUnit, textSummary } from 'https://jslib.k6.io/k6-summary/0.0.2/index.js';
 import { setStages, setScenarios } from '../common/stageUtils.js';
 import defaultHandleSummaryBuilder from '../common/handleSummaryBuilder.js'
@@ -15,14 +15,13 @@ import defaultHandleSummaryBuilder from '../common/handleSummaryBuilder.js'
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
 let baseUrl
-let myEnv
 let cfList = new SharedArray('cfList', function() {
     return getFCList()
 })
 
 const services = JSON.parse(open('../../services/environments.json'))
 
-const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
+const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.DURATION_STAGES, __ENV.MAX_TARGET)
 
 const vuIterationsScenario = {
     scenarios: setScenarios(__ENV.VIRTUAL_USERS_ENV, __ENV.VUS_MAX_ENV, __ENV.START_TIME_ENV, __ENV.DURATION_PER_VU_ITERATION),
@@ -51,7 +50,7 @@ let rampingArrivalRateScenario = {
 }
 
 let typeScenario
-if (__ENV.SCENARIO_TYPE_ENV === 'perVuIterations') {
+if (__ENV.SCENARIO_TYPE_ENV === 'vuIterations') {
     typeScenario = vuIterationsScenario
 } else if (__ENV.SCENARIO_TYPE_ENV === 'rampingArrivalRate') {
     typeScenario = rampingArrivalRateScenario
@@ -62,52 +61,27 @@ if (__ENV.SCENARIO_TYPE_ENV === 'perVuIterations') {
 export let options = typeScenario
 
 if (isEnvValid(__ENV.TARGET_ENV)) {
-    baseUrl = services[`${__ENV.TARGET_ENV}_pdv`].baseUrl
-}
-
-function buildScenarios(options) {
-    let counter = 0
-    const scenarioBaseIndexes = {}
-
-    Object.keys(options.scenarios)
-        .filter(scenarioName => scenarioName.startsWith('scenario_'))
-        .sort()
-        .forEach(scenarioName => {
-            const singleScenario = options.scenarios[scenarioName]
-            let scenarioBaseIndex = counter
-            counter += singleScenario.vus
-            scenarioBaseIndexes[scenarioName] = scenarioBaseIndex
-        })
-    return scenarioBaseIndexes
-}
-
-function coalesce(o1, o2){
-    return o1 ? o1 : o2
+    baseUrl = services[`${__ENV.TARGET_ENV}_io`].baseUrl
 }
 
 export default () => {
-    const scenarioBaseIndex = buildScenarios(exec.test.options)
-    const cfBaseIndex = coalesce(scenarioBaseIndex[scenario.name], 0)
-    let FC = cfList[cfBaseIndex+scenario.iterationInTest].FC
+    //MOCK TOKEN
+    group('Should pdv put a cf', () => {
+        group('Returns a token', () => {
 
-    const uniqueCF = auth(FC)
-
-    //UPSERT TOKEN
-    group('Should onboard Citizen', () => {
-        group('When the inititive and consents exist', () => {
+        const uniqueCF = cfList[vu.idInTest-1].FC
             
         const params= {
             headers:  { 
                 'Content-Type' : 'application/json',
                 'Ocp-Apim-Trace': 'true',
-                'x-api-key':`${__ENV.APIM_SK}`,
             },
             body: {
                 "pii": uniqueCF,
             }
         }
 
-        let res = upsertToken(
+        let res = upsertMockToken(
             baseUrl,
             JSON.stringify(params.body),
             params
@@ -120,12 +94,12 @@ export default () => {
 
         assert(res,
             [statusOk()])
-         
         })
     })
     sleep(1)
 }
 
 export const handleSummary = defaultHandleSummaryBuilder(
-    'putTokenPdv', customStages
+    'putTokenMockedPdv', customStages
 )
+
