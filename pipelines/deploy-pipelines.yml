@@ -67,9 +67,9 @@ parameters:
     displayName: 'Number of virtual users'
     type: number
   - name: 'STAGE_NUMBER_ENV'
-    displayName: 'Stage number rampingArrivalRate
+    displayName: 'Stage number rampingArrivalRate'
     type: number
-    default: '10'
+    default: 10
   - name: 'VUS_MAX_ENV'
     displayName: 'Maximum number of virtual users for scenario perVuIterations (1 - 300)'
     type: number
