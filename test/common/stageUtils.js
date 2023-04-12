@@ -36,7 +36,6 @@ export function setScenarios(vus, maxVus, startTime, maxDuration) {
             vus -= randomVus
         }
         while (vus > 0)
-        console.log('scenarios', scenarios)
         return scenarios
     }
     if (maxVus > 0) {
