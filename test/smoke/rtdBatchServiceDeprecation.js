@@ -54,7 +54,7 @@ export default () => {
     }
     group('Public Key API', () => {
         group('Batch service minimum version returns OK', () => {
-            params.headers['User-Agent'] = 'BatchService/1.2.5'
+            params.headers['User-Agent'] = 'BatchService/1.3.2'
             assert(getPublicKey(baseUrl, params), [
                 statusOk(),
                 bodyPgpPublicKey(),
@@ -68,13 +68,13 @@ export default () => {
             ])
         })
         group('Batch service deprecated patch returns 403', () => {
-            params.headers['User-Agent'] = 'BatchService/1.2.0'
+            params.headers['User-Agent'] = 'BatchService/1.3.0'
             assert(getPublicKey(baseUrl, params), [
                 statusForbidden()
             ])
         })
         group('Batch service previous minor returns 403', () => {
-            params.headers['User-Agent'] = 'BatchService/1.1.0'
+            params.headers['User-Agent'] = 'BatchService/1.2.5'
             assert(getPublicKey(baseUrl, params), [
                 statusForbidden()
             ])
