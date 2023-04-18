@@ -89,9 +89,8 @@ function coalesce(o1, o2){
 export default () => {
     const scenarioBaseIndex = buildScenarios(exec.test.options)
     const cfBaseIndex = coalesce(scenarioBaseIndex[scenario.name], 0)
-    let FC = cfList[cfBaseIndex+scenario.iterationInTest].FC
+    let uniqueCF = cfList[cfBaseIndex+scenario.iterationInTest].FC
 
-    const uniqueCF = auth(FC)
 
     //UPSERT TOKEN
     group('Should onboard Citizen', () => {
