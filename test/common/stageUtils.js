@@ -21,6 +21,7 @@ export function setScenarios(vus, maxVus, startTime, maxDuration) {
         let scenarios = {}
         let counter = 0
         do {
+            //random vus
             let randomVus = randomIntBetween(1, vus/2)
             let actualVus = vus <= randomVus ? vus : randomVus
             const propertyName = `scenario_${counter}`
@@ -42,6 +43,7 @@ export function setScenarios(vus, maxVus, startTime, maxDuration) {
         let scenarios = {}
         let counter = 0
         do {
+            //random vus with a maximum number of vus
             let randomVus = randomIntBetween(300, maxVus)
             let actualVus = vus <= randomVus ? vus : randomVus
             const propertyName = `scenario_${counter}`
@@ -59,4 +61,14 @@ export function setScenarios(vus, maxVus, startTime, maxDuration) {
         while (vus > 0)
         return scenarios
     }
+}
+
+export function thresholds(virtualUsers){
+    return {
+        http_req_failed: [{ threshold: 'rate<0.05', abortOnFail: false, delayAbortEval: '10s' },],
+        http_reqs: [{ threshold: `count<=${parseInt(virtualUsers) * 6}`, abortOnFail: false, delayAbortEval: '10s' },]
+    }
+}
+
+function getScenarios(){
 }

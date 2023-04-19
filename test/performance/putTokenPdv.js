@@ -1,7 +1,6 @@
 import { group, sleep } from 'k6'
 import {
      upsertToken,
-     upsertMockToken
     } from '../common/api/pdv.js'
 import { assert, statusOk, } from '../common/assertions.js'
 import { isEnvValid, DEV, UAT, PROD } from '../common/envs.js'
@@ -10,7 +9,7 @@ import { scenario, vu} from 'k6/execution'
 import exec from 'k6/execution'
 import { SharedArray } from 'k6/data'
 import { jUnit, textSummary } from 'https://jslib.k6.io/k6-summary/0.0.2/index.js'
-import { setStages, setScenarios } from '../common/stageUtils.js'
+import { setStages, setScenarios, thresholds } from '../common/stageUtils.js'
 import defaultHandleSummaryBuilder from '../common/handleSummaryBuilder.js'
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
@@ -27,10 +26,7 @@ const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.STAGE_NUMBER_ENV >
 
 const vuIterationsScenario = {
     scenarios: setScenarios(__ENV.VIRTUAL_USERS_ENV, __ENV.VUS_MAX_ENV, __ENV.START_TIME_ENV, __ENV.DURATION_PER_VU_ITERATION),
-    thresholds: {
-        http_req_failed: [{ threshold: 'rate<0.05', abortOnFail: false, delayAbortEval: '10s' },],
-        http_reqs: [{ threshold: `count<=${parseInt(__ENV.VIRTUAL_USERS_ENV) * 6}`, abortOnFail: false, delayAbortEval: '10s' },]
-    }
+    thresholds: thresholds(__ENV.VIRTUAL_USERS_ENV)
 }
 
 let customArrivalRate = {
@@ -42,13 +38,28 @@ let customArrivalRate = {
         stages: customStages
     }
 }
+
 // Scenario configuration for rampingArrivalRate
 let rampingArrivalRateScenario = {
     scenarios: customArrivalRate,
-    thresholds: {
-        http_req_failed: [{ threshold: 'rate<0.05', abortOnFail: false, delayAbortEval: '10s' },],
-        http_reqs: [{ threshold: `count<=${parseInt(__ENV.VIRTUAL_USERS_ENV) * 6}`, abortOnFail: false, delayAbortEval: '10s' },]
+    thresholds: thresholds(__ENV.VIRTUAL_USERS_ENV)
+}
+
+let customConstantArrivalRate = {
+    constantArrivalRate: {
+        executor: 'constant-arrival-rate',
+        duration: `${__ENV.DURATION_PER_VU_ITERATION}s`,
+        rate: __ENV.RATE,
+        timeUnit: '1s',
+        preAllocatedVUs: __ENV.VIRTUAL_USERS_ENV,
+        maxVUs: __ENV.VIRTUAL_USERS_ENV
     }
+}
+
+// Scenario configuration for constantArrivalRate
+let rampingConstantArrivalRateScenario = {
+    scenarios: customConstantArrivalRate,
+    thresholds: thresholds(__ENV.VIRTUAL_USERS_ENV)
 }
 
 let typeScenario
@@ -56,6 +67,8 @@ if (__ENV.SCENARIO_TYPE_ENV === 'perVuIterations') {
     typeScenario = vuIterationsScenario
 } else if (__ENV.SCENARIO_TYPE_ENV === 'rampingArrivalRate') {
     typeScenario = rampingArrivalRateScenario
+} else if (__ENV.SCENARIO_TYPE_ENV === 'constantArrivalRate'){
+    typeScenario = rampingConstantArrivalRateScenario
 } else {
     console.log(`Scenario ${__ENV.SCENARIO_TYPE_ENV} not found`)
 }

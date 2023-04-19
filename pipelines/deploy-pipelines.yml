@@ -63,6 +63,7 @@ parameters:
     values:
       - 'rampingArrivalRate'
       - 'perVuIterations'
+      - 'constantArrivalRate'
   - name: 'VIRTUAL_USERS_ENV'
     displayName: 'Number of virtual users'
     type: number
@@ -79,6 +80,10 @@ parameters:
     default: 0
   - name: 'DURATION_PER_VU_ITERATION'
     displayName: 'Maximum duration in seconds for the perVuIterations-type scenario Esempio: 10'
+    type: number
+    default: 10
+  - name: 'RATE'
+    displayName: 'Rate of iterations per timeUnit(default 1s)'
     type: number
     default: 10
   - name: 'SERVICE_ID'
@@ -200,6 +205,7 @@ jobs:
             -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
             -e START_TIME_ENV=${{ parameters.START_TIME_ENV }} \
             -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
+            -e RATE=${{ parameters.RATE }} \
             -e APIM_SK=$(pdvApiKey) \
             grafana/k6:latest \
             run /app/test/performance/putTokenPdv.js
