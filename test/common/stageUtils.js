@@ -48,7 +48,7 @@ export function setScenarios(vus, maxVus, startTime, maxDuration) {
             scenarios[propertyName] = {
                 executor: 'per-vu-iterations',
                 vus: actualVus,
-                iterations: 1,
+                iterations: 30,
                 startTime: `${startTime}s`,
                 maxDuration: `${maxDuration}s`
             }
