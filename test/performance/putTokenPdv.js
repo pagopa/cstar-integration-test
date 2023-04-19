@@ -51,7 +51,7 @@ let customConstantArrivalRate = {
         duration: `${__ENV.DURATION_PER_VU_ITERATION}s`,
         rate: __ENV.RATE,
         timeUnit: '1s',
-        preAllocatedVUs: __ENV.VIRTUAL_USERS_ENV,
+        preAllocatedVUs: Math.ceil(0.01 * __ENV.VIRTUAL_USERS_ENV),
         maxVUs: __ENV.VIRTUAL_USERS_ENV
     }
 }
