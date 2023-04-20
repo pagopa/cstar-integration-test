@@ -6,7 +6,8 @@ import {
 import { assert, statusOk, } from '../common/assertions.js'
 import { isEnvValid, DEV, UAT, PROD } from '../common/envs.js'
 import { getFCList } from '../common/utils.js'
-import { vu } from 'k6/execution'
+import { scenario, vu } from 'k6/execution'
+import exec from 'k6/execution'
 import { SharedArray } from 'k6/data'
 import { jUnit, textSummary } from 'https://jslib.k6.io/k6-summary/0.0.2/index.js';
 import { setStages, setScenarios, thresholds } from '../common/stageUtils.js';
@@ -21,7 +22,7 @@ let cfList = new SharedArray('cfList', function() {
 
 const services = JSON.parse(open('../../services/environments.json'))
 
-const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.DURATION_STAGES, __ENV.MAX_TARGET)
+const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
 
 const vuIterationsScenario = {
     scenarios: setScenarios(__ENV.VIRTUAL_USERS_ENV, __ENV.VUS_MAX_ENV, __ENV.START_TIME_ENV, __ENV.DURATION_PER_VU_ITERATION),
