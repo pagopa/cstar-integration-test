@@ -187,6 +187,7 @@ jobs:
             -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
             -e START_TIME_ENV=${{ parameters.START_TIME_ENV }} \
             -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
+            -e RATE=${{ parameters.RATE }} \
             grafana/k6:latest \
             run /app/test/performance/putTokenMockedPdv.js
         displayName: Run k6 putTokenMockedPdv.js
@@ -225,6 +226,7 @@ jobs:
             -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
             -e START_TIME_ENV=${{ parameters.START_TIME_ENV }} \
             -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
+            -e RATE=${{ parameters.RATE }} \
             -e APIM_SK=$(apimSK) \
             -e SERVICE_ID=${{ parameters.SERVICE_ID }} \
             grafana/k6:latest \
@@ -245,6 +247,7 @@ jobs:
             -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
             -e START_TIME_ENV=${{ parameters.START_TIME_ENV }} \
             -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
+            -e RATE=${{ parameters.RATE }} \
             -e APIM_SK=$(issuerSK) \
             -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
             grafana/k6:latest \
@@ -266,6 +269,7 @@ jobs:
             -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
             -e START_TIME_ENV=${{ parameters.START_TIME_ENV }} \
             -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
+            -e RATE=${{ parameters.RATE }} \
             -e APIM_SK=$(apimSK) \
             -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
             grafana/k6:latest \

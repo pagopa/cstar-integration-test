@@ -24,14 +24,7 @@ export function setScenarios(vus, maxVus, startTime, maxDuration) {
             //random vus
             let randomVus = randomIntBetween(1, vus/2)
             let actualVus = vus <= randomVus ? vus : randomVus
-            const propertyName = `scenario_${counter}`
-            scenarios[propertyName] = {
-                executor: 'per-vu-iterations',
-                vus: actualVus,
-                iterations: 1,
-                startTime: `${startTime}s`,
-                maxDuration: `${maxDuration}s`
-            }
+            getScenarios(counter, scenarios, actualVus, startTime, maxDuration)
             startTime = parseInt(startTime) + parseInt(maxDuration)
             counter++
             vus -= randomVus
@@ -46,14 +39,7 @@ export function setScenarios(vus, maxVus, startTime, maxDuration) {
             //random vus with a maximum number of vus
             let randomVus = randomIntBetween(1, maxVus)
             let actualVus = vus <= randomVus ? vus : randomVus
-            const propertyName = `scenario_${counter}`
-            scenarios[propertyName] = {
-                executor: 'per-vu-iterations',
-                vus: actualVus,
-                iterations: 30,
-                startTime: `${startTime}s`,
-                maxDuration: `${maxDuration}s`
-            }
+            getScenarios(counter, scenarios, actualVus, startTime, maxDuration)
             startTime = parseInt(startTime) + parseInt(maxDuration)
             counter++
             vus -= randomVus
@@ -70,5 +56,14 @@ export function thresholds(virtualUsers){
     }
 }
 
-function getScenarios(){
+function getScenarios(counter, scenarios, actualVus, startTime, maxDuration){
+    const propertyName = `scenario_${counter}`
+    return scenarios[propertyName] = {
+            executor: 'per-vu-iterations',
+            vus: actualVus,
+            iterations: 1,
+            startTime: `${startTime}s`,
+            maxDuration: `${maxDuration}s`
+      }
+    
 }
