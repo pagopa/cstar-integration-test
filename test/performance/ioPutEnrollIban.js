@@ -25,26 +25,26 @@ let cfIbanList = new SharedArray('cfIbanList', function() {
 let baseUrl
 const services = JSON.parse(open('../../services/environments.json'))
 
-const customStages = setStages(__ENV.VIRTUAL_USERS_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
+const customStages = setStages(__ENV.VUS_MAX_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
 
 const vuIterationsScenario = {
     scenarios: setScenarios(__ENV.VIRTUAL_USERS_ENV, __ENV.VUS_MAX_ENV, __ENV.START_TIME_ENV, __ENV.DURATION_PER_VU_ITERATION),
-    thresholds: thresholds(__ENV.VIRTUAL_USERS_ENV)
+    thresholds: thresholds(__ENV.VUS_MAX_ENV)
 }
 
 let customArrivalRate = {
     rampingArrivalRate: {
         executor: 'ramping-arrival-rate',
         timeUnit: '1s',
-        preAllocatedVUs: __ENV.VIRTUAL_USERS_ENV,
-        maxVUs: __ENV.VIRTUAL_USERS_ENV,
+        preAllocatedVUs: __ENV.VUS_MAX_ENV,
+        maxVUs: __ENV.VUS_MAX_ENV,
         stages: customStages
     }
 }
 // Scenario configuration for rampingArrivalRate
 let rampingArrivalRateScenario = {
     scenarios: customArrivalRate,
-    thresholds: thresholds(__ENV.VIRTUAL_USERS_ENV)
+    thresholds: thresholds(__ENV.VUS_MAX_ENV)
 }
 
 let customConstantArrivalRate = {
@@ -53,15 +53,15 @@ let customConstantArrivalRate = {
         duration: `${__ENV.DURATION_PER_VU_ITERATION}s`,
         rate: __ENV.RATE,
         timeUnit: '1s',
-        preAllocatedVUs: Math.ceil(0.01 * __ENV.VIRTUAL_USERS_ENV),
-        maxVUs: __ENV.VIRTUAL_USERS_ENV
+        preAllocatedVUs: __ENV.VUS_MAX_ENV,
+        maxVUs: __ENV.VUS_MAX_ENV
     }
 }
 
 // Scenario configuration for constantArrivalRate
 let rampingConstantArrivalRateScenario = {
     scenarios: customConstantArrivalRate,
-    thresholds: thresholds(__ENV.VIRTUAL_USERS_ENV)
+    thresholds: thresholds(__ENV.VUS_MAX_ENV)
 }
 
 let typeScenario
