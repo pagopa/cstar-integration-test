@@ -65,14 +65,14 @@ parameters:
       - 'perVuIterations'
       - 'constantArrivalRate'
   - name: 'VIRTUAL_USERS_ENV'
-    displayName: 'Number of virtual users'
+    displayName: 'Number of fiscal Code'
     type: number
   - name: 'STAGE_NUMBER_ENV'
     displayName: 'Stage number rampingArrivalRate'
     type: number
     default: 10
   - name: 'VUS_MAX_ENV'
-    displayName: 'Maximum number of virtual users for scenario perVuIterations (1 - 300)'
+    displayName: 'Maximum number of virtual users'
     type: number
   - name: 'START_TIME_ENV'
     displayName: 'Start time (number)'
