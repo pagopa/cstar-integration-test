@@ -63,7 +63,7 @@ export default function () {
     }
 );
 
-  var r = http.put(baseUrl, payload, params);
+  var r = http.put(`${baseUrl}/tokenizer/v1/tokens`, payload, params);
 
   if(r.status != 200){
     console.error('ERROR-> '+JSON.stringify(r))
