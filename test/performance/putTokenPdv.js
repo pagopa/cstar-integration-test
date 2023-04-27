@@ -29,6 +29,7 @@ const vuIterationsScenario = {
     scenarios: setScenarios(__ENV.VIRTUAL_USERS_ENV, __ENV.VUS_MAX_ENV, __ENV.START_TIME_ENV, __ENV.DURATION_PER_VU_ITERATION, oneScenario),
     thresholds: thresholds(__ENV.VUS_MAX_ENV)
 }
+console.log("oneScenario", oneScenario)
 
 let customArrivalRate = {
     rampingArrivalRate: {
