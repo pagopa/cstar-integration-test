@@ -206,6 +206,7 @@ jobs:
             --workdir "/app" \
             -e RESULTS_DIR=/app \
             -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
+            -e APIM_SK=$(pdvApiKey) \
             grafana/k6:latest \
             run /app/test/performance/testPDV.js
         displayName: Run k6 testPDV.js
