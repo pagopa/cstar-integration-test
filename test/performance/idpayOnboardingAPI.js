@@ -48,7 +48,6 @@ let rampingArrivalRateScenario = {
 }
 
 let customConstantArrivalRate = {
-    //Math.ceil(0.01 * __ENV.VIRTUAL_USERS_ENV)
     constantArrivalRate: {
         executor: 'constant-arrival-rate',
         duration: `${__ENV.DURATION_PER_VU_ITERATION}s`,
