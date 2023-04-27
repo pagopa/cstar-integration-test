@@ -17,63 +17,58 @@ export function setStages(tempVus, stageNumber) {
     return arr;
 }
 export function setScenarios(vus, maxVus, startTime, maxDuration) {
-    if (maxVus == 0) {
-        let scenarios = {}
-        let counter = 0
-        do {
-            let randomVus = randomIntBetween(1, vus/2)
-            let actualVus = vus <= randomVus ? vus : randomVus
-            getScenarios(counter, scenarios, actualVus, startTime, maxDuration)
-            startTime = parseInt(startTime) + parseInt(maxDuration)
-            counter++
-            vus -= randomVus
+    if (__ENV.ONE_SCENARIO == false) {
+        if (maxVus == 0) {
+            let scenarios = {}
+            let counter = 0
+            do {
+                let randomVus = randomIntBetween(1, vus / 2)
+                let actualVus = vus <= randomVus ? vus : randomVus
+                getScenarios(counter, scenarios, actualVus, startTime, maxDuration)
+                startTime = parseInt(startTime) + parseInt(maxDuration)
+                counter++
+                vus -= randomVus
+            }
+            while (vus > 0)
+            return scenarios
         }
-        while (vus > 0)
-        return scenarios
-    }
-    if (maxVus > 0) {
-        let scenarios = {}
-        let counter = 0
-        do {
-            //random vus with a maximum number of vus
-            let randomVus = randomIntBetween(1, maxVus)
-            let actualVus = vus <= randomVus ? vus : randomVus
-            getScenarios(counter, scenarios, actualVus, startTime, maxDuration)
-            startTime = parseInt(startTime) + parseInt(maxDuration)
-            counter++
-            vus -= randomVus
+        if (maxVus > 0) {
+            let scenarios = {}
+            let counter = 0
+            do {
+                //random vus with a maximum number of vus
+                let randomVus = randomIntBetween(1, maxVus)
+                let actualVus = vus <= randomVus ? vus : randomVus
+                getScenarios(counter, scenarios, actualVus, startTime, maxDuration)
+                startTime = parseInt(startTime) + parseInt(maxDuration)
+                counter++
+                vus -= randomVus
+            }
+            while (vus > 0)
+            return scenarios
         }
-        while (vus > 0)
+    } else {
+        let scenarios = {}
+        getScenarios(0, scenarios, actualVus, startTime, maxDuration)
         return scenarios
     }
 }
 
-export function thresholds(virtualUsers){
+export function thresholds(virtualUsers) {
     return {
         http_req_failed: [{ threshold: 'rate<0.05', abortOnFail: false, delayAbortEval: '10s' },],
         http_reqs: [{ threshold: `count<=${parseInt(virtualUsers) * 6}`, abortOnFail: false, delayAbortEval: '10s' },]
     }
 }
 
-function getScenarios(counter, scenarios, actualVus, startTime, maxDuration){
+function getScenarios(counter, scenarios, actualVus, startTime, maxDuration) {
     const propertyName = `scenario_${counter}`
     return scenarios[propertyName] = {
-            executor: 'per-vu-iterations',
-            vus: actualVus,
-            iterations: 1,
-            startTime: `${startTime}s`,
-            maxDuration: `${maxDuration}s`
-      }
-    
-}
+        executor: 'per-vu-iterations',
+        vus: actualVus,
+        iterations: 1,
+        startTime: `${startTime}s`,
+        maxDuration: `${maxDuration}s`
+    }
 
-export function parameters(){
-      return {
-        'putTokenMockedPdv': ['param1', 'param2'],
-        'putTokenPdv': ['param3', 'param4'],
-        'idpayOnboardingAPI': ['param5', 'param6'],
-        'ioPutEnrollInstrumentIssuer': ['param7', 'param8'],
-        'ioPutEnrollIban': ['param9', 'param10'],
-        'rtdTransactionsFile': ['param11', 'param12']
-      }
 }
