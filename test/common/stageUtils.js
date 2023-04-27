@@ -17,7 +17,7 @@ export function setStages(tempVus, stageNumber) {
     return arr;
 }
 export function setScenarios(vus, maxVus, startTime, maxDuration, oneScenario) {
-    if (oneScenario==false) {
+    if (oneScenario=='false') {
         if (maxVus == 0) {
             let scenarios = {}
             let counter = 0

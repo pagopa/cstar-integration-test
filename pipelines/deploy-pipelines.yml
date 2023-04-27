@@ -72,8 +72,8 @@ parameters:
     type: number
   - name: 'ONE_SCENARIO'
     displayName: 'Run one single perVuIterations scenario'
-    type: boolean
-    default: false
+    type: string
+    default: 'false'
   - name: 'STAGE_NUMBER_ENV'
     displayName: 'Stage number rampingArrivalRate'
     type: number
