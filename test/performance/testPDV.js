@@ -46,9 +46,9 @@ const random = (length = 8) => {
 
 export default function () {
 
-    var apiKey = `${__ENV.APIM_SK}`
-
   baseUrl = services[`${__ENV.TARGET_ENV}_pdv`].baseUrl
+  var apiKey = `${__ENV.APIM_SK}`
+
 
   var params = {
     headers: {
@@ -65,7 +65,10 @@ export default function () {
 
   var r = http.put(baseUrl, payload, params);
 
-  console.log(`Status ${r.status}`);
+  if(r.status != 200){
+    console.error('ERROR-> '+JSON.stringify(r))
+    return
+}
 
   check(r, {
     'status is 200': (r) => r.status === 200,
