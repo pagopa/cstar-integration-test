@@ -63,7 +63,7 @@ export default function () {
     }
 );
 
-  var r = http.put(url, payload, params);
+  var r = http.put(baseUrl, payload, params);
 
   console.log(`Status ${r.status}`);
 
