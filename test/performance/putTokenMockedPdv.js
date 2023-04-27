@@ -1,8 +1,8 @@
-import { group, sleep} from 'k6'
+import { group, sleep } from 'k6'
 import {
-     upsertToken,
-     upsertMockToken
-    } from '../common/api/pdv.js'
+    upsertToken,
+    upsertMockToken
+} from '../common/api/pdv.js'
 import { assert, statusOk, } from '../common/assertions.js'
 import { isEnvValid, DEV, UAT, PROD } from '../common/envs.js'
 import { getFCList } from '../common/utils.js'
@@ -16,7 +16,7 @@ import defaultHandleSummaryBuilder from '../common/handleSummaryBuilder.js'
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
 let baseUrl
-let cfList = new SharedArray('cfList', function() {
+let cfList = new SharedArray('cfList', function () {
     return getFCList()
 })
 
@@ -25,7 +25,7 @@ const services = JSON.parse(open('../../services/environments.json'))
 const customStages = setStages(__ENV.VUS_MAX_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
 
 const vuIterationsScenario = {
-    scenarios: setScenarios(__ENV.VIRTUAL_USERS_ENV, __ENV.VUS_MAX_ENV, __ENV.START_TIME_ENV, __ENV.DURATION_PER_VU_ITERATION),
+    scenarios: setScenarios(__ENV.VIRTUAL_USERS_ENV, __ENV.VUS_MAX_ENV, __ENV.START_TIME_ENV, __ENV.DURATION_PER_VU_ITERATION, JSON.parse(__ENV.ONE_SCENARIO)),
     thresholds: thresholds(__ENV.VUS_MAX_ENV)
 }
 
@@ -33,7 +33,7 @@ let customArrivalRate = {
     rampingArrivalRate: {
         executor: 'ramping-arrival-rate',
         timeUnit: '1s',
-        preAllocatedVUs:__ENV.VUS_MAX_ENV,
+        preAllocatedVUs: __ENV.VUS_MAX_ENV,
         maxVUs: __ENV.VUS_MAX_ENV,
         stages: customStages
     }
@@ -66,7 +66,7 @@ if (__ENV.SCENARIO_TYPE_ENV === 'perVuIterations') {
     typeScenario = vuIterationsScenario
 } else if (__ENV.SCENARIO_TYPE_ENV === 'rampingArrivalRate') {
     typeScenario = rampingArrivalRateScenario
-} else if (__ENV.SCENARIO_TYPE_ENV === 'constantArrivalRate'){
+} else if (__ENV.SCENARIO_TYPE_ENV === 'constantArrivalRate') {
     typeScenario = rampingConstantArrivalRateScenario
 } else {
     console.log(`Scenario ${__ENV.SCENARIO_TYPE_ENV} not found`)
@@ -94,7 +94,7 @@ function buildScenarios(options) {
     return scenarioBaseIndexes
 }
 
-function coalesce(o1, o2){
+function coalesce(o1, o2) {
     return o1 ? o1 : o2
 }
 
@@ -102,34 +102,34 @@ export default () => {
     //MOCK TOKEN
     const scenarioBaseIndex = buildScenarios(exec.test.options)
     const cfBaseIndex = coalesce(scenarioBaseIndex[scenario.name], 0)
-    let uniqueCF = cfList[cfBaseIndex+scenario.iterationInTest].FC
+    let uniqueCF = cfList[cfBaseIndex + scenario.iterationInTest].FC
 
     group('Should pdv put a cf', () => {
         group('Returns a token', () => {
 
-        const params= {
-            headers:  { 
-                'Content-Type' : 'application/json',
-                'Ocp-Apim-Trace': 'true',
-            },
-            body: {
-                "pii": uniqueCF,
+            const params = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Ocp-Apim-Trace': 'true',
+                },
+                body: {
+                    "pii": uniqueCF,
+                }
             }
-        }
 
-        let res = upsertMockToken(
-            baseUrl,
-            JSON.stringify(params.body),
-            params
-        )
+            let res = upsertMockToken(
+                baseUrl,
+                JSON.stringify(params.body),
+                params
+            )
 
-        if(res.status != 200){
-            console.error('ERROR-> '+JSON.stringify(res))
-            return
-        }
+            if (res.status != 200) {
+                console.error('ERROR-> ' + JSON.stringify(res))
+                return
+            }
 
-        assert(res,
-            [statusOk()])
+            assert(res,
+                [statusOk()])
         })
     })
     sleep(1)

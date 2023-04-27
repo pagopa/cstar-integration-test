@@ -1,16 +1,16 @@
 import { group, sleep } from 'k6'
 import {
-     putOnboardingCitizen,
-     putCheckPrerequisites,
-     getInitiative,
-     getStatus,
-     putSaveConsent
-    } from '../common/api/idpayOnboardingCitizen.js'
+    putOnboardingCitizen,
+    putCheckPrerequisites,
+    getInitiative,
+    getStatus,
+    putSaveConsent
+} from '../common/api/idpayOnboardingCitizen.js'
 import { loginFullUrl } from '../common/api/bpdIoLogin.js'
 import { assert, statusNoContent, statusAccepted, statusOk, bodyJsonSelectorValue } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT, PROD } from '../common/envs.js'
 import { getFCList } from '../common/utils.js'
-import { scenario, vu} from 'k6/execution'
+import { scenario, vu } from 'k6/execution'
 import exec from 'k6/execution'
 import { SharedArray } from 'k6/data'
 import { setStages, setScenarios, thresholds } from '../common/stageUtils.js';
@@ -21,14 +21,14 @@ const REGISTERED_ENVS = [DEV, UAT, PROD]
 const services = JSON.parse(open('../../services/environments.json'))
 let baseUrl
 let init
-let cfList = new SharedArray('cfList', function() {
+let cfList = new SharedArray('cfList', function () {
     return getFCList()
 })
 
 const customStages = setStages(__ENV.VUS_MAX_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
 
 const vuIterationsScenario = {
-    scenarios: setScenarios(__ENV.VIRTUAL_USERS_ENV, __ENV.VUS_MAX_ENV, __ENV.START_TIME_ENV, __ENV.DURATION_PER_VU_ITERATION),
+    scenarios: setScenarios(__ENV.VIRTUAL_USERS_ENV, __ENV.VUS_MAX_ENV, __ENV.START_TIME_ENV, __ENV.DURATION_PER_VU_ITERATION, JSON.parse(__ENV.ONE_SCENARIO)),
     thresholds: thresholds(__ENV.VUS_MAX_ENV)
 }
 
@@ -69,7 +69,7 @@ if (__ENV.SCENARIO_TYPE_ENV === 'perVuIterations') {
     typeScenario = vuIterationsScenario
 } else if (__ENV.SCENARIO_TYPE_ENV === 'rampingArrivalRate') {
     typeScenario = rampingArrivalRateScenario
-} else if (__ENV.SCENARIO_TYPE_ENV === 'constantArrivalRate'){
+} else if (__ENV.SCENARIO_TYPE_ENV === 'constantArrivalRate') {
     typeScenario = rampingConstantArrivalRateScenario
 } else {
     console.log(`Scenario ${__ENV.SCENARIO_TYPE_ENV} not found`)
@@ -113,7 +113,7 @@ function buildScenarios(options) {
     return scenarioBaseIndexes
 }
 
-function coalesce(o1, o2){
+function coalesce(o1, o2) {
     return o1 ? o1 : o2
 }
 
@@ -122,7 +122,7 @@ export default () => {
 
     const scenarioBaseIndex = buildScenarios(exec.test.options)
     const cfBaseIndex = coalesce(scenarioBaseIndex[scenario.name], 0)
-    let FC = cfList[cfBaseIndex+scenario.iterationInTest].FC
+    let FC = cfList[cfBaseIndex + scenario.iterationInTest].FC
 
     const cf = auth(FC)
 
@@ -133,116 +133,116 @@ export default () => {
         exec.test.abort()
     }
 
-    if (checked){
+    if (checked) {
         const serviceId = `${__ENV.SERVICE_ID}`
         const params = {
             headers: {
                 'Content-Type': 'application/json',
                 'Ocp-Apim-Trace': 'true'
-            } 
-        } 
+            }
+        }
         const res = getInitiative(
             baseUrl,
             cf,
             serviceId,
             params
         )
-            
-        if(res.status != 200){
-            console.error('GetInitiative -> '+JSON.stringify(res))
+
+        if (res.status != 200) {
+            console.error('GetInitiative -> ' + JSON.stringify(res))
             checked = false
             return
         }
         assert(res,
             [statusOk()])
-    
+
         const bodyObj = JSON.parse(res.body)
         init = bodyObj.initiativeId
     }
 
-     group('Should onboard Citizen', () => {
+    group('Should onboard Citizen', () => {
 
         group('When the inititive exists, put t&c', () => {
-            if(checked){
-            
-            const body = {
-                initiativeId: init
-            }  
+            if (checked) {
+
+                const body = {
+                    initiativeId: init
+                }
                 let res = putOnboardingCitizen(
                     baseUrl,
                     JSON.stringify(body),
                     cf
                 )
-                if(res.status != 204){
-                    console.error('PutOnboardingCitizen -> '+JSON.stringify(res))
+                if (res.status != 204) {
+                    console.error('PutOnboardingCitizen -> ' + JSON.stringify(res))
                     checked = false
                     return
                 }
                 assert(res, [statusNoContent()])
             }
-  
+
         })
         group('Check accepted status', () => {
-            if(checked){
-            const params = init
-            let res = getStatus(
+            if (checked) {
+                const params = init
+                let res = getStatus(
                     baseUrl,
                     cf,
                     params
                 )
-            if(res.status != 200){
-                console.error('GetStatus -> '+JSON.stringify(res))
-                checked = false
-                return
+                if (res.status != 200) {
+                    console.error('GetStatus -> ' + JSON.stringify(res))
+                    checked = false
+                    return
+                }
+                assert(res,
+                    [statusOk(),
+                    bodyJsonSelectorValue('status', 'ACCEPTED_TC')])
             }
-            assert(res,
-            [statusOk(),
-            bodyJsonSelectorValue('status', 'ACCEPTED_TC')])
-        }
-        
+
         })
 
         group('When the TC consent exists, check the prerequisites', () => {
-            if(checked){
-            const body = {
-                initiativeId: init
-            }
+            if (checked) {
+                const body = {
+                    initiativeId: init
+                }
                 let res = putCheckPrerequisites(
                     baseUrl,
                     JSON.stringify(body),
                     cf
                 )
-            if(res.status != 200){
-                console.error('PutCheckPrerequisites -> '+JSON.stringify(res))
-                checked = false
-                return
+                if (res.status != 200) {
+                    console.error('PutCheckPrerequisites -> ' + JSON.stringify(res))
+                    checked = false
+                    return
+                }
+
+                assert(res,
+                    [statusOk()])
             }
-            
-            assert(res,
-            [statusOk()])
-            }
-            
+
         })
 
         group('When the inititive and consents exist, save consent', () => {
-            if(checked){
-            const body = {
-                initiativeId: init,
-                pdndAccept: true,
-                selfDeclarationList: []
-            }
+            if (checked) {
+                const body = {
+                    initiativeId: init,
+                    pdndAccept: true,
+                    selfDeclarationList: []
+                }
                 let res = putSaveConsent(
                     baseUrl,
                     JSON.stringify(body),
                     cf
                 )
-            if(res.status != 202){
-                console.error('PutSaveConsent -> '+JSON.stringify(res))
-                checked = false
-            }
-            
-            assert(res,
-            [statusAccepted()])
+                if (res.status != 202) {
+                    console.error('PutSaveConsent -> ' + JSON.stringify(res))
+                    checked = false
+                }
+
+                assert(res,
+                    [statusAccepted()])
             }
         })
     })
