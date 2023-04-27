@@ -66,3 +66,14 @@ function getScenarios(counter, scenarios, actualVus, startTime, maxDuration){
       }
     
 }
+
+export function parameters(){
+      return {
+        'putTokenMockedPdv': ['param1', 'param2'],
+        'putTokenPdv': ['param3', 'param4'],
+        'idpayOnboardingAPI': ['param5', 'param6'],
+        'ioPutEnrollInstrumentIssuer': ['param7', 'param8'],
+        'ioPutEnrollIban': ['param9', 'param10'],
+        'rtdTransactionsFile': ['param11', 'param12']
+      }
+}
