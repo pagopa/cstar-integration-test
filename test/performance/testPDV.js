@@ -26,9 +26,10 @@ export const options = {
   },
 };
 
-const apiVersion = 'v1';
 const throttling = new Counter('throttling');
 const services = JSON.parse(open('../../services/environments.json'))
+let baseUrl
+
 const random = (length = 8) => {
     // Declare all characters
     let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
