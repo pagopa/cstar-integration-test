@@ -49,7 +49,7 @@ export function setScenarios(vus, maxVus, startTime, maxDuration) {
         }
     } else {
         let scenarios = {}
-        getScenarios(0, scenarios, actualVus, startTime, maxDuration)
+        getScenarios(0, scenarios, vus, startTime, maxDuration)
         return scenarios
     }
 }
