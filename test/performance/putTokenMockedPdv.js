@@ -26,7 +26,7 @@ const customStages = setStages(__ENV.VUS_MAX_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? _
 
 const vuIterationsScenario = {
     scenarios: setScenarios(__ENV.VIRTUAL_USERS_ENV, __ENV.VUS_MAX_ENV, __ENV.START_TIME_ENV, __ENV.DURATION_PER_VU_ITERATION, __ENV.ONE_SCENARIO),
-    thresholds: thresholds(__ENV.VUS_MAX_ENV)
+    thresholds: thresholds(__ENV.VUS_MAX_ENV, 1)
 }
 
 let customArrivalRate = {
@@ -41,7 +41,7 @@ let customArrivalRate = {
 // Scenario configuration for rampingArrivalRate
 let rampingArrivalRateScenario = {
     scenarios: customArrivalRate,
-    thresholds: thresholds(__ENV.VUS_MAX_ENV)
+    thresholds: thresholds(__ENV.VUS_MAX_ENV, 1)
 }
 
 let customConstantArrivalRate = {
@@ -50,7 +50,7 @@ let customConstantArrivalRate = {
         duration: `${__ENV.DURATION_PER_VU_ITERATION}s`,
         rate: __ENV.RATE,
         timeUnit: '1s',
-        preAllocatedVUs: __ENV.VUS_MAX_ENV,
+        preAllocatedVUs: Math.ceil(0.01 * __ENV.VUS_MAX_ENV),
         maxVUs: __ENV.VUS_MAX_ENV
     }
 }
@@ -58,7 +58,7 @@ let customConstantArrivalRate = {
 // Scenario configuration for constantArrivalRate
 let rampingConstantArrivalRateScenario = {
     scenarios: customConstantArrivalRate,
-    thresholds: thresholds(__ENV.VUS_MAX_ENV)
+    thresholds: thresholds(__ENV.VUS_MAX_ENV, 1)
 }
 
 let typeScenario

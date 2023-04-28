@@ -75,20 +75,20 @@ parameters:
     displayName: 'Run one single perVuIterations scenario'
     type: string
     default: 'false'
-  - name: 'STAGE_NUMBER_ENV'
-    displayName: 'Stage number rampingArrivalRate'
-    type: number
-    default: 10
   - name: 'START_TIME_ENV'
-    displayName: 'Start time (number)'
+    displayName: 'Start time for perVuIterations'
     type: number
     default: 0
   - name: 'DURATION_PER_VU_ITERATION'
-    displayName: 'Maximum duration in seconds for the perVuIterations-type scenario Esempio: 10'
+    displayName: 'Duration in seconds for perVuIterations e constantArrivalRate Esempio: 10'
     type: number
     default: 10
   - name: 'RATE'
-    displayName: 'Rate of iterations per timeUnit(default 1s)'
+    displayName: 'Rate of iterations per timeUnit(default 1s) for constantArrivalRate'
+    type: number
+    default: 10
+  - name: 'STAGE_NUMBER_ENV'
+    displayName: 'Stage number rampingArrivalRate'
     type: number
     default: 10
   - name: 'SERVICE_ID'
