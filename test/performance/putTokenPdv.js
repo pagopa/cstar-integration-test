@@ -25,7 +25,7 @@ const services = JSON.parse(open('../../services/environments.json'))
 const customStages = setStages(__ENV.VUS_MAX_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? __ENV.STAGE_NUMBER_ENV : 3)
 
 const vuIterationsScenario = {
-    scenarios: setScenarios(__ENV.VIRTUAL_USERS_ENV, __ENV.VUS_MAX_ENV, __ENV.START_TIME_ENV, __ENV.DURATION_PER_VU_ITERATION, __ENV.ONE_SCENARIO),
+    scenarios: setScenarios(__ENV.VIRTUAL_USERS_ENV, __ENV.VUS_MAX_ENV, __ENV.START_TIME_ENV, __ENV.DURATION_PER_VU_ITERATION, JSON.parse(__ENV.ONE_SCENARIO)),
     thresholds: thresholds(__ENV.VUS_MAX_ENV, 1)
 }
 
