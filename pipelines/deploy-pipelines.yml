@@ -73,7 +73,7 @@ parameters:
     type: number
   - name: 'ONE_SCENARIO'
     displayName: 'Run one single perVuIterations scenario'
-    type: boolean
+    type: string
     default: 'false'
   - name: 'START_TIME_ENV'
     displayName: 'Start time for perVuIterations'
