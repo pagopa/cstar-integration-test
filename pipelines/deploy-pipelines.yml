@@ -49,6 +49,7 @@ parameters:
       - ioPutEnrollInstrumentIssuer
       - ioPutEnrollIban
       - rtdTransactionsFile
+      - testPDV
   - name: 'TARGET_ENV'
     displayName: 'Target Environment'
     type: string
@@ -63,22 +64,31 @@ parameters:
     values:
       - 'rampingArrivalRate'
       - 'perVuIterations'
+      - 'constantArrivalRate'
   - name: 'VIRTUAL_USERS_ENV'
-    displayName: 'Number of virtual users'
+    displayName: 'Number of fiscal Code'
     type: number
-  - name: 'STAGE_NUMBER_ENV'
-    displayName: 'Stage number rampingArrivalRate'
-    type: number
-    default: 10
   - name: 'VUS_MAX_ENV'
-    displayName: 'Maximum number of virtual users for scenario perVuIterations (1 - 300)'
+    displayName: 'Maximum number of virtual users'
     type: number
+  - name: 'ONE_SCENARIO'
+    displayName: 'Run one single perVuIterations scenario'
+    type: string
+    default: 'false'
   - name: 'START_TIME_ENV'
-    displayName: 'Start time (number)'
+    displayName: 'Start time for perVuIterations'
     type: number
     default: 0
   - name: 'DURATION_PER_VU_ITERATION'
-    displayName: 'Maximum duration in seconds for the perVuIterations-type scenario Esempio: 10'
+    displayName: 'Duration in seconds for perVuIterations e constantArrivalRate Esempio: 10'
+    type: number
+    default: 10
+  - name: 'RATE'
+    displayName: 'Rate of iterations per timeUnit(default 1s) for constantArrivalRate'
+    type: number
+    default: 10
+  - name: 'STAGE_NUMBER_ENV'
+    displayName: 'Stage number rampingArrivalRate'
     type: number
     default: 10
   - name: 'SERVICE_ID'
@@ -182,10 +192,25 @@ jobs:
             -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
             -e START_TIME_ENV=${{ parameters.START_TIME_ENV }} \
             -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
+            -e RATE=${{ parameters.RATE }} \
+            -e ONE_SCENARIO=${{ parameters.ONE_SCENARIO }} \
             grafana/k6:latest \
             run /app/test/performance/putTokenMockedPdv.js
         displayName: Run k6 putTokenMockedPdv.js
         condition: eq('${{parameters.SCRIPT }}', 'putTokenMockedPdv')
+        timeoutInMinutes: 0
+      - script: |
+          docker run -i \
+            --user $UID \
+            -v $(pwd):/app \
+            --workdir "/app" \
+            -e RESULTS_DIR=/app \
+            -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
+            -e APIM_SK=$(pdvApiKey) \
+            grafana/k6:latest \
+            run /app/test/performance/testPDV.js
+        displayName: Run k6 testPDV.js
+        condition: eq('${{parameters.SCRIPT }}', 'testPDV')
         timeoutInMinutes: 0
       - script: |
           docker run -i \
@@ -200,6 +225,8 @@ jobs:
             -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
             -e START_TIME_ENV=${{ parameters.START_TIME_ENV }} \
             -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
+            -e RATE=${{ parameters.RATE }} \
+            -e ONE_SCENARIO=${{ parameters.ONE_SCENARIO }} \
             -e APIM_SK=$(pdvApiKey) \
             grafana/k6:latest \
             run /app/test/performance/putTokenPdv.js
@@ -219,6 +246,8 @@ jobs:
             -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
             -e START_TIME_ENV=${{ parameters.START_TIME_ENV }} \
             -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
+            -e RATE=${{ parameters.RATE }} \
+            -e ONE_SCENARIO=${{ parameters.ONE_SCENARIO }} \
             -e APIM_SK=$(apimSK) \
             -e SERVICE_ID=${{ parameters.SERVICE_ID }} \
             grafana/k6:latest \
@@ -239,6 +268,8 @@ jobs:
             -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
             -e START_TIME_ENV=${{ parameters.START_TIME_ENV }} \
             -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
+            -e RATE=${{ parameters.RATE }} \
+            -e ONE_SCENARIO=${{ parameters.ONE_SCENARIO }} \
             -e APIM_SK=$(issuerSK) \
             -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
             grafana/k6:latest \
@@ -260,6 +291,8 @@ jobs:
             -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
             -e START_TIME_ENV=${{ parameters.START_TIME_ENV }} \
             -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
+            -e RATE=${{ parameters.RATE }} \
+            -e ONE_SCENARIO=${{ parameters.ONE_SCENARIO }} \
             -e APIM_SK=$(apimSK) \
             -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
             grafana/k6:latest \
