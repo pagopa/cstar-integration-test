@@ -13,8 +13,11 @@ import dotenv from 'k6/x/dotenv'
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
 const services = JSON.parse(open('../../services/environments.json'))
+const BLOB_WRONG_NAME = 'foo.bar.pgp'
+const BLOB_PREFIX_WITH_PATH = 'foo/bar/CSTAR.K6000.TRNLOG'
 const BLOB_PREFIX = 'CSTAR.K6000.TRNLOG.'
-const BLOB_SUFFIX = '.001.csv.pgp'
+const BLOB_SUFFIX = '.001.01.csv.pgp'
+const BLOB_WRONG_SUFFIX = '.csv'
 export let options = {}
 let params = {}
 let baseUrl
@@ -58,7 +61,10 @@ export default () => {
         .replace(':', '')
         .replace(':', '')
         .substring(0, 15)
-    const blob = BLOB_PREFIX + blobDateTimePart + BLOB_SUFFIX
+    const blobCorrect = BLOB_PREFIX + blobDateTimePart + BLOB_SUFFIX
+    const blobNameWithPath = BLOB_PREFIX_WITH_PATH + blobDateTimePart + BLOB_SUFFIX
+    const blobWrongNaming = BLOB_WRONG_NAME + blobDateTimePart + BLOB_SUFFIX
+    const blobWrongSuffix = BLOB_PREFIX + blobDateTimePart + BLOB_WRONG_SUFFIX
 
     group('Storage API', () => {
         group('Should upload file via PUT', () =>
@@ -67,7 +73,46 @@ export default () => {
                     baseUrl,
                     params,
                     myEnv.RTD_STORAGE_CONTAINER,
-                    blob,
+                    blobCorrect,
+                    payload,
+                    myEnv.RTD_STORAGE_SAS
+                ),
+                [statusCreated()]
+            )
+        ),
+        group('Should fail upload file via PUT for wrong naming', () =>
+            assert(
+                putBlob(
+                    baseUrl,
+                    params,
+                    myEnv.RTD_STORAGE_CONTAINER,
+                    blobWrongNaming,
+                    payload,
+                    myEnv.RTD_STORAGE_SAS
+                ),
+                [statusCreated()]
+            )
+        ),
+        group('Should fail upload file via PUT for path included in naming', () =>
+            assert(
+                putBlob(
+                    baseUrl,
+                    params,
+                    myEnv.RTD_STORAGE_CONTAINER,
+                    blobNameWithPath,
+                    payload,
+                    myEnv.RTD_STORAGE_SAS
+                ),
+                [statusCreated()]
+            )
+        ),
+        group('Should fail upload file via PUT for wrong suffix', () =>
+            assert(
+                putBlob(
+                    baseUrl,
+                    params,
+                    myEnv.RTD_STORAGE_CONTAINER,
+                    blobWrongSuffix,
                     payload,
                     myEnv.RTD_STORAGE_SAS
                 ),
