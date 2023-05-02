@@ -14,8 +14,8 @@ const REGISTERED_ENVS = [DEV, UAT, PROD]
 
 const services = JSON.parse(open('../../services/environments.json'))
 const BLOB_WRONG_NAME = 'foo.bar.pgp'
-const BLOB_PREFIX_WITH_PATH = 'foo/bar/CSTAR.K6000.TRNLOG'
-const BLOB_PREFIX = 'CSTAR.K6000.TRNLOG.'
+const BLOB_PREFIX_WITH_PATH = 'foo/bar/CSTAR.12345.TRNLOG.'
+const BLOB_PREFIX = 'CSTAR.12345.TRNLOG.'
 const BLOB_SUFFIX = '.001.01.csv.pgp'
 const BLOB_WRONG_SUFFIX = '.csv'
 export let options = {}
