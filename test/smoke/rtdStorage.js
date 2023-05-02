@@ -1,6 +1,6 @@
 import { group } from 'k6'
 import { putBlob } from '../common/api/rtdStorage.js'
-import { assert, statusCreated } from '../common/assertions.js'
+import { assert, statusCreated, statusBadFormat } from '../common/assertions.js'
 import {
     isEnvValid,
     isTestEnabledOnEnv,
@@ -90,7 +90,7 @@ export default () => {
                     payload,
                     myEnv.RTD_STORAGE_SAS
                 ),
-                [statusCreated()]
+                [statusBadFormat()]
             )
         ),
         group('Should fail upload file via PUT for path included in naming', () =>
@@ -103,7 +103,7 @@ export default () => {
                     payload,
                     myEnv.RTD_STORAGE_SAS
                 ),
-                [statusCreated()]
+                [statusBadFormat()]
             )
         ),
         group('Should fail upload file via PUT for wrong suffix', () =>
@@ -116,7 +116,7 @@ export default () => {
                     payload,
                     myEnv.RTD_STORAGE_SAS
                 ),
-                [statusCreated()]
+                [statusBadFormat()]
             )
         )
     })
