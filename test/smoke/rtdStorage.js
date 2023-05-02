@@ -17,7 +17,7 @@ const BLOB_WRONG_NAME = 'foo.bar.pgp'
 const BLOB_PREFIX_WITH_PATH = 'foo/bar/CSTAR.12345.TRNLOG.'
 const BLOB_PREFIX = 'CSTAR.12345.TRNLOG.'
 const BLOB_SUFFIX = '.001.01.csv.pgp'
-const BLOB_WRONG_SUFFIX = '.csv'
+const BLOB_WRONG_FORMAT = '.csv'
 export let options = {}
 let params = {}
 let baseUrl
@@ -63,8 +63,8 @@ export default () => {
         .substring(0, 15)
     const blobCorrect = BLOB_PREFIX + blobDateTimePart + BLOB_SUFFIX
     const blobNameWithPath = BLOB_PREFIX_WITH_PATH + blobDateTimePart + BLOB_SUFFIX
-    const blobWrongNaming = BLOB_WRONG_NAME + blobDateTimePart + BLOB_SUFFIX
-    const blobWrongSuffix = BLOB_PREFIX + blobDateTimePart + BLOB_WRONG_SUFFIX
+    const blobWrongNaming = BLOB_WRONG_NAME
+    const blobWrongSuffix = BLOB_PREFIX + blobDateTimePart + BLOB_WRONG_FORMAT
 
     group('Storage API', () => {
         group('Should upload file via PUT', () =>
