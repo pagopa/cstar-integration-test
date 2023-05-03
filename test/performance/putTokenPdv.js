@@ -73,7 +73,11 @@ if (__ENV.SCENARIO_TYPE_ENV === 'perVuIterations') {
     console.log(`Scenario ${__ENV.SCENARIO_TYPE_ENV} not found`)
 }
 
+console.log(`Running scenario ${__ENV.SCENARIO_TYPE_ENV}`);
+
+
 export let options = typeScenario
+console.log(`option: \n`, JSON.stringify(options));
 
 if (isEnvValid(__ENV.TARGET_ENV)) {
     baseUrl = services[`${__ENV.TARGET_ENV}_pdv`].baseUrl
