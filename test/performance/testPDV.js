@@ -67,7 +67,7 @@ export default function () {
 
   if(r.status != 200){
     console.error('ERROR-> '+JSON.stringify(r))
-    return
+    // return
 }
 
   check(r, {
