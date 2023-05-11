@@ -148,13 +148,13 @@ export default () => {
             params
         )
 
+        assert(res, [statusOk()])
+
         if (res.status != 200) {
             console.error('GetInitiative -> ' + JSON.stringify(res))
             checked = false
             return
         }
-        assert(res,
-            [statusOk()])
 
         const bodyObj = JSON.parse(res.body)
         init = bodyObj.initiativeId
@@ -173,12 +173,12 @@ export default () => {
                     JSON.stringify(body),
                     cf
                 )
+                assert(res, [statusNoContent()])
                 if (res.status != 204) {
                     console.error('PutOnboardingCitizen -> ' + JSON.stringify(res))
                     checked = false
                     return
                 }
-                assert(res, [statusNoContent()])
             }
 
         })
@@ -190,14 +190,16 @@ export default () => {
                     cf,
                     params
                 )
+
+                assert(res,
+                    [statusOk(),
+                    bodyJsonSelectorValue('status', 'ACCEPTED_TC')])
+
                 if (res.status != 200) {
                     console.error('GetStatus -> ' + JSON.stringify(res))
                     checked = false
                     return
                 }
-                assert(res,
-                    [statusOk(),
-                    bodyJsonSelectorValue('status', 'ACCEPTED_TC')])
             }
 
         })
@@ -212,14 +214,14 @@ export default () => {
                     JSON.stringify(body),
                     cf
                 )
+
+                assert(res, [statusOk()])
+
                 if (res.status != 200) {
                     console.error('PutCheckPrerequisites -> ' + JSON.stringify(res))
                     checked = false
                     return
                 }
-
-                assert(res,
-                    [statusOk()])
             }
 
         })
@@ -236,13 +238,13 @@ export default () => {
                     JSON.stringify(body),
                     cf
                 )
+
+                assert(res, [statusAccepted()])
+
                 if (res.status != 202) {
                     console.error('PutSaveConsent -> ' + JSON.stringify(res))
                     checked = false
                 }
-
-                assert(res,
-                    [statusAccepted()])
             }
         })
     })
