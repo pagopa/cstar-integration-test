@@ -182,7 +182,7 @@ export default () => {
             }
 
         })
-        /* group('Check accepted status', () => {
+        group('Check accepted status', () => {
             if (checked) {
                 const params = init
                 let res = getStatus(
@@ -246,7 +246,7 @@ export default () => {
                     checked = false
                 }
             }
-        })*/
+        })
     }) 
     sleep(1)
 }
