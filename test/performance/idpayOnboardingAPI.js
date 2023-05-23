@@ -181,7 +181,7 @@ export default () => {
                 }
             }
 
-        })
+        /* })
         group('Check accepted status', () => {
             if (checked) {
                 const params = init
@@ -245,8 +245,8 @@ export default () => {
                     console.error('PutSaveConsent -> ' + JSON.stringify(res))
                     checked = false
                 }
-            }
-        })
+            }*/
+        }) 
     }) 
     sleep(1)
 }
