@@ -5,7 +5,7 @@ six
 certifi
 charset-normalizer
 click
-cryptography
+cryptography=40.0.2
 idna
 mypy-extensions
 numpy
