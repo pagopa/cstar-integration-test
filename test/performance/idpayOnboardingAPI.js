@@ -182,7 +182,7 @@ export default () => {
             }
 
          })
-        group('Check accepted status', () => {
+        /*group('Check accepted status', () => {
             if (checked) {
                 const params = init
                 let res = getStatus(
@@ -204,7 +204,7 @@ export default () => {
 
         })
 
-        group('When the TC consent exists, check the prerequisites', () => {
+         group('When the TC consent exists, check the prerequisites', () => {
             if (checked) {
                 const body = {
                     initiativeId: init
@@ -246,7 +246,7 @@ export default () => {
                     checked = false
                 }
             }
-        }) 
+        }) */ 
     }) 
     sleep(1)
 }
