@@ -133,7 +133,7 @@ export default () => {
         exec.test.abort()
     }
 
-    if (checked) {
+    /*if (checked) {
         const serviceId = `${__ENV.SERVICE_ID}`
         const params = {
             headers: {
@@ -141,7 +141,7 @@ export default () => {
                 'Ocp-Apim-Trace': 'true'
             }
         }
-        const res = getInitiative(
+        const res = getInitiative( //-e SERVICE_ID=${{ parameters.SERVICE_ID }} \
             baseUrl,
             cf,
             serviceId,
@@ -158,7 +158,7 @@ export default () => {
 
         const bodyObj = JSON.parse(res.body)
         init = bodyObj.initiativeId
-    }
+    }*/
 
     group('Should onboard Citizen', () => {
 
@@ -166,7 +166,7 @@ export default () => {
             if (checked) {
 
                 const body = {
-                    initiativeId: init
+                    initiativeId: `${__ENV.INITIATIVE_ID}`
                 }
                 let res = putOnboardingCitizen(
                     baseUrl,
