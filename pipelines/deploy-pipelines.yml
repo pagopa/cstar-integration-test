@@ -249,7 +249,7 @@ jobs:
             -e RATE=${{ parameters.RATE }} \
             -e ONE_SCENARIO=${{ parameters.ONE_SCENARIO }} \
             -e APIM_SK=$(apimSK) \
-            -e SERVICE_ID=${{ parameters.SERVICE_ID }} \
+            -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
             grafana/k6:latest \
             run /app/test/performance/idpayOnboardingAPI.js
         displayName: Run k6 idpayOnboardingAPI.js
