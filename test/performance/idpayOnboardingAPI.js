@@ -132,8 +132,7 @@ export default () => {
     ) {
         exec.test.abort()
     }
-
-    if (checked) {
+    /*if (checked) {
         const serviceId = `${__ENV.SERVICE_ID}`
         const params = {
             headers: {
@@ -141,24 +140,21 @@ export default () => {
                 'Ocp-Apim-Trace': 'true'
             }
         }
-        const res = getInitiative(
+        const res = getInitiative( //-e SERVICE_ID=${{ parameters.SERVICE_ID }} \
             baseUrl,
             cf,
             serviceId,
             params
         )
-
+        assert(res, [statusOk()])
         if (res.status != 200) {
             console.error('GetInitiative -> ' + JSON.stringify(res))
             checked = false
             return
         }
-        assert(res,
-            [statusOk()])
-
         const bodyObj = JSON.parse(res.body)
         init = bodyObj.initiativeId
-    }
+    }*/
 
     group('Should onboard Citizen', () => {
 
@@ -166,60 +162,62 @@ export default () => {
             if (checked) {
 
                 const body = {
-                    initiativeId: init
+                    initiativeId: `${__ENV.INITIATIVE_ID}`
                 }
                 let res = putOnboardingCitizen(
                     baseUrl,
                     JSON.stringify(body),
                     cf
                 )
+                assert(res, [statusNoContent()])
                 if (res.status != 204) {
                     console.error('PutOnboardingCitizen -> ' + JSON.stringify(res))
                     checked = false
                     return
                 }
-                assert(res, [statusNoContent()])
             }
 
-        })
+         })
         group('Check accepted status', () => {
             if (checked) {
-                const params = init
+                const params = `${__ENV.INITIATIVE_ID}`
                 let res = getStatus(
                     baseUrl,
                     cf,
                     params
                 )
+
+                assert(res,
+                    [statusOk(),
+                    bodyJsonSelectorValue('status', 'ACCEPTED_TC')])
+
                 if (res.status != 200) {
                     console.error('GetStatus -> ' + JSON.stringify(res))
                     checked = false
                     return
                 }
-                assert(res,
-                    [statusOk(),
-                    bodyJsonSelectorValue('status', 'ACCEPTED_TC')])
             }
 
         })
 
-        group('When the TC consent exists, check the prerequisites', () => {
+         group('When the TC consent exists, check the prerequisites', () => {
             if (checked) {
                 const body = {
-                    initiativeId: init
+                    initiativeId: `${__ENV.INITIATIVE_ID}`
                 }
                 let res = putCheckPrerequisites(
                     baseUrl,
                     JSON.stringify(body),
                     cf
                 )
+
+                assert(res, [statusOk()])
+
                 if (res.status != 200) {
                     console.error('PutCheckPrerequisites -> ' + JSON.stringify(res))
                     checked = false
                     return
                 }
-
-                assert(res,
-                    [statusOk()])
             }
 
         })
@@ -227,7 +225,7 @@ export default () => {
         group('When the inititive and consents exist, save consent', () => {
             if (checked) {
                 const body = {
-                    initiativeId: init,
+                    initiativeId: `${__ENV.INITIATIVE_ID}`,
                     pdndAccept: true,
                     selfDeclarationList: []
                 }
@@ -236,13 +234,13 @@ export default () => {
                     JSON.stringify(body),
                     cf
                 )
+
+                assert(res, [statusAccepted()])
+
                 if (res.status != 202) {
                     console.error('PutSaveConsent -> ' + JSON.stringify(res))
                     checked = false
                 }
-
-                assert(res,
-                    [statusAccepted()])
             }
         })
     })
