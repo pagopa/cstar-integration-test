@@ -91,14 +91,10 @@ parameters:
     displayName: 'Stage number rampingArrivalRate'
     type: number
     default: 10
-  - name: 'SERVICE_ID'
-    displayName: 'ServiceId (required for idpayOnboardingAPI script)'
-    type: string
-    default: 'IGNORE_IF_NOT_idpayOnboardingAPI'
   - name: 'INITIATIVE_ID'
-    displayName: 'InitiativeId (required for ioPutEnrollInstrumentIssuer and ioPutEnrollIban script)'
+    displayName: 'InitiativeId'
     type: string
-    default: 'IGNORE_IF_NOT_ioPutEnrollInstrumentIssuer_and_ioPutEnrollIban'
+    default: 'IGNORE_IF_NOT_idpayOnboardingAPI_and_ioPutEnrollInstrumentIssuer_and_ioPutEnrollIban'
   - name: 'TRX_FOR_VU'
     displayName: 'Number of transaction for VUs'
     type: number
