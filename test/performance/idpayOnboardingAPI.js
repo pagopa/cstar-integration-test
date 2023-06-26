@@ -182,9 +182,9 @@ export default () => {
             }
 
          })
-        /*group('Check accepted status', () => {
+        group('Check accepted status', () => {
             if (checked) {
-                const params = init
+                const params = `${__ENV.INITIATIVE_ID}`
                 let res = getStatus(
                     baseUrl,
                     cf,
@@ -207,7 +207,7 @@ export default () => {
          group('When the TC consent exists, check the prerequisites', () => {
             if (checked) {
                 const body = {
-                    initiativeId: init
+                    initiativeId: `${__ENV.INITIATIVE_ID}`
                 }
                 let res = putCheckPrerequisites(
                     baseUrl,
@@ -229,7 +229,7 @@ export default () => {
         group('When the inititive and consents exist, save consent', () => {
             if (checked) {
                 const body = {
-                    initiativeId: init,
+                    initiativeId: `${__ENV.INITIATIVE_ID}`,
                     pdndAccept: true,
                     selfDeclarationList: []
                 }
@@ -246,7 +246,7 @@ export default () => {
                     checked = false
                 }
             }
-        }) */
+        }) 
     }) 
     sleep(1)
 }
