@@ -1,4 +1,8 @@
 import { group, sleep } from 'k6'
+import { createTransaction,
+    preAuth,
+    authTrx
+} from '../common/api/idPayPaymentDiscount.js'
 import { loginFullUrl } from '../common/api/bpdIoLogin.js'
 import { assert, statusCreated, statusOk} from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT, PROD } from '../common/envs.js'
@@ -8,10 +12,6 @@ import exec from 'k6/execution'
 import { SharedArray } from 'k6/data'
 import { setStages, setScenarios, thresholds } from '../common/stageUtils.js';
 import defaultHandleSummaryBuilder from '../common/handleSummaryBuilder.js'
-import { createTransaction,
-          preAuth,
-          authTrx
-} from '../common/api/idPayPaymentDiscount.js'
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
@@ -142,7 +142,7 @@ export default () => {
                     "merchantFiscalCode" :  `MERCHANTFISCALCODE${Math.random()}`,
                     "vat" : `VAT${Math.random()}`,
                     "idTrxIssuer" : `IDTRXISSUER${Math.random()}`,
-                    "trxDate" : Date.now,
+                    "trxDate" : Date.now(),
                     "amountCents" : "100",
                     "mcc" : `MCC${Math.random}`
 

@@ -8,7 +8,7 @@ export function createTransaction(baseUrl, body, headers){
         {headers : headers}
     )
 
-    __Env.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
     return res
 }
 

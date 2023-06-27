@@ -20,7 +20,6 @@ const REGISTERED_ENVS = [DEV, UAT, PROD]
 
 const services = JSON.parse(open('../../services/environments.json'))
 let baseUrl
-let init
 let cfList = new SharedArray('cfList', function () {
     return getFCList()
 })
