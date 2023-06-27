@@ -104,10 +104,6 @@ parameters:
     displayName: 'merchantId'
     type: string
     default: 'IGNORE_IF_NOT_idPayPaymentDiscountAPI'
-  - name: 'TRX_CODE'
-    displayName: 'trxCode'
-    type: string
-    default: 'IGNORE_IF_NOT_idPayPaymentDiscountAPI'
   - name: 'TRX_FOR_VU'
     displayName: 'Number of transaction for VUs'
     type: number
@@ -282,7 +278,6 @@ jobs:
             -e APIM_SK=$(acquirerApiKey) \
             -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
             -e MERCHANT_ID=${{ parameters.MERCHANT_ID }} \
-            -e TRX_CODE=${{ parameters.TRX_CODE }} \
             grafana/k6:latest \
             run /app/test/performance/ioPutEnrollInstrumentIssuer.js
           displayName: Run k6 idPayPaymentDiscountAPI.js

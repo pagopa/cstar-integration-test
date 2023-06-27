@@ -17,6 +17,7 @@ const REGISTERED_ENVS = [DEV, UAT, PROD]
 
 const services = JSON.parse(open('../../services/environments.json'))
 let baseUrl
+let trxCode
 let cfList = new SharedArray('cfList', function () {
     return getFCList()
 })
@@ -124,8 +125,6 @@ export default () => {
         exec.test.abort()
     }
 
-
-    group ('Create Transaction', () => {
         if (checked) {
 
             const params = {
@@ -161,8 +160,10 @@ export default () => {
                 checked = false
                 return
             }
+
+            const bodyObj = JSON.parse(res.body)
+            trxCode = bodyObj.id
         }
-    })
     sleep(60)
     group ('Pre Auth Transaction', () => {
         if (checked) {
@@ -170,7 +171,7 @@ export default () => {
             let res = preAuth(
                 baseUrl, 
                 cf, 
-                `${__ENV.TRX_CODE}`
+                trxCode
             )
 
             assert(res, [statusOk()])
@@ -188,7 +189,7 @@ export default () => {
             let res = authTrx(
                 baseUrl, 
                 cf, 
-                `${__ENV.TRX_CODE}`
+                trxCode
             )
 
             assert(res, [statusOk()])
