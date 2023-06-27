@@ -139,10 +139,7 @@ export default () => {
                 },
                 body: {
                     "initiativeId" : `${__ENV.INITIATIVE_ID}`,
-                    "merchantFiscalCode" :  `MERCHANTFISCALCODE${Math.random()}`,
-                    "vat" : `VAT${Math.random()}`,
-                    "idTrxIssuer" : `IDTRXISSUER${Math.random()}`,
-                    "trxDate" : Date.now(),
+                    "idTrxAcquirer" : `IDTRXACQUIRER${Math.random()}`,
                     "amountCents" : "100",
                     "mcc" : `MCC${Math.random}`
 
@@ -157,7 +154,7 @@ export default () => {
 
             assert(res, [statusCreated()])
             if (res.status != 201) {
-                console.error('Auth -> ' + JSON.stringify(res))
+                console.error('Create Trx -> ' + JSON.stringify(res))
                 checked = false
                 return
             }
