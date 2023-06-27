@@ -112,6 +112,7 @@ function coalesce(o1, o2) {
 }
 
 export default () => {
+    let checked = true
     const scenarioBaseIndex = buildScenarios(exec.test.options)
     const cfBaseIndex = coalesce(scenarioBaseIndex[scenario.name], 0)
     let FC = cfList[cfBaseIndex + scenario.iterationInTest].FC
