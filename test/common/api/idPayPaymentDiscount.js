@@ -11,3 +11,23 @@ export function createTransaction(baseUrl, body, headers){
     __Env.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
     return res
 }
+
+export function preAuth(baseUrl, params, trxCode) {
+    const myParams = Object.assign({}, params)
+    const res = http.put(
+        `${baseUrl}${API_PREFIX}/${trxCode}/relate-user`,
+        myParams
+    )
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
+    return res
+}
+
+export function authTrx(baseUrl, params, trxCode) {
+    const myParams = Object.assign({}, params)
+    const res = http.put(
+        `${baseUrl}${API_PREFIX}/${trxCode}/authorize`,
+        myParams
+    )
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
+    return res
+}

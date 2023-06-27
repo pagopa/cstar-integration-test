@@ -1,14 +1,17 @@
 import { group, sleep } from 'k6'
 import { loginFullUrl } from '../common/api/bpdIoLogin.js'
-import { assert, statusNoContent, statusAccepted, statusOk, bodyJsonSelectorValue } from '../common/assertions.js'
+import { assert, statusCreated, statusOk} from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT, PROD } from '../common/envs.js'
 import { getFCList } from '../common/utils.js'
-import { scenario, vu } from 'k6/execution'
+import { scenario } from 'k6/execution'
 import exec from 'k6/execution'
 import { SharedArray } from 'k6/data'
 import { setStages, setScenarios, thresholds } from '../common/stageUtils.js';
 import defaultHandleSummaryBuilder from '../common/handleSummaryBuilder.js'
-import { createTransaction } from '../common/api/idPayPaymentDiscount.js'
+import { createTransaction,
+          preAuth,
+          authTrx
+} from '../common/api/idPayPaymentDiscount.js'
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
@@ -125,18 +128,17 @@ export default () => {
     group ('Create Transaction', () => {
         if (checked) {
 
-            let initiativeId = `${__ENV.INITIATIVE_ID}`
             const params = {
                 headers: {
                     'Content-Type': 'application/json',
                     'Ocp-Apim-Subscription-Key': `${__ENV.APIM_SK}`,
                     'Ocp-Apim-Trace': 'true',
-                    'x-merchant-id' : `MERCHANTID${Math.random()}`,
+                    'x-merchant-id' : `${__ENV.MERCHANT_ID}`,
                     'x-acquirer-id' : 'PAGOPA',
                     'x-apim-request-id' : 'Test k6'
                 },
                 body: {
-                    "initiativeId" : initiativeId,
+                    "initiativeId" : `${__ENV.INITIATIVE_ID}`,
                     "merchantFiscalCode" :  `MERCHANTFISCALCODE${Math.random()}`,
                     "vat" : `VAT${Math.random()}`,
                     "idTrxIssuer" : `IDTRXISSUER${Math.random()}`,
@@ -152,6 +154,49 @@ export default () => {
                 JSON.stringify(params.body),
                 params.headers
             )
+
+            assert(res, [statusCreated()])
+            if (res.status != 201) {
+                console.error('Auth -> ' + JSON.stringify(res))
+                checked = false
+                return
+            }
+        }
+    })
+    sleep(60)
+    group ('Pre Auth Transaction', () => {
+        if (checked) {
+
+            let res = preAuth(
+                baseUrl, 
+                cf, 
+                `${__ENV.TRX_CODE}`
+            )
+
+            assert(res, [statusOk()])
+            if (res.status != 200) {
+                console.error('preAuth -> ' + JSON.stringify(res))
+                checked = false
+                return
+            }
+        }
+    })
+    sleep(60)
+    group ('Auth Transaction', () => {
+        if (checked) {
+
+            let res = authTrx(
+                baseUrl, 
+                cf, 
+                `${__ENV.TRX_CODE}`
+            )
+
+            assert(res, [statusOk()])
+            if (res.status != 200) {
+                console.error('Auth -> ' + JSON.stringify(res))
+                checked = false
+                return
+            }
         }
     })
 }
