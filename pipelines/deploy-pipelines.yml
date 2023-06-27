@@ -280,9 +280,9 @@ jobs:
             -e MERCHANT_ID=${{ parameters.MERCHANT_ID }} \
             grafana/k6:latest \
             run /app/test/performance/idPayPaymentDiscountAPI.js
-          displayName: Run k6 idPayPaymentDiscountAPI.js
-          condition: in('${{parameters.SCRIPT }}', 'idPayPaymentDiscountAPI', 'rtdTransactionsFile') 
-          timeoutInMinutes: 0
+        displayName: Run k6 idPayPaymentDiscountAPI.js
+        condition: in('${{parameters.SCRIPT }}', 'idPayPaymentDiscountAPI', 'rtdTransactionsFile')
+        timeoutInMinutes: 0
       - script: |
           docker run -i \
             --user $UID \
