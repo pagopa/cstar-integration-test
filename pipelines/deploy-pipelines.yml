@@ -279,7 +279,7 @@ jobs:
             -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
             -e MERCHANT_ID=${{ parameters.MERCHANT_ID }} \
             grafana/k6:latest \
-            run /app/test/performance/ioPutEnrollInstrumentIssuer.js
+            run /app/test/performance/idPayPaymentDiscountAPI.js
           displayName: Run k6 idPayPaymentDiscountAPI.js
           condition: in('${{parameters.SCRIPT }}', 'idPayPaymentDiscountAPI', 'rtdTransactionsFile') 
           timeoutInMinutes: 0
