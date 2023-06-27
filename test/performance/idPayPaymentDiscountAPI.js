@@ -1,11 +1,4 @@
 import { group, sleep } from 'k6'
-import {
-    putOnboardingCitizen,
-    putCheckPrerequisites,
-    getInitiative,
-    getStatus,
-    putSaveConsent
-} from '../common/api/idpayOnboardingCitizen.js'
 import { loginFullUrl } from '../common/api/bpdIoLogin.js'
 import { assert, statusNoContent, statusAccepted, statusOk, bodyJsonSelectorValue } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT, PROD } from '../common/envs.js'
@@ -15,12 +8,12 @@ import exec from 'k6/execution'
 import { SharedArray } from 'k6/data'
 import { setStages, setScenarios, thresholds } from '../common/stageUtils.js';
 import defaultHandleSummaryBuilder from '../common/handleSummaryBuilder.js'
+import { createTransaction } from '../common/api/idPayPaymentDiscount.js'
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 
 const services = JSON.parse(open('../../services/environments.json'))
 let baseUrl
-let init
 let cfList = new SharedArray('cfList', function () {
     return getFCList()
 })
@@ -138,9 +131,9 @@ export default () => {
                     'Content-Type': 'application/json',
                     'Ocp-Apim-Subscription-Key': `${__ENV.APIM_SK}`,
                     'Ocp-Apim-Trace': 'true',
-                    'x-merchant-id' : '',
+                    'x-merchant-id' : `MERCHANTID${Math.random()}`,
                     'x-acquirer-id' : 'PAGOPA',
-                    'x-apim-request-id' : ''
+                    'x-apim-request-id' : 'Test k6'
                 },
                 body: {
                     "initiativeId" : initiativeId,
@@ -153,6 +146,16 @@ export default () => {
 
                 }
             }
+
+            let res = createTransaction(
+                baseUrl,
+                JSON.stringify(params.body),
+                params.headers
+            )
         }
     })
 }
+
+export const handleSummary = defaultHandleSummaryBuilder(
+    'idpayPaymentDiscountAPI', customStages
+)
