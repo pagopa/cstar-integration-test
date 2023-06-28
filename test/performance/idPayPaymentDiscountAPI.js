@@ -168,8 +168,8 @@ export default () => {
 
             let res = preAuth(
                 baseUrl, 
-                cf.headers, 
-                trxCode
+                trxCode,
+                cf.headers
             )
 
             assert(res, [statusOk()])
@@ -185,8 +185,8 @@ export default () => {
 
             let res = authTrx(
                 baseUrl, 
-                cf.headers, 
-                trxCode
+                trxCode,
+                cf.headers
             )
 
             assert(res, [statusOk()])
