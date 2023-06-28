@@ -165,10 +165,17 @@ export default () => {
     })
     group ('Pre Auth Transaction', () => {
         if (checked) {
+            const params = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': cf,
+                    'Ocp-Apim-Trace': 'true'
+                }
+            }
 
             let res = preAuth(
                 baseUrl, 
-                cf, 
+                params.headers, 
                 trxCode
             )
 
@@ -182,10 +189,17 @@ export default () => {
     })
     group ('Auth Transaction', () => {
         if (checked) {
+            const params = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': cf,
+                    'Ocp-Apim-Trace': 'true'
+                }
+            }
 
             let res = authTrx(
                 baseUrl, 
-                cf, 
+                params.headers, 
                 trxCode
             )
 
