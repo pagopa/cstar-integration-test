@@ -139,9 +139,9 @@ export default () => {
                 },
                 body: {
                     "initiativeId" : `${__ENV.INITIATIVE_ID}`,
-                    "idTrxAcquirer" : `IDTRXACQUIRER${Math.random()}`,
+                    "idTrxAcquirer" : `IDTRXACQUIRER${Math.floor(Math.random()*(100-10+10)+1)}`,
                     "amountCents" : "100",
-                    "mcc" : `MCC${Math.random()}`
+                    "mcc" : `MCC${Math.floor(Math.random()*(100-10+10)+1)}`
 
                 }
             }
