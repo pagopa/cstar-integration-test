@@ -160,7 +160,7 @@ export default () => {
             }
 
             const bodyObj = JSON.parse(res.body)
-            trxCode = bodyObj.id
+            trxCode = bodyObj.trxCode
         }
     })
     group ('Pre Auth Transaction', () => {
