@@ -56,8 +56,13 @@ export function setScenarios(vus, maxVus, startTime, maxDuration, oneScenario) {
 
 export function thresholds(virtualUsers, count) {
     return {
+        checks: [
+            {
+                threshold: 'rate==1', // pass all checks
+                abortOnFail: false,
+                delayAbortEval: '10s',
+            },],
         http_req_failed: [{ threshold: 'rate<0.05', abortOnFail: false, delayAbortEval: '10s' },],
-        http_reqs: [{ threshold: `count<=${parseInt(virtualUsers) * count}`, abortOnFail: false, delayAbortEval: '10s' },]
     }
 }
 
