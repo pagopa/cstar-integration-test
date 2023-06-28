@@ -12,7 +12,7 @@ export function createTransaction(baseUrl, body, headers){
     return res
 }
 
-export function preAuth(baseUrl, headers, trxCode) {
+export function preAuth(baseUrl, params, trxCode) {
     const myParams = Object.assign({}, params)
     const res = http.put(
         `${baseUrl}${API_PREFIX}/${trxCode}/relate-user`,
