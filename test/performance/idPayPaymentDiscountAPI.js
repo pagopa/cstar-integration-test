@@ -168,7 +168,7 @@ export default () => {
 
             let res = preAuth(
                 baseUrl, 
-                cf, 
+                cf.headers, 
                 trxCode
             )
 
@@ -185,7 +185,7 @@ export default () => {
 
             let res = authTrx(
                 baseUrl, 
-                cf, 
+                cf.headers, 
                 trxCode
             )
 
