@@ -117,7 +117,7 @@ export default () => {
     const cfBaseIndex = coalesce(scenarioBaseIndex[scenario.name], 0)
     let FC = cfList[cfBaseIndex + scenario.iterationInTest].FC
 
-    const headers = auth(FC)
+    const cf = auth(FC)
 
     if (
         !isEnvValid(__ENV.TARGET_ENV) ||
@@ -163,16 +163,14 @@ export default () => {
             trxCode = bodyObj.trxCode
         }
     })
-    const params = {
-        headers
-    }
+    
     group ('Pre Auth Transaction', () => {
         if (checked) {
 
             let res = preAuth(
                 baseUrl, 
                 trxCode,
-                params.headers
+                cf
             )
 
             assert(res, [statusOk()])
@@ -189,7 +187,7 @@ export default () => {
             let res = authTrx(
                 baseUrl, 
                 trxCode,
-                params.headers
+                cf
             )
 
             assert(res, [statusOk()])

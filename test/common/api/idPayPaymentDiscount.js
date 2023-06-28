@@ -15,6 +15,7 @@ export function createTransaction(baseUrl, body, headers){
 export function preAuth(baseUrl, trxCode, headers) {
     const res = http.put(
         `${baseUrl}${API_PREFIX}/${trxCode}/relate-user`,
+        null,
         {headers : headers}
     )
     __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
@@ -24,6 +25,7 @@ export function preAuth(baseUrl, trxCode, headers) {
 export function authTrx(baseUrl,trxCode, headers) {
     const res = http.put(
         `${baseUrl}${API_PREFIX}/${trxCode}/authorize`,
+        null,
         {headers : headers}
     )
     __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
