@@ -85,8 +85,7 @@ function auth(fiscalCode) {
         headers: {
             Authorization: `Bearer ${authToken}`,
             'Content-Type': 'application/json',
-            'Ocp-Apim-Subscription-Key': `${__ENV.APIM_SK}`,
-            'Ocp-Apim-Trace': 'true'
+            'Ocp-Apim-Subscription-Key': `${__ENV.APIM_SK}`
         },
     }
 }
