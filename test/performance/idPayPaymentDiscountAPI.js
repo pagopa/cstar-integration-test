@@ -19,9 +19,6 @@ const REGISTERED_ENVS = [DEV, UAT, PROD]
 const services = JSON.parse(open('../../services/environments.json'))
 let baseUrl
 let trxCode
-const createTrxCounter = new Counter('Create Trx')
-const preAuthTrxCounter = new Counter('Pre-Auth Trx')
-const authTrxCounter = new Counter('Auth Trx')
 let cfList = new SharedArray('cfList', function () {
     return getFCList()
 })
@@ -163,7 +160,6 @@ export default () => {
 
             const bodyObj = JSON.parse(res.body)
             trxCode = bodyObj.trxCode
-            createTrxCounter.add(1)
         }
     })
     
@@ -182,7 +178,6 @@ export default () => {
                 checked = false
                 return
             }
-            preAuthTrxCounter.add(1)
         }
     })
     group ('Auth Transaction', () => {
@@ -200,17 +195,11 @@ export default () => {
                 checked = false
                 return
             }
-            authTrxCounter.add(1)
         }
     })
 }
 
-/* export const handleSummary = defaultHandleSummaryBuilder(
+export const handleSummary = defaultHandleSummaryBuilder(
     'idpayPaymentDiscountAPI', customStages
   
-) */
-export function handleSummary(data){
-    console.log(`Create Transaction Requests: ${createTrxCounter.value()}`)
-    console.log(`Pre Auth Transaction Requests: ${preAuthTrxCounter.value()}`)
-    console.log(`Auth Transaction Requests: ${authTrxCounter.value()}`)
-  }
+)
