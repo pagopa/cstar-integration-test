@@ -125,7 +125,7 @@ export default () => {
     ) {
         exec.test.abort()
     }
-    group ('Pre Auth Transaction', () => {
+    group ('Create Transaction', () => {
         if (checked) {
 
             const params = {
