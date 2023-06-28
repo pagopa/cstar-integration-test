@@ -141,7 +141,7 @@ export default () => {
                     "initiativeId" : `${__ENV.INITIATIVE_ID}`,
                     "idTrxAcquirer" : `IDTRXACQUIRER${Math.random()}`,
                     "amountCents" : "100",
-                    "mcc" : `MCC${Math.random}`
+                    "mcc" : `MCC${Math.random()}`
 
                 }
             }
@@ -165,17 +165,10 @@ export default () => {
     })
     group ('Pre Auth Transaction', () => {
         if (checked) {
-            const params = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': cf,
-                    'Ocp-Apim-Trace': 'true'
-                }
-            }
 
             let res = preAuth(
                 baseUrl, 
-                params.headers, 
+                cf, 
                 trxCode
             )
 
@@ -189,17 +182,10 @@ export default () => {
     })
     group ('Auth Transaction', () => {
         if (checked) {
-            const params = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': cf,
-                    'Ocp-Apim-Trace': 'true'
-                }
-            }
 
             let res = authTrx(
                 baseUrl, 
-                params.headers, 
+                cf, 
                 trxCode
             )
 
