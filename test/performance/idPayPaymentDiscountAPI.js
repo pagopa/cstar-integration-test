@@ -163,13 +163,16 @@ export default () => {
             trxCode = bodyObj.trxCode
         }
     })
+    const params = {
+        cf
+    }
     group ('Pre Auth Transaction', () => {
         if (checked) {
 
             let res = preAuth(
                 baseUrl, 
                 trxCode,
-                cf.headers
+                params
             )
 
             assert(res, [statusOk()])
@@ -186,7 +189,7 @@ export default () => {
             let res = authTrx(
                 baseUrl, 
                 trxCode,
-                cf.headers
+                params
             )
 
             assert(res, [statusOk()])
