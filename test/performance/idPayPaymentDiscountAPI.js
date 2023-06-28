@@ -26,7 +26,7 @@ const customStages = setStages(__ENV.VUS_MAX_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? _
 
 const vuIterationsScenario = {
     scenarios: setScenarios(__ENV.VIRTUAL_USERS_ENV, __ENV.VUS_MAX_ENV, __ENV.START_TIME_ENV, __ENV.DURATION_PER_VU_ITERATION, __ENV.ONE_SCENARIO),
-    thresholds: thresholds(__ENV.VUS_MAX_ENV, 6)
+    thresholds: thresholds(__ENV.VUS_MAX_ENV, 4)
 }
 let customArrivalRate = {
     rampingArrivalRate: {
@@ -40,7 +40,7 @@ let customArrivalRate = {
 // Scenario configuration for rampingArrivalRate
 let rampingArrivalRateScenario = {
     scenarios: customArrivalRate,
-    thresholds: thresholds(__ENV.VUS_MAX_ENV, 6)
+    thresholds: thresholds(__ENV.VUS_MAX_ENV, 4)
 }
 let customConstantArrivalRate = {
     constantArrivalRate: {
@@ -56,7 +56,7 @@ let customConstantArrivalRate = {
 // Scenario configuration for constantArrivalRate
 let rampingConstantArrivalRateScenario = {
     scenarios: customConstantArrivalRate,
-    thresholds: thresholds(__ENV.VUS_MAX_ENV, 6)
+    thresholds: thresholds(__ENV.VUS_MAX_ENV, 4)
 }
 
 let typeScenario
@@ -125,7 +125,7 @@ export default () => {
     ) {
         exec.test.abort()
     }
-
+    group ('Pre Auth Transaction', () => {
         if (checked) {
 
             const params = {
@@ -162,7 +162,7 @@ export default () => {
             const bodyObj = JSON.parse(res.body)
             trxCode = bodyObj.id
         }
-    sleep(60)
+    })
     group ('Pre Auth Transaction', () => {
         if (checked) {
 
@@ -180,7 +180,6 @@ export default () => {
             }
         }
     })
-    sleep(60)
     group ('Auth Transaction', () => {
         if (checked) {
 
