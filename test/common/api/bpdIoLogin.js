@@ -22,9 +22,23 @@ export function loginFullUrl(url, fiscalCode) {
 export function loginWithApiKey(baseUrl, rtdMockApiKey, fiscalCode) {
     const myUrl = new URL(`${baseUrl}/rtd/mock-io/login`)
     myUrl.searchParams.append('fiscalCode', fiscalCode)
-    const res = http.post(myUrl.toString(), {
-      headers: { 'Ocp-Apim-Subscription-Key': `${__ENV.APIM_MOCK_IO_SK}` }
+    const res = http.post(myUrl.toString(), null, {
+      headers: { 'Ocp-Apim-Subscription-Key': rtdMockApiKey }
     })
     __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
-    return res.body
+    return res
+}
+
+export function getMockedIoToken(baseUrl, rtdMockApiKey, fiscalCode) {
+    return loginWithApiKey(baseUrl, rtdMockApiKey, fiscalCode).body
+}
+
+export function getUser(baseUrl, rtdMockApiKey, token) {
+    const myUrl = new URL(`${baseUrl}/rtd/mock-io/user`)
+    myUrl.searchParams.append('token', token)
+    const res = http.get(myUrl.toString(), {
+      headers: { 'Ocp-Apim-Subscription-Key': rtdMockApiKey }
+    })
+    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
+    return res
 }
