@@ -6,7 +6,7 @@ import {
      getStatus,
      putSaveConsent
     } from '../common/api/idpayOnboardingCitizen.js'
-import { getMockedIoToken } from '../common/api/bpdIoLogin.js'
+import { loginFullUrl } from '../common/api/bpdIoLogin.js'
 import { assert, statusNoContent, statusAccepted, statusOk, bodyJsonSelectorValue } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT, PROD } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
@@ -32,9 +32,8 @@ if (isEnvValid(__ENV.TARGET_ENV)){
 
 
 function auth(fiscalCode) {
-    const authToken = getMockedIoToken(
-        baseUrl,
-        myEnv.APIM_MOCK_IO_SK,
+    const authToken = loginFullUrl(
+        `${baseUrl}/bpd/pagopa/api/v1/login`,
         fiscalCode
     )
     return {
