@@ -28,6 +28,8 @@ variables:
       value: $(issuer_sk_dev)
     - name: pdvApiKey
       value: $(pdv_apikey_dev)
+    - name: acquirerApiKey
+      value: $(acquirer_apikey_dev)
   - ${{ else }}:
     - name: rtdSK
       value: $(rtd_sk_uat)
@@ -37,6 +39,8 @@ variables:
       value: $(issuer_sk_uat)
     - name: pdvApiKey
       value: $(pdv_apikey_uat)
+    - name: acquirerApiKey
+      value: $(acquirer_apikey_uat)
 
 parameters:
   - name: 'SCRIPT'
@@ -46,6 +50,7 @@ parameters:
       - putTokenMockedPdv
       - putTokenPdv
       - idpayOnboardingAPI
+      - idPayPaymentDiscountAPI
       - ioPutEnrollInstrumentIssuer
       - ioPutEnrollIban
       - rtdTransactionsFile
@@ -95,6 +100,10 @@ parameters:
     displayName: 'InitiativeId'
     type: string
     default: 'IGNORE_IF_NOT_idpayOnboardingAPI_and_ioPutEnrollInstrumentIssuer_and_ioPutEnrollIban'
+  - name: 'MERCHANT_ID'
+    displayName: 'merchantId'
+    type: string
+    default: 'IGNORE_IF_NOT_idPayPaymentDiscountAPI'
   - name: 'TRX_FOR_VU'
     displayName: 'Number of transaction for VUs'
     type: number
@@ -249,7 +258,30 @@ jobs:
             grafana/k6:latest \
             run /app/test/performance/idpayOnboardingAPI.js
         displayName: Run k6 idpayOnboardingAPI.js
-        condition: in('${{parameters.SCRIPT }}', 'idpayOnboardingAPI', 'ioPutEnrollInstrumentIssuer', 'ioPutEnrollIban', 'rtdTransactionsFile') 
+        condition: in('${{parameters.SCRIPT }}', 'idpayOnboardingAPI', 'idPayPaymentDiscountAPI', 'ioPutEnrollInstrumentIssuer', 'ioPutEnrollIban', 'rtdTransactionsFile')
+        timeoutInMinutes: 0
+      - script: |
+          docker run -i \
+            --user $UID \
+            -v $(pwd):/app \
+            --workdir "/app" \
+            -e RESULTS_DIR=/app \
+            -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
+            -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
+            -e VIRTUAL_USERS_ENV=${{ parameters.VIRTUAL_USERS_ENV }} \
+            -e STAGE_NUMBER_ENV=${{ parameters.STAGE_NUMBER_ENV }} \
+            -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
+            -e START_TIME_ENV=${{ parameters.START_TIME_ENV }} \
+            -e DURATION_PER_VU_ITERATION=${{ parameters.DURATION_PER_VU_ITERATION }} \
+            -e RATE=${{ parameters.RATE }} \
+            -e ONE_SCENARIO=${{ parameters.ONE_SCENARIO }} \
+            -e APIM_SK=$(acquirerApiKey) \
+            -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
+            -e MERCHANT_ID=${{ parameters.MERCHANT_ID }} \
+            grafana/k6:latest \
+            run /app/test/performance/idPayPaymentDiscountAPI.js
+        displayName: Run k6 idPayPaymentDiscountAPI.js
+        condition: in('${{parameters.SCRIPT }}', 'idPayPaymentDiscountAPI', 'rtdTransactionsFile')
         timeoutInMinutes: 0
       - script: |
           docker run -i \

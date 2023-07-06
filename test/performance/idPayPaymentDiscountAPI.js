@@ -1,16 +1,14 @@
 import { group, sleep } from 'k6'
-import {
-    putOnboardingCitizen,
-    putCheckPrerequisites,
-    getInitiative,
-    getStatus,
-    putSaveConsent
-} from '../common/api/idpayOnboardingCitizen.js'
+import { Counter } from 'k6/metrics';
+import { createTransaction,
+    preAuth,
+    authTrx
+} from '../common/api/idPayPaymentDiscount.js'
 import { loginFullUrl } from '../common/api/bpdIoLogin.js'
-import { assert, statusNoContent, statusAccepted, statusOk, bodyJsonSelectorValue } from '../common/assertions.js'
+import { assert, statusCreated, statusOk} from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, DEV, UAT, PROD } from '../common/envs.js'
 import { getFCList } from '../common/utils.js'
-import { scenario, vu } from 'k6/execution'
+import { scenario } from 'k6/execution'
 import exec from 'k6/execution'
 import { SharedArray } from 'k6/data'
 import { setStages, setScenarios, thresholds } from '../common/stageUtils.js';
@@ -20,6 +18,7 @@ const REGISTERED_ENVS = [DEV, UAT, PROD]
 
 const services = JSON.parse(open('../../services/environments.json'))
 let baseUrl
+let trxCode
 let cfList = new SharedArray('cfList', function () {
     return getFCList()
 })
@@ -28,9 +27,8 @@ const customStages = setStages(__ENV.VUS_MAX_ENV, __ENV.STAGE_NUMBER_ENV > 3 ? _
 
 const vuIterationsScenario = {
     scenarios: setScenarios(__ENV.VIRTUAL_USERS_ENV, __ENV.VUS_MAX_ENV, __ENV.START_TIME_ENV, __ENV.DURATION_PER_VU_ITERATION, __ENV.ONE_SCENARIO),
-    thresholds: thresholds(__ENV.VUS_MAX_ENV, 6)
+    thresholds: thresholds(__ENV.VUS_MAX_ENV, 4)
 }
-
 let customArrivalRate = {
     rampingArrivalRate: {
         executor: 'ramping-arrival-rate',
@@ -43,9 +41,8 @@ let customArrivalRate = {
 // Scenario configuration for rampingArrivalRate
 let rampingArrivalRateScenario = {
     scenarios: customArrivalRate,
-    thresholds: thresholds(__ENV.VUS_MAX_ENV, 6)
+    thresholds: thresholds(__ENV.VUS_MAX_ENV, 4)
 }
-
 let customConstantArrivalRate = {
     constantArrivalRate: {
         executor: 'constant-arrival-rate',
@@ -60,7 +57,7 @@ let customConstantArrivalRate = {
 // Scenario configuration for constantArrivalRate
 let rampingConstantArrivalRateScenario = {
     scenarios: customConstantArrivalRate,
-    thresholds: thresholds(__ENV.VUS_MAX_ENV, 6)
+    thresholds: thresholds(__ENV.VUS_MAX_ENV, 4)
 }
 
 let typeScenario
@@ -80,7 +77,6 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
     baseUrl = services[`${__ENV.TARGET_ENV}_io`].baseUrl
 }
 
-
 function auth(fiscalCode) {
     const authToken = loginFullUrl(
         `${baseUrl}/bpd/pagopa/api/v1/login`,
@@ -89,9 +85,7 @@ function auth(fiscalCode) {
     return {
         headers: {
             Authorization: `Bearer ${authToken}`,
-            'Content-Type': 'application/json',
-            'Ocp-Apim-Subscription-Key': `${__ENV.APIM_SK}`,
-            'Ocp-Apim-Trace': 'true'
+            'Content-Type': 'application/json'
         },
     }
 }
@@ -118,7 +112,6 @@ function coalesce(o1, o2) {
 
 export default () => {
     let checked = true
-
     const scenarioBaseIndex = buildScenarios(exec.test.options)
     const cfBaseIndex = coalesce(scenarioBaseIndex[scenario.name], 0)
     let FC = cfList[cfBaseIndex + scenario.iterationInTest].FC
@@ -131,99 +124,82 @@ export default () => {
     ) {
         exec.test.abort()
     }
+    group ('Create Transaction', () => {
+        if (checked) {
 
-    group('Should onboard Citizen', () => {
+            const params = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Ocp-Apim-Subscription-Key': `${__ENV.APIM_SK}`,
+                    'Ocp-Apim-Trace': 'true',
+                    'x-merchant-id' : `${__ENV.MERCHANT_ID}`,
+                    'x-acquirer-id' : 'PAGOPA',
+                    'x-apim-request-id' : 'Test k6'
+                },
+                body: {
+                    "initiativeId" : `${__ENV.INITIATIVE_ID}`,
+                    "idTrxAcquirer" : `IDTRXACQUIRER${Math.floor(Math.random()*(100-10+10)+1)}`,
+                    "amountCents" : "100",
+                    "mcc" : `MCC${Math.floor(Math.random()*(100-10+10)+1)}`
 
-        group('When the inititive exists, put t&c', () => {
-            if (checked) {
-
-                const body = {
-                    initiativeId: `${__ENV.INITIATIVE_ID}`
-                }
-                let res = putOnboardingCitizen(
-                    baseUrl,
-                    JSON.stringify(body),
-                    cf
-                )
-                assert(res, [statusNoContent()])
-                if (res.status != 204) {
-                    console.error('PutOnboardingCitizen -> ' + JSON.stringify(res))
-                    checked = false
-                    return
-                }
-            }
-
-         })
-        group('Check accepted status', () => {
-            if (checked) {
-                const params = `${__ENV.INITIATIVE_ID}`
-                let res = getStatus(
-                    baseUrl,
-                    cf,
-                    params
-                )
-
-                assert(res,
-                    [statusOk(),
-                    bodyJsonSelectorValue('status', 'ACCEPTED_TC')])
-
-                if (res.status != 200) {
-                    console.error('GetStatus -> ' + JSON.stringify(res))
-                    checked = false
-                    return
                 }
             }
 
-        })
+            let res = createTransaction(
+                baseUrl,
+                JSON.stringify(params.body),
+                params.headers
+            )
 
-         group('When the TC consent exists, check the prerequisites', () => {
-            if (checked) {
-                const body = {
-                    initiativeId: `${__ENV.INITIATIVE_ID}`
-                }
-                let res = putCheckPrerequisites(
-                    baseUrl,
-                    JSON.stringify(body),
-                    cf
-                )
-
-                assert(res, [statusOk()])
-
-                if (res.status != 200) {
-                    console.error('PutCheckPrerequisites -> ' + JSON.stringify(res))
-                    checked = false
-                    return
-                }
+            assert(res, [statusCreated()])
+            if (res.status != 201) {
+                console.error('Create Trx -> ' + JSON.stringify(res))
+                checked = false
+                return
             }
 
-        })
-
-        group('When the inititive and consents exist, save consent', () => {
-            if (checked) {
-                const body = {
-                    initiativeId: `${__ENV.INITIATIVE_ID}`,
-                    pdndAccept: true,
-                    selfDeclarationList: []
-                }
-                let res = putSaveConsent(
-                    baseUrl,
-                    JSON.stringify(body),
-                    cf
-                )
-
-                assert(res, [statusAccepted()])
-
-                if (res.status != 202) {
-                    console.error('PutSaveConsent -> ' + JSON.stringify(res))
-                    checked = false
-                }
-            }
-        })
+            const bodyObj = JSON.parse(res.body)
+            trxCode = bodyObj.trxCode
+        }
     })
-    sleep(1)
+    
+    group ('Pre Auth Transaction', () => {
+        if (checked) {
+
+            let res = preAuth(
+                baseUrl, 
+                trxCode,
+                cf.headers
+            )
+
+            assert(res, [statusOk()])
+            if (res.status != 200) {
+                console.error('preAuth -> ' + JSON.stringify(res))
+                checked = false
+                return
+            }
+        }
+    })
+    group ('Auth Transaction', () => {
+        if (checked) {
+
+            let res = authTrx(
+                baseUrl, 
+                trxCode,
+                cf.headers
+            )
+
+            assert(res, [statusOk()])
+            if (res.status != 200) {
+                console.error('Auth -> ' + JSON.stringify(res))
+                checked = false
+                return
+            }
+        }
+    })
 }
 
 export const handleSummary = defaultHandleSummaryBuilder(
-    'idpayOnboardingAPI', customStages
+    'idpayPaymentDiscountAPI', customStages
+  
 )
-
