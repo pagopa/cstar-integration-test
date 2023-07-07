@@ -33,6 +33,7 @@ export const handleSummary = defaultHandleSummaryBuilder(application, testName)
 
 export default () => {
     let checked = true
+    let trxCode
 
     const cf = getScenarioTestEntity(cfList).FC
     const citizenParams = { headers: buildIOAuthorizationHeader(cf) }
