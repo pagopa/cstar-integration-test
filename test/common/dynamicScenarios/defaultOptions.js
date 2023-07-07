@@ -11,9 +11,9 @@ function applyTags(options, tags) {
 export const defaultApiOptions = {
     scenarios: buildScenarios(),
     thresholds: buildThresholds(
-        CONFIG.THRESHOLDS.API.AVG,
-        CONFIG.THRESHOLDS.API.P90,
-        CONFIG.THRESHOLDS.API.P95
+        CONFIG.THRESHOLDS.AVG,
+        CONFIG.THRESHOLDS.P90,
+        CONFIG.THRESHOLDS.P95
     ),
 }
 
