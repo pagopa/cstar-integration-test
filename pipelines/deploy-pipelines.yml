@@ -227,7 +227,7 @@ jobs:
                 docker pull grafana/k6:latest
             displayName: Pull k6 image
 
-          - ${{ each k6Test in variables.k6Test_idPayPaymentDiscountAPI }}:
+          - ${{ each k6Test in variables['k6Test_idPayPaymentDiscountAPI'] }}:
                 - script: |
                       docker run -i \
                         --user $UID \
