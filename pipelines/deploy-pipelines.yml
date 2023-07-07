@@ -107,7 +107,7 @@ parameters:
       type: number
       default: 1
 
-    - name: 'SCENARIO_CONSTANT_RATE_ENV'
+    - name: 'SCENARIO_CONSTANT_RATE_ENV' # TODO use VU_MAX?
       displayName: '[constantArrivalRate] Rate of iterations per timeUnit (when 1s it will represent the TPS)'
       type: number
       default: 10

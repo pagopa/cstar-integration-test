@@ -3,13 +3,14 @@ import { assert, statusOk } from '../../common/assertions.js'
 import { DEV, UAT, PROD, getBaseUrl } from '../../common/envs.js'
 import defaultHandleSummaryBuilder from '../../common/handleSummaryBuilder.js'
 import { putEnrollIbanIssuer } from '../../common/api/idpay/idPayWallet.js'
-import { getFCIbanList, getScenarioTestEntity } from '../../common/utils.js'
+import { getFCIbanList } from '../../common/utils.js'
 import { SharedArray } from 'k6/data'
 import {
     IDPAY_CONFIG,
     idpayDefaultHeaders,
 } from '../../common/idpay/envVars.js'
 import { defaultApiOptionsBuilder } from '../../common/dynamicScenarios/defaultOptions.js'
+import { getScenarioTestEntity } from '../../common/dynamicScenarios/utils.js'
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 const baseUrl = getBaseUrl(REGISTERED_ENVS, 'io')

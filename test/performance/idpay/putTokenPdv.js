@@ -2,11 +2,12 @@ import { group, sleep } from 'k6'
 import { upsertToken } from '../../common/api/pdv.js'
 import { assert, statusOk } from '../../common/assertions.js'
 import { DEV, UAT, PROD } from '../../common/envs.js'
-import { getFCList, getScenarioTestEntity } from '../../common/utils.js'
+import { getFCList } from '../../common/utils.js'
 import { SharedArray } from 'k6/data'
 import defaultHandleSummaryBuilder from '../../common/handleSummaryBuilder.js'
 import { idpayDefaultHeaders } from '../../common/idpay/envVars.js'
 import { defaultApiOptionsBuilder } from '../../common/dynamicScenarios/defaultOptions.js'
+import { getScenarioTestEntity } from '../../common/dynamicScenarios/utils.js'
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 const baseUrl = getBaseUrl(REGISTERED_ENVS, 'pdv')

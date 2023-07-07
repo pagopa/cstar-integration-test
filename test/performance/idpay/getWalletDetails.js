@@ -3,7 +3,7 @@ import { assert, statusOk } from '../../common/assertions.js'
 import { DEV, getBaseUrl } from '../../common/envs.js'
 
 import { getWalletDetail } from '../../common/api/idpay/idPayWallet.js'
-import { getFCPanList, getScenarioTestEntity } from '../../common/utils.js'
+import { getFCPanList } from '../../common/utils.js'
 import { SharedArray } from 'k6/data'
 import {
     IDPAY_CONFIG,
@@ -12,6 +12,7 @@ import {
 } from '../../common/idpay/envVars.js'
 import defaultHandleSummaryBuilder from '../../common/handleSummaryBuilder.js'
 import { defaultApiOptionsBuilder } from '../../common/dynamicScenarios/defaultOptions.js'
+import { getScenarioTestEntity } from '../../common/dynamicScenarios/utils.js'
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 const baseUrl = getBaseUrl(REGISTERED_ENVS, 'io')

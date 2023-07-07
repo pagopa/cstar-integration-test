@@ -1,3 +1,6 @@
+import { CONFIG } from './dynamicScenarios/envVars.js'
+import { abort } from './utils.js'
+
 export const DEV = 'dev'
 export const UAT = 'uat'
 export const PROD = 'prod'
@@ -16,12 +19,12 @@ export function isTestEnabledOnEnv(env, registeredEnvs) {
 
 export function getBaseUrl(operationAvailableEnvs, system) {
     if (
-        !isEnvValid(__ENV.TARGET_ENV) ||
-        !isTestEnabledOnEnv(__ENV.TARGET_ENV, operationAvailableEnvs)
+        !isEnvValid(CONFIG.TARGET_ENV) ||
+        !isTestEnabledOnEnv(CONFIG.TARGET_ENV, operationAvailableEnvs)
     ) {
         abort('Environment selected not allowed for the test')
         return null
     } else {
-        return services[`${__ENV.TARGET_ENV}_${system}`].baseUrl
+        return SERVICES[`${CONFIG.TARGET_ENV}_${system}`].baseUrl
     }
 }

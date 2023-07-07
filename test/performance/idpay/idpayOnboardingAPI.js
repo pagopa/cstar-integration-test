@@ -13,7 +13,7 @@ import {
     bodyJsonSelectorValue,
 } from '../../common/assertions.js'
 import { DEV, UAT, PROD, getBaseUrl } from '../../common/envs.js'
-import { getFCList, getScenarioTestEntity } from '../../common/utils.js'
+import { getFCList } from '../../common/utils.js'
 import { SharedArray } from 'k6/data'
 import defaultHandleSummaryBuilder from '../../common/handleSummaryBuilder.js'
 import { defaultApiOptionsBuilder } from '../../common/dynamicScenarios/defaultOptions.js'
@@ -21,6 +21,7 @@ import {
     IDPAY_CONFIG,
     buildIOAuthorizationHeader,
 } from '../../common/idpay/envVars.js'
+import { getScenarioTestEntity } from '../../common/dynamicScenarios/utils.js'
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 const baseUrl = getBaseUrl(REGISTERED_ENVS, 'io')

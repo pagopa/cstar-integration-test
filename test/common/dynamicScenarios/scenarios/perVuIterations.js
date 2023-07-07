@@ -1,6 +1,6 @@
 import { randomIntBetween } from 'https://jslib.k6.io/k6-utils/1.4.0/index.js'
 import { CONFIG } from '../envVars.js'
-import { testEntitiesBasedScenarioPrefix } from '../../utils.js'
+import { testEntitiesBasedScenarioPrefix } from '../utils.js'
 
 const scenarios = {}
 
@@ -11,18 +11,18 @@ if (CONFIG.SCENARIOS.perVuIterations.ONESHOT) {
 
     do {
         //random vus with a maximum number of vus
-        let randomVus = Math.min(
+        const randomVus = Math.min(
             availableEntitiesData,
             randomIntBetween(1, CONFIG.VIRTUAL_USERS)
         )
 
         scenarios[`${testEntitiesBasedScenarioPrefix}${counter}`] =
             buildPerVuIteration(startTime, randomVus)
-        getScenarios(counter, scenarios, actualVus, startTime, maxDuration)
+
         startTime = startTime + CONFIG.SCENARIOS.perVuIterations.DURATION
         counter++
         availableEntitiesData -= randomVus
-    } while (vus > 0)
+    } while (availableEntitiesData > 0)
 } else {
     scenarios['perVuIterations'] = buildPerVuIteration(0, CONFIG.VIRTUAL_USERS)
 }

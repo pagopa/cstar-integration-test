@@ -1,6 +1,6 @@
 import { coalesce } from '../utils.js'
 
-const vu = __ENV.VUS_MAX_ENV ? __ENV.VUS_MAX_ENV : 3
+const vu = coalesce(__ENV.VUS_MAX_ENV, 3)
 
 const rampStageNumber = Math.max(
     coalesce(__ENV.SCENARIO_RAMP_STAGE_NUMBER_ENV, 3),
@@ -12,7 +12,10 @@ export const CONFIG = {
     DUMP_REQUESTS: __ENV.REQ_DUMP,
 
     VIRTUAL_USERS: vu,
-    MAX_AVAILABLE_TEST_ENTITIES_ENV: __ENV.MAX_AVAILABLE_TEST_ENTITIES_ENV,
+    MAX_AVAILABLE_TEST_ENTITIES_ENV: coalesce(
+        __ENV.MAX_AVAILABLE_TEST_ENTITIES_ENV,
+        vu
+    ),
 
     SCENARIOS: {
         TYPES: coalesce(__ENV.SCENARIO_TYPES_ENV, 'ALL').split(','),

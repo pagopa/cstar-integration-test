@@ -4,7 +4,6 @@ import {
 } from 'https://jslib.k6.io/k6-utils/1.1.0/index.js'
 import papaparse from 'https://jslib.k6.io/papaparse/5.1.1/index.js'
 import exec from 'k6/execution'
-import { scenario } from 'k6/execution'
 
 export function randomFiscalCode() {
     '^([A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST]{1}[0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z]{1}[0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]{1})$'
@@ -39,18 +38,39 @@ export function chooseRandomPanFromList(panList) {
     return panList.list[index]
 }
 
+export function getRelativePathToRootFolder() {
+    try {
+        open('.')
+    } catch (error) {
+        const path = error.message.substr(
+            error.message.indexOf('cstar-integration-test')
+        )
+        return path
+            .match(/(\\\\|\/)/g)
+            .map((x) => '..')
+            .join('/')
+    }
+    return '../..'
+}
+
 export function getFCList() {
-    return papaparse.parse(open('../../assets/fc_pgpans.csv'), { header: true })
-        .data
+    return papaparse.parse(
+        open(`${getRelativePathToRootFolder()}/assets/fc_pgpans.csv`),
+        { header: true }
+    ).data
 }
 
 export function getFCPanList() {
-    return papaparse.parse(open('../../assets/fc_pgpans.csv'), { header: true })
-        .data
+    return papaparse.parse(
+        open(`${getRelativePathToRootFolder()}/assets/fc_pgpans.csv`),
+        { header: true }
+    ).data
 }
 export function getFCIbanList() {
-    return papaparse.parse(open('../../assets/fc_iban.csv'), { header: true })
-        .data
+    return papaparse.parse(
+        open(`${getRelativePathToRootFolder()}/assets/fc_iban.csv`),
+        { header: true }
+    ).data
 }
 
 function getFiscalCodeMonth(month) {
@@ -75,31 +95,12 @@ export function coalesce(o1, o2) {
     return o1 !== undefined && o1 !== null ? o1 : o2
 }
 
-export const testEntitiesBasedScenarioPrefix = 'scenario_'
-export function testEntitiesBasedScenariosParser(options) {
-    let counter = 0
-    const scenarioBaseIndexes = {}
-
-    Object.keys(options.scenarios)
-        .filter((scenarioName) =>
-            scenarioName.startsWith(testEntitiesBasedScenarioPrefix)
-        )
-        .sort()
-        .forEach((scenarioName) => {
-            const singleScenario = options.scenarios[scenarioName]
-            let scenarioBaseIndex = counter
-            counter += singleScenario.vus
-            scenarioBaseIndexes[scenarioName] = scenarioBaseIndex
-        })
-    return scenarioBaseIndexes
-}
-export function testEntitiesBasedScenariosBaseIndexRetriever() {
-    const scenariosBaseIndexes = testEntitiesBasedScenariosParser(
-        exec.test.options
-    )
-    return (cfBaseIndex = coalesce(scenariosBaseIndexes[scenario.name], 0))
-}
-export function getScenarioTestEntity(testEntities) {
-    const baseIndex = testEntitiesBasedScenariosBaseIndexRetriever()
-    return testEntities[baseIndex + scenario.iterationInTest]
+export function abort(description) {
+    description = `Aborting execution due to: ${description}`
+    if (exec) {
+        console.error(description)
+        exec.test.abort()
+    } else {
+        throw new Error(description)
+    }
 }

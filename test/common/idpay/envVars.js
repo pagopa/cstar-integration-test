@@ -1,6 +1,7 @@
 import { loginFullUrl } from '../api/bpdIoLogin.js'
 import { defaultHeaders } from '../dynamicScenarios/envVars.js'
-import { coalesce } from '../utils/utils.js'
+import { DEV, PROD, UAT, getBaseUrl } from '../envs.js'
+import { coalesce } from '../utils.js'
 
 export const IDPAY_CONFIG = {
     CONTEXT_DATA: {
@@ -25,9 +26,10 @@ export const idpayDefaultHeaders = {
     ),
 }
 
+const ioBaseUrl = getBaseUrl([DEV, UAT, PROD], 'io')
 export function buildIOAuthorizationHeader(fiscalCode) {
     const authToken = loginFullUrl(
-        `${baseUrl}/bpd/pagopa/api/v1/login`,
+        `${ioBaseUrl}/bpd/pagopa/api/v1/login`,
         fiscalCode
     )
 
