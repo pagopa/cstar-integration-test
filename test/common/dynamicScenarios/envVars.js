@@ -18,7 +18,7 @@ export const CONFIG = {
     ),
 
     SCENARIOS: {
-        TYPES: coalesce(__ENV.SCENARIO_TYPES_ENV, 'ALL').split(','),
+        TYPES: coalesce(__ENV.SCENARIO_TYPE_ENV, 'ALL').split(','),
 
         perVuIterations: {
             ONESHOT: !(__ENV.SCENARIO_PER_VU_SINGLE_ITERATION_ENV === 'false'),
