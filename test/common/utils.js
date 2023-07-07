@@ -42,6 +42,7 @@ export function getRelativePathToRootFolder() {
     try {
         open('.')
     } catch (error) {
+        console.log(error.message)
         const path = error.message.substr(
             error.message.indexOf('cstar-integration-test')
         )
