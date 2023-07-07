@@ -30,6 +30,8 @@ variables:
             value: $(pdv_apikey_dev)
           - name: acquirerApiKey
             value: $(acquirer_apikey_dev)
+          - name: milApiKey
+            value: $(mil_apikey_dev)
     - ${{ else }}:
           - name: rtdSK
             value: $(rtd_sk_uat)
@@ -41,6 +43,8 @@ variables:
             value: $(pdv_apikey_uat)
           - name: acquirerApiKey
             value: $(acquirer_apikey_uat)
+          - name: milApiKey
+            value: $(mil_apikey_uat)
 
 parameters:
     - name: 'TARGET_ENV'
@@ -68,8 +72,12 @@ parameters:
       displayName: 'InitiativeId'
       type: string
       default: 'IGNORE_IF_NOT_idpayOnboardingAPI_and_ioPutEnrollInstrumentIssuer_and_ioPutEnrollIban'
-    - name: 'MERCHANT_ID'
-      displayName: 'merchantId'
+    - name: 'ACQUIRER_ID'
+      displayName: 'acquirerId'
+      type: string
+      default: 'PAGOPA'
+    - name: 'MERCHANT_FISCALCODE'
+      displayName: 'merchant fiscalCode'
       type: string
       default: 'IGNORE_IF_NOT_idPayPaymentDiscountAPI'
     - name: 'ASYNC_TRX_DATE'
@@ -292,9 +300,12 @@ jobs:
                   -e SCENARIO_DURATION_ENV=${{ parameters.SCENARIO_DURATION_ENV }} \
                   -e SCENARIO_CONSTANT_RATE_ENV=${{ parameters.SCENARIO_CONSTANT_RATE_ENV }} \
                   -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }} \
-                  -e APIM_SK=$(acquirerApiKey) \
+                  -e APIM_SK=$(apimSK) \
+                  -e APIM_ACQUIRER_SK=$(acquirerApiKey) \
+                  -e APIM_MIL_SK=$(milApiKey) \
                   -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
-                  -e MERCHANT_ID=${{ parameters.MERCHANT_ID }} \
+                  -e MERCHANT_FISCALCODE=${{ parameters.MERCHANT_FISCALCODE }} \
+                  -e ACQUIRER_ID=${{ parameters.ACQUIRER_ID }} \
                   grafana/k6:latest \
                   run /app/test/performance/idpay/idPayPaymentDiscountAPI.js
             displayName: Run k6 idPayPaymentDiscountAPI.js

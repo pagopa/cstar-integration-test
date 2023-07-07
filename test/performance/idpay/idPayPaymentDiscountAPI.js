@@ -38,10 +38,12 @@ export default () => {
     const citizenParams = { headers: buildIOAuthorizationHeader(cf) }
     const merchantHeaders = Object.assign(
         {
-            'x-merchant-id': IDPAY_CONFIG.CONTEXT_DATA.merchantId,
-            'x-acquirer-id': 'PAGOPA',
+            'x-merchant-fiscalcode':
+                IDPAY_CONFIG.CONTEXT_DATA.merchantFiscalCode,
+            'x-acquirer-id': IDPAY_CONFIG.CONTEXT_DATA.acquirerId,
         },
-        idpayDefaultHeaders
+        idpayDefaultHeaders,
+        { 'Ocp-Apim-Subscription-Key': IDPAY_CONFIG.AUTH_KEYS.APIM_MIL_SK }
     )
 
     group('Create Transaction', () => {
