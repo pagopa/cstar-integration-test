@@ -239,7 +239,7 @@ jobs:
                         --workdir "/app" \
                         -e RESULTS_DIR=/app \
                         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
-                        -e SCENARIO_TYPE_ENV=${{ if eq(k6Test,parameters.SCRIPT) parameters.SCENARIO_TYPE_ENV else "perVuIterations"}} \
+                        -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
                         -e MAX_AVAILABLE_TEST_ENTITIES_ENV=${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} \
                         -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
                         -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
