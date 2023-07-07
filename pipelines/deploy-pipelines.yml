@@ -72,6 +72,10 @@ parameters:
       displayName: 'merchantId'
       type: string
       default: 'IGNORE_IF_NOT_idPayPaymentDiscountAPI'
+    - name: 'ASYNC_TRX_DATE'
+      displayName: 'Async transactions date'
+      type: string
+      default: '2023-01-01T00:00:00.000Z'
 
     - name: 'SCENARIO_TYPE_ENV'
       displayName: 'Scenario type'
@@ -182,7 +186,7 @@ jobs:
           - script: |
                 ls -lrt
                 ls -lrt ./assets
-                cst idpay idpaydataset --action dataset_and_transactions --env ${{ parameters.TARGET_ENV }} --api-key $(rtdSK) --key $(rtd_acquirer_mauth_key.secureFilePath) --cert $(rtd_acquirer_mauth_pem.secureFilePath) --PM-pubk $(bpd_pm.secureFilePath) --out-dir ./generated --num-fc ${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} --trx-per-fc 1 --start-datetime ${{ parameters.TRX_DATE }} --mcc 1234 --PM-salt SALT123
+                cst idpay idpaydataset --action dataset_and_transactions --env ${{ parameters.TARGET_ENV }} --api-key $(rtdSK) --key $(rtd_acquirer_mauth_key.secureFilePath) --cert $(rtd_acquirer_mauth_pem.secureFilePath) --PM-pubk $(bpd_pm.secureFilePath) --out-dir ./generated --num-fc ${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} --trx-per-fc 1 --start-datetime ${{ parameters.ASYNC_TRX_DATE }} --mcc 1234 --PM-salt SALT123
                 mkdir -p assets
                 mkdir -p results
                 cp ./generated/*/* ./assets
@@ -212,7 +216,6 @@ jobs:
                   -e MAX_AVAILABLE_TEST_ENTITIES_ENV=${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} \
                   -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
                   -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
-                  -e SCENARIO_PER_VU_START_TIME_ENV=${{ parameters.SCENARIO_PER_VU_START_TIME_ENV }} \
                   -e SCENARIO_DURATION_ENV=${{ parameters.SCENARIO_DURATION_ENV }} \
                   -e SCENARIO_CONSTANT_RATE_ENV=${{ parameters.SCENARIO_CONSTANT_RATE_ENV }} \
                   -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }} \
@@ -245,7 +248,6 @@ jobs:
                   -e MAX_AVAILABLE_TEST_ENTITIES_ENV=${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} \
                   -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
                   -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
-                  -e SCENARIO_PER_VU_START_TIME_ENV=${{ parameters.SCENARIO_PER_VU_START_TIME_ENV }} \
                   -e SCENARIO_DURATION_ENV=${{ parameters.SCENARIO_DURATION_ENV }} \
                   -e SCENARIO_CONSTANT_RATE_ENV=${{ parameters.SCENARIO_CONSTANT_RATE_ENV }} \
                   -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }} \
@@ -266,7 +268,6 @@ jobs:
                   -e MAX_AVAILABLE_TEST_ENTITIES_ENV=${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} \
                   -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
                   -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
-                  -e SCENARIO_PER_VU_START_TIME_ENV=${{ parameters.SCENARIO_PER_VU_START_TIME_ENV }} \
                   -e SCENARIO_DURATION_ENV=${{ parameters.SCENARIO_DURATION_ENV }} \
                   -e SCENARIO_CONSTANT_RATE_ENV=${{ parameters.SCENARIO_CONSTANT_RATE_ENV }} \
                   -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }} \
@@ -288,7 +289,6 @@ jobs:
                   -e MAX_AVAILABLE_TEST_ENTITIES_ENV=${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} \
                   -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
                   -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
-                  -e SCENARIO_PER_VU_START_TIME_ENV=${{ parameters.SCENARIO_PER_VU_START_TIME_ENV }} \
                   -e SCENARIO_DURATION_ENV=${{ parameters.SCENARIO_DURATION_ENV }} \
                   -e SCENARIO_CONSTANT_RATE_ENV=${{ parameters.SCENARIO_CONSTANT_RATE_ENV }} \
                   -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }} \
@@ -311,7 +311,6 @@ jobs:
                   -e MAX_AVAILABLE_TEST_ENTITIES_ENV=${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} \
                   -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
                   -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
-                  -e SCENARIO_PER_VU_START_TIME_ENV=${{ parameters.SCENARIO_PER_VU_START_TIME_ENV }} \
                   -e SCENARIO_DURATION_ENV=${{ parameters.SCENARIO_DURATION_ENV }} \
                   -e SCENARIO_CONSTANT_RATE_ENV=${{ parameters.SCENARIO_CONSTANT_RATE_ENV }} \
                   -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }} \
@@ -334,7 +333,6 @@ jobs:
                   -e MAX_AVAILABLE_TEST_ENTITIES_ENV=${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} \
                   -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
                   -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
-                  -e SCENARIO_PER_VU_START_TIME_ENV=${{ parameters.SCENARIO_PER_VU_START_TIME_ENV }} \
                   -e SCENARIO_DURATION_ENV=${{ parameters.SCENARIO_DURATION_ENV }} \
                   -e SCENARIO_CONSTANT_RATE_ENV=${{ parameters.SCENARIO_CONSTANT_RATE_ENV }} \
                   -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }} \
