@@ -231,7 +231,7 @@ jobs:
           - script: |
                 docker pull grafana/k6:latest
             displayName: Pull k6 image
-          - ${{each k6Test in parameters.testFolders}}:
+          - ${{each k6Test in variables.k6Tests[parameters.SCRIPT]}}:
                 - script: |
                       docker run -i \
                         --user $UID \
