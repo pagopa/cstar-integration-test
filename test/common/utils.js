@@ -42,11 +42,14 @@ export function getRelativePathToRootFolder() {
     try {
         open('.')
     } catch (error) {
-        console.log(error.message)
-        const path = error.message.substr(
-            error.message.indexOf('cstar-integration-test')
-        )
-        console.log(path)
+        const testFolderMatch = error.message.match('(?:\\\\|/)test(?:\\\\|/)')
+        if (!testFolderMatch) {
+            console.log(
+                'WARNING! Unexpected folder structure, cannot found test folder'
+            )
+            return '../..'
+        }
+        const path = error.message.substr(testFolderMatch.index - 1)
         return path
             .match(/(\\\\|\/)/g)
             .map((x) => '..')
