@@ -67,6 +67,13 @@ parameters:
           - ioPutEnrollIban
           - rtdTransactionsFile
           - testPDV
+    - name: listOfFruits
+      type: object
+      default:
+          - fruitName: 'apple'
+            colors: ['red', 'green']
+          - fruitName: 'lemon'
+            colors: ['yellow']
 
     - name: 'INITIATIVE_ID'
       displayName: 'InitiativeId'
@@ -99,7 +106,7 @@ parameters:
       displayName: 'Number of fiscal codes generated'
       type: number
     - name: 'VUS_MAX_ENV'
-      displayName: 'Maximum number of virtual users (or max TPS)'
+      displayName: 'Maximum number of virtual users (or max TPS), [constantArrivalRate] MaxRate'
       type: number
 
     - name: 'SCENARIO_PER_VU_SINGLE_ITERATION_ENV'
@@ -113,12 +120,8 @@ parameters:
     - name: 'SCENARIO_DURATION_ENV'
       displayName: '[perVuIterations][constantArrivalRate] Duration in seconds of the scenario'
       type: number
-      default: 1
-
-    - name: 'SCENARIO_CONSTANT_RATE_ENV' # TODO use VU_MAX?
-      displayName: '[constantArrivalRate] Rate of iterations per timeUnit (when 1s it will represent the TPS)'
-      type: number
       default: 10
+
     - name: 'SCENARIO_TIME_UNIT_ENV'
       displayName: '[constantArrivalRate][rampingArrivalRate][rampingGrowingArrivalRate] timeUnit'
       type: number
@@ -225,7 +228,6 @@ jobs:
                   -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
                   -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
                   -e SCENARIO_DURATION_ENV=${{ parameters.SCENARIO_DURATION_ENV }} \
-                  -e SCENARIO_CONSTANT_RATE_ENV=${{ parameters.SCENARIO_CONSTANT_RATE_ENV }} \
                   -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }} \
                   grafana/k6:latest \
                   run /app/test/performance/idpay/putTokenMockedPdv.js
@@ -257,7 +259,6 @@ jobs:
                   -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
                   -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
                   -e SCENARIO_DURATION_ENV=${{ parameters.SCENARIO_DURATION_ENV }} \
-                  -e SCENARIO_CONSTANT_RATE_ENV=${{ parameters.SCENARIO_CONSTANT_RATE_ENV }} \
                   -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }} \
                   -e APIM_SK=$(pdvApiKey) \
                   grafana/k6:latest \
@@ -277,7 +278,6 @@ jobs:
                   -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
                   -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
                   -e SCENARIO_DURATION_ENV=${{ parameters.SCENARIO_DURATION_ENV }} \
-                  -e SCENARIO_CONSTANT_RATE_ENV=${{ parameters.SCENARIO_CONSTANT_RATE_ENV }} \
                   -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }} \
                   -e APIM_SK=$(apimSK) \
                   -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
@@ -298,7 +298,6 @@ jobs:
                   -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
                   -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
                   -e SCENARIO_DURATION_ENV=${{ parameters.SCENARIO_DURATION_ENV }} \
-                  -e SCENARIO_CONSTANT_RATE_ENV=${{ parameters.SCENARIO_CONSTANT_RATE_ENV }} \
                   -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }} \
                   -e APIM_SK=$(apimSK) \
                   -e APIM_ACQUIRER_SK=$(acquirerApiKey) \
@@ -323,7 +322,6 @@ jobs:
                   -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
                   -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
                   -e SCENARIO_DURATION_ENV=${{ parameters.SCENARIO_DURATION_ENV }} \
-                  -e SCENARIO_CONSTANT_RATE_ENV=${{ parameters.SCENARIO_CONSTANT_RATE_ENV }} \
                   -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }} \
                   -e APIM_SK=$(issuerSK) \
                   -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
@@ -345,7 +343,6 @@ jobs:
                   -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
                   -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
                   -e SCENARIO_DURATION_ENV=${{ parameters.SCENARIO_DURATION_ENV }} \
-                  -e SCENARIO_CONSTANT_RATE_ENV=${{ parameters.SCENARIO_CONSTANT_RATE_ENV }} \
                   -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }} \
                   -e APIM_SK=$(apimSK) \
                   -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
