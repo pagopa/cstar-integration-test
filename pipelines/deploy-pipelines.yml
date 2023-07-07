@@ -5,47 +5,6 @@ trigger: none
 pool:
     vmImage: ubuntu-22.04
 
-variables:
-    # Python version: 3.10
-    - name: pythonVersion
-      value: '3.10'
-
-    # Folder name of this sub-repository
-    - name: working-dir
-      value: '.'
-
-    # Project root folder
-    - name: projectRoot
-      value: $(System.DefaultWorkingDirectory)/$(working-dir)
-
-    #Setting Api Key
-    - ${{ if eq(parameters.TARGET_ENV, 'dev') }}:
-          - name: rtdSK
-            value: $(rtd_sk_dev)
-          - name: apimSK
-            value: $(apim_sk_dev)
-          - name: issuerSK
-            value: $(issuer_sk_dev)
-          - name: pdvApiKey
-            value: $(pdv_apikey_dev)
-          - name: acquirerApiKey
-            value: $(acquirer_apikey_dev)
-          - name: milApiKey
-            value: $(mil_apikey_dev)
-    - ${{ else }}:
-          - name: rtdSK
-            value: $(rtd_sk_uat)
-          - name: apimSK
-            value: $(apim_sk_uat)
-          - name: issuerSK
-            value: $(issuer_sk_uat)
-          - name: pdvApiKey
-            value: $(pdv_apikey_uat)
-          - name: acquirerApiKey
-            value: $(acquirer_apikey_uat)
-          - name: milApiKey
-            value: $(mil_apikey_uat)
-
 parameters:
     - name: 'TARGET_ENV'
       displayName: 'Target Environment'
@@ -67,13 +26,6 @@ parameters:
           - ioPutEnrollIban
           - rtdTransactionsFile
           - testPDV
-    - name: listOfFruits
-      type: object
-      default:
-          - fruitName: 'apple'
-            colors: ['red', 'green']
-          - fruitName: 'lemon'
-            colors: ['yellow']
 
     - name: 'INITIATIVE_ID'
       displayName: 'InitiativeId'
@@ -144,6 +96,69 @@ parameters:
       displayName: 'Max P95 milliseconds applied as default to single API tests'
       type: number
       default: 1000
+
+variables:
+    # Python version: 3.10
+    - name: pythonVersion
+      value: '3.10'
+
+    # Folder name of this sub-repository
+    - name: working-dir
+      value: '.'
+
+    # Project root folder
+    - name: projectRoot
+      value: $(System.DefaultWorkingDirectory)/$(working-dir)
+
+    - name: k6Tests
+      value:
+          putTokenMockedPdv: putTokenMockedPdv
+          putTokenPdv: putTokenPdv
+          idpayOnboardingAPI: idpayOnboardingAPI
+          idPayPaymentDiscountAPI:
+              - idpayOnboardingAPI
+              - idPayPaymentDiscountAPI
+          ioPutEnrollInstrumentIssuer:
+              - idpayOnboardingAPI
+              - ioPutEnrollInstrumentIssuer
+          ioPutEnrollIban:
+              - idpayOnboardingAPI
+              - ioPutEnrollIban
+          rtdTransactionsFile:
+              - idpayOnboardingAPI
+              - idPayPaymentDiscountAPI
+              - ioPutEnrollInstrumentIssuer
+              - ioPutEnrollIban
+              - ../rtdTransactionsFile
+          testPDV: testPDV
+
+    #Setting Api Key
+    - ${{ if eq(parameters.TARGET_ENV, 'dev') }}:
+          - name: rtdSK
+            value: $(rtd_sk_dev)
+          - name: apimSK
+            value: $(apim_sk_dev)
+          - name: issuerSK
+            value: $(issuer_sk_dev)
+          - name: pdvApiKey
+            value: $(pdv_apikey_dev)
+          - name: acquirerApiKey
+            value: $(acquirer_apikey_dev)
+          - name: milApiKey
+            value: $(mil_apikey_dev)
+    - ${{ else }}:
+          - name: rtdSK
+            value: $(rtd_sk_uat)
+          - name: apimSK
+            value: $(apim_sk_uat)
+          - name: issuerSK
+            value: $(issuer_sk_uat)
+          - name: pdvApiKey
+            value: $(pdv_apikey_uat)
+          - name: acquirerApiKey
+            value: $(acquirer_apikey_uat)
+          - name: milApiKey
+            value: $(mil_apikey_uat)
 
 jobs:
     - job:
@@ -216,156 +231,31 @@ jobs:
           - script: |
                 docker pull grafana/k6:latest
             displayName: Pull k6 image
-          - script: |
-                docker run -i \
-                  --user $UID \
-                  -v $(pwd):/app \
-                  --workdir "/app" \
-                  -e RESULTS_DIR=/app \
-                  -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
-                  -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
-                  -e MAX_AVAILABLE_TEST_ENTITIES_ENV=${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} \
-                  -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
-                  -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
-                  -e SCENARIO_DURATION_ENV=${{ parameters.SCENARIO_DURATION_ENV }} \
-                  -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }} \
-                  grafana/k6:latest \
-                  run /app/test/performance/idpay/putTokenMockedPdv.js
-            displayName: Run k6 putTokenMockedPdv.js
-            condition: eq('${{parameters.SCRIPT }}', 'putTokenMockedPdv')
-            timeoutInMinutes: 0
-          - script: |
-                docker run -i \
-                  --user $UID \
-                  -v $(pwd):/app \
-                  --workdir "/app" \
-                  -e RESULTS_DIR=/app \
-                  -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
-                  -e APIM_SK=$(pdvApiKey) \
-                  grafana/k6:latest \
-                  run /app/test/performance/idpay/testPDV.js
-            displayName: Run k6 testPDV.js
-            condition: eq('${{parameters.SCRIPT }}', 'testPDV')
-            timeoutInMinutes: 0
-          - script: |
-                docker run -i \
-                  --user $UID \
-                  -v $(pwd):/app \
-                  --workdir "/app" \
-                  -e RESULTS_DIR=/app \
-                  -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
-                  -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
-                  -e MAX_AVAILABLE_TEST_ENTITIES_ENV=${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} \
-                  -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
-                  -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
-                  -e SCENARIO_DURATION_ENV=${{ parameters.SCENARIO_DURATION_ENV }} \
-                  -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }} \
-                  -e APIM_SK=$(pdvApiKey) \
-                  grafana/k6:latest \
-                  run /app/test/performance/idpay/putTokenPdv.js
-            displayName: Run k6 putTokenPdv.js
-            condition: eq('${{parameters.SCRIPT }}', 'putTokenPdv')
-            timeoutInMinutes: 0
-          - script: |
-                docker run -i \
-                  --user $UID \
-                  -v $(pwd):/app \
-                  --workdir "/app" \
-                  -e RESULTS_DIR=/app \
-                  -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
-                  -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
-                  -e MAX_AVAILABLE_TEST_ENTITIES_ENV=${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} \
-                  -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
-                  -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
-                  -e SCENARIO_DURATION_ENV=${{ parameters.SCENARIO_DURATION_ENV }} \
-                  -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }} \
-                  -e APIM_SK=$(apimSK) \
-                  -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
-                  grafana/k6:latest \
-                  run /app/test/performance/idpay/idpayOnboardingAPI.js
-            displayName: Run k6 idpayOnboardingAPI.js
-            condition: in('${{parameters.SCRIPT }}', 'idpayOnboardingAPI', 'idPayPaymentDiscountAPI', 'ioPutEnrollInstrumentIssuer', 'ioPutEnrollIban', 'rtdTransactionsFile')
-            timeoutInMinutes: 0
-          - script: |
-                docker run -i \
-                  --user $UID \
-                  -v $(pwd):/app \
-                  --workdir "/app" \
-                  -e RESULTS_DIR=/app \
-                  -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
-                  -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
-                  -e MAX_AVAILABLE_TEST_ENTITIES_ENV=${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} \
-                  -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
-                  -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
-                  -e SCENARIO_DURATION_ENV=${{ parameters.SCENARIO_DURATION_ENV }} \
-                  -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }} \
-                  -e APIM_SK=$(apimSK) \
-                  -e APIM_ACQUIRER_SK=$(acquirerApiKey) \
-                  -e APIM_MIL_SK=$(milApiKey) \
-                  -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
-                  -e MERCHANT_FISCALCODE=${{ parameters.MERCHANT_FISCALCODE }} \
-                  -e ACQUIRER_ID=${{ parameters.ACQUIRER_ID }} \
-                  grafana/k6:latest \
-                  run /app/test/performance/idpay/idPayPaymentDiscountAPI.js
-            displayName: Run k6 idPayPaymentDiscountAPI.js
-            condition: in('${{parameters.SCRIPT }}', 'idPayPaymentDiscountAPI', 'rtdTransactionsFile')
-            timeoutInMinutes: 0
-          - script: |
-                docker run -i \
-                  --user $UID \
-                  -v $(pwd):/app \
-                  --workdir "/app" \
-                  -e RESULTS_DIR=/app \
-                  -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
-                  -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
-                  -e MAX_AVAILABLE_TEST_ENTITIES_ENV=${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} \
-                  -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
-                  -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
-                  -e SCENARIO_DURATION_ENV=${{ parameters.SCENARIO_DURATION_ENV }} \
-                  -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }} \
-                  -e APIM_SK=$(issuerSK) \
-                  -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
-                  grafana/k6:latest \
-                  run /app/test/performance/idpay/ioPutEnrollInstrumentIssuer.js
-            displayName: Run k6 ioPutEnrollInstrumentIssuer.js
-            condition: in('${{parameters.SCRIPT }}', 'ioPutEnrollInstrumentIssuer', 'rtdTransactionsFile')
-            timeoutInMinutes: 0
-          - script: |
-                ls -lrt $(pwd)
-                docker run -i \
-                  --user $UID \
-                  -v $(pwd):/app \
-                  --workdir "/app" \
-                  -e RESULTS_DIR=/app \
-                  -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
-                  -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
-                  -e MAX_AVAILABLE_TEST_ENTITIES_ENV=${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} \
-                  -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
-                  -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
-                  -e SCENARIO_DURATION_ENV=${{ parameters.SCENARIO_DURATION_ENV }} \
-                  -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }} \
-                  -e APIM_SK=$(apimSK) \
-                  -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
-                  grafana/k6:latest \
-                  run /app/test/performance/idpay/ioPutEnrollIban.js
-            displayName: Run k6 ioPutEnrollIban.js
-            condition: in('${{parameters.SCRIPT }}', 'ioPutEnrollIban', 'rtdTransactionsFile')
-            timeoutInMinutes: 0
-          - script: |
-                ls -lrt $(pwd)
-                docker run -i \
-                  --user $UID \
-                  -v $(pwd):/app \
-                  --workdir "/app" \
-                  -e RESULTS_DIR=/app \
-                  -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
-                  -e SCENARIO_DURATION_ENV=${{ parameters.SCENARIO_DURATION_ENV }} \
-                  -e APIM_SK=$(rtdSK) \
-                  -e TRX_FILE_NAME=$(trxFileName) \
-                  grafana/k6:latest \
-                  run /app/test/performance/idpay/rtdTransactionsFile.js
-            displayName: Run k6 rtdTransactionsFile.js
-            condition: eq('${{ parameters.SCRIPT }}', 'rtdTransactionsFile')
+          - ${{each k6Test in parameters.testFolders}}:
+                - script: |
+                      docker run -i \
+                        --user $UID \
+                        -v $(pwd):/app \
+                        --workdir "/app" \
+                        -e RESULTS_DIR=/app \
+                        -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
+                        -e SCENARIO_TYPE_ENV=${{ if eq(k6Test,parameters.SCRIPT) parameters.SCENARIO_TYPE_ENV else "perVuIterations"}} \
+                        -e MAX_AVAILABLE_TEST_ENTITIES_ENV=${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} \
+                        -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
+                        -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
+                        -e SCENARIO_DURATION_ENV=${{ parameters.SCENARIO_DURATION_ENV }} \
+                        -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }} \
+                        -e APIM_SK=$(apimSK) \
+                        -e APIM_ACQUIRER_SK=$(acquirerApiKey) \
+                        -e APIM_MIL_SK=$(milApiKey) \
+                        -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
+                        -e MERCHANT_FISCALCODE=${{ parameters.MERCHANT_FISCALCODE }} \
+                        -e ACQUIRER_ID=${{ parameters.ACQUIRER_ID }} \
+                        grafana/k6:latest \
+                        run /app/test/performance/idpay/${{k6Test}}.js
+                  displayName: Run k6 ${{k6Test}}.js
+                  timeoutInMinutes: 0
+
           - task: PublishTestResults@2
             condition: true
             inputs:

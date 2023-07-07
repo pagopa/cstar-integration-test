@@ -27,7 +27,7 @@ export const CONFIG = {
         },
 
         constantArrivalRate: {
-            RATE: coalesce(__ENV.SCENARIO_CONSTANT_RATE_ENV, 10),
+            RATE: vu,
             DURATION: coalesce(__ENV.SCENARIO_PER_VU_DURATION_ENV, 1),
             TIME_UNIT: coalesce(__ENV.SCENARIO_TIME_UNIT_ENV, 1),
         },
