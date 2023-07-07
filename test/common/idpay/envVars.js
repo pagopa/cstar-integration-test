@@ -16,15 +16,13 @@ export const IDPAY_CONFIG = {
     },
 }
 
-export const idpayDefaultHeaders = {
-    headers: Object.assign(
-        {
-            'Ocp-Apim-Subscription-Key': IDPAY_CONFIG.AUTH_KEYS.APIM,
-            'Ocp-Apim-Trace': IDPAY_CONFIG.ENABLE_TRACE,
-        },
-        defaultHeaders.headers
-    ),
-}
+export const idpayDefaultHeaders = Object.assign(
+    {
+        'Ocp-Apim-Subscription-Key': IDPAY_CONFIG.AUTH_KEYS.APIM,
+        'Ocp-Apim-Trace': IDPAY_CONFIG.ENABLE_TRACE,
+    },
+    defaultHeaders
+)
 
 const ioBaseUrl = getBaseUrl([DEV, UAT, PROD], 'io')
 export function buildIOAuthorizationHeader(fiscalCode) {
