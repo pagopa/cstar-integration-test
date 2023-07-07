@@ -39,7 +39,7 @@ export default () => {
         group('Should enroll iban', () => {
             const res = putEnrollIban(
                 baseUrl,
-                IDPAY_CONFIG.CONTEXT_DATA.INITIATIVE_ID,
+                IDPAY_CONFIG.CONTEXT_DATA.initiativeId,
                 params,
                 JSON.stringify({
                     iban,

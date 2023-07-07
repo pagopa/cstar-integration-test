@@ -47,7 +47,7 @@ export default () => {
         group('When the inititive exists, put t&c', () => {
             if (checked) {
                 const body = {
-                    initiativeId: IDPAY_CONFIG.CONTEXT_DATA.INITIATIVE_ID,
+                    initiativeId: IDPAY_CONFIG.CONTEXT_DATA.initiativeId,
                 }
                 const res = putOnboardingCitizen(
                     baseUrl,
@@ -69,7 +69,7 @@ export default () => {
                 const res = getStatus(
                     baseUrl,
                     params,
-                    IDPAY_CONFIG.CONTEXT_DATA.INITIATIVE_ID
+                    IDPAY_CONFIG.CONTEXT_DATA.initiativeId
                 )
 
                 assert(res, [
@@ -88,7 +88,7 @@ export default () => {
         group('When the TC consent exists, check the prerequisites', () => {
             if (checked) {
                 const body = {
-                    initiativeId: IDPAY_CONFIG.CONTEXT_DATA.INITIATIVE_ID,
+                    initiativeId: IDPAY_CONFIG.CONTEXT_DATA.initiativeId,
                 }
                 const res = putCheckPrerequisites(
                     baseUrl,
@@ -111,7 +111,7 @@ export default () => {
         group('When the inititive and consents exist, save consent', () => {
             if (checked) {
                 const body = {
-                    initiativeId: IDPAY_CONFIG.CONTEXT_DATA.INITIATIVE_ID,
+                    initiativeId: IDPAY_CONFIG.CONTEXT_DATA.initiativeId,
                     pdndAccept: true,
                     selfDeclarationList: [],
                 }

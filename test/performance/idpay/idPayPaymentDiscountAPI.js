@@ -49,7 +49,7 @@ export default () => {
             const params = {
                 headers: merchantHeaders,
                 body: {
-                    initiativeId: IDPAY_CONFIG.CONTEXT_DATA.INITIATIVE_ID,
+                    initiativeId: IDPAY_CONFIG.CONTEXT_DATA.initiativeId,
                     idTrxAcquirer: `IDTRXACQUIRER${Math.floor(
                         Math.random() * (100 - 10 + 10) + 1
                     )}`,

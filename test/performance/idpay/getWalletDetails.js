@@ -42,7 +42,7 @@ export default () => {
                 baseUrl,
                 params.headers,
                 buildIOAuthorizationHeader(cf),
-                IDPAY_CONFIG.CONTEXT_DATA.INITIATIVE_ID
+                IDPAY_CONFIG.CONTEXT_DATA.initiativeId
             )
 
             if (res.status != 200) {

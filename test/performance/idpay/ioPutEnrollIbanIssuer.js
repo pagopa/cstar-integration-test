@@ -51,7 +51,7 @@ export default () => {
                 baseUrl,
                 JSON.stringify(params.body),
                 params.headers,
-                IDPAY_CONFIG.CONTEXT_DATA.INITIATIVE_ID
+                IDPAY_CONFIG.CONTEXT_DATA.initiativeId
             )
 
             if (res.status != 200) {
