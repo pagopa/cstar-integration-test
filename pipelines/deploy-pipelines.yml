@@ -110,27 +110,22 @@ variables:
     - name: projectRoot
       value: $(System.DefaultWorkingDirectory)/$(working-dir)
 
-    - name: k6Tests
-      value:
-          putTokenMockedPdv: putTokenMockedPdv
-          putTokenPdv: putTokenPdv
-          idpayOnboardingAPI: idpayOnboardingAPI
-          idPayPaymentDiscountAPI:
-              - idpayOnboardingAPI
-              - idPayPaymentDiscountAPI
-          ioPutEnrollInstrumentIssuer:
-              - idpayOnboardingAPI
-              - ioPutEnrollInstrumentIssuer
-          ioPutEnrollIban:
-              - idpayOnboardingAPI
-              - ioPutEnrollIban
-          rtdTransactionsFile:
-              - idpayOnboardingAPI
-              - idPayPaymentDiscountAPI
-              - ioPutEnrollInstrumentIssuer
-              - ioPutEnrollIban
-              - ../rtdTransactionsFile
-          testPDV: testPDV
+    - name: k6Test_putTokenMockedPdv
+      value: putTokenMockedPdv
+    - name: k6Test_putTokenPdv
+      value: putTokenPdv
+    - name: k6Test_idpayOnboardingAPI
+      value: idpayOnboardingAPI
+    - name: k6Test_idPayPaymentDiscountAPI
+      value: idpayOnboardingAPI,idPayPaymentDiscountAPI
+    - name: k6Test_ioPutEnrollInstrumentIssuer
+      value: idpayOnboardingAPI,ioPutEnrollInstrumentIssuer
+    - name: k6Test_ioPutEnrollIban
+      value: idpayOnboardingAPI,ioPutEnrollIban
+    - name: k6Test_rtdTransactionsFile
+      value: idpayOnboardingAPI,idPayPaymentDiscountAPI,ioPutEnrollInstrumentIssuer,ioPutEnrollIban,../rtdTransactionsFile
+    - name: k6Test_testPDV
+      value: testPDV
 
     #Setting Api Key
     - ${{ if eq(parameters.TARGET_ENV, 'dev') }}:
@@ -231,7 +226,8 @@ jobs:
           - script: |
                 docker pull grafana/k6:latest
             displayName: Pull k6 image
-          - ${{each k6Test in variables.k6Tests[parameters.SCRIPT]}}:
+
+          - ${{each k6Test in split(variables.["k6Test_" + parameters.SCRIPT], ",")}}:
                 - script: |
                       docker run -i \
                         --user $UID \
