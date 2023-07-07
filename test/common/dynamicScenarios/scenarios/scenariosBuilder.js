@@ -15,15 +15,15 @@ export const scenarios = Object.assign(
 export default function buildScenarios() {
     if (CONFIG.SCENARIOS.TYPES.indexOf('ALL') === -1) {
         return Object.fromEntries(
-            CONFIG.SCENARIOS.TYPES.map((t) => [t, scenarios[t] ]).filter(([_, s]) => s)
-            .concat(
-            CONFIG.SCENARIOS.TYPES.indexOf('perVuIterations') > -1
-                ? Object.entries(perVuIterations)
-                : []
-            )
+            CONFIG.SCENARIOS.TYPES.map((t) => [t, scenarios[t]])
+                .filter(([_, s]) => s)
+                .concat(
+                    CONFIG.SCENARIOS.TYPES.indexOf('perVuIterations') > -1
+                        ? Object.entries(perVuIterations)
+                        : []
+                )
         )
     } else {
         return scenarios // Use all scenrios
     }
 }
-,
