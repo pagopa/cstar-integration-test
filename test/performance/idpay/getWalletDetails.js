@@ -34,18 +34,14 @@ export const handleSummary = defaultHandleSummaryBuilder(application, testName)
 export default () => {
     const scenarioEntity = getScenarioTestEntity(cfPanList)
     const cf = scenarioEntity.cf
+    const params = { headers: buildIOAuthorizationHeader(cf) }
 
     group('Payment Instrument API', () => {
         group('Should enroll pgpan', () => {
-            const params = {
-                headers: idpayDefaultHeaders,
-            }
-
             const res = getWalletDetail(
                 baseUrl,
-                params.headers,
-                buildIOAuthorizationHeader(cf),
-                IDPAY_CONFIG.CONTEXT_DATA.initiativeId
+                IDPAY_CONFIG.CONTEXT_DATA.initiativeId,
+                params
             )
 
             if (res.status != 200) {

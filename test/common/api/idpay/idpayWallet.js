@@ -9,43 +9,47 @@ export function putEnrollInstrumentIssuer(
     headers,
     initiativeId
 ) {
+    const apiName = 'wallet/putEnrollInstrumentIssuer'
     const res = http.put(
         `${baseUrl}${API_PREFIX}/hb/wallet/${initiativeId}/instruments`,
         body,
-        { headers }
+        { headers, tags: { apiName } }
     )
-    logResult('wallet/putEnrollInstrumentIssuer', res)
+    logResult(apiName, res)
     return res
 }
 
 export function putEnrollIbanIssuer(baseUrl, body, headers, initiativeId) {
+    const apiName = 'wallet/putEnrollIbanIssuer'
     const res = http.put(
         `${baseUrl}${API_PREFIX}/hb/wallet/${initiativeId}/iban`,
         body,
-        { headers }
+        { headers, tags: { apiName } }
     )
-    logResult('wallet/putEnrollIbanIssuer', res)
+    logResult(apiName, res)
     return res
 }
 
 export function putEnrollIban(baseUrl, initiativeId, params, body) {
-    const myParams = Object.assign({}, params)
+    const apiName = 'wallet/putEnrollIban'
+    const myParams = Object.assign({}, params, { tags: { apiName } })
     const res = http.put(
         `${baseUrl}${API_PREFIX}/wallet/${initiativeId}/iban`,
         body,
         myParams
     )
-    logResult('wallet/putEnrollIban', res)
+    logResult(apiName, res)
     return res
 }
 
-export function getWalletDetail(baseUrl, headers, params, initiativeId) {
-    const myParams = Object.assign({}, params)
+export function getWalletDetail(baseUrl, initiativeId, params) {
+    const apiName = 'wallet/getWalletDetail'
+    const myParams = Object.assign(params, { tags: { apiName } })
     const res = http.put(
         `${baseUrl}${API_PREFIX}/hb/wallet/${initiativeId}/instruments`,
-        myParams,
-        { headers }
+        null,
+        myParams
     )
-    logResult('wallet/getWalletDetail', res)
+    logResult(apiName, res)
     return res
 }
