@@ -27,7 +27,6 @@ test
 4. Customize env variables in `./.env.dev.local` [`./.env.uat.local` | `./.env.prod.local`]
 5. Run a test with `TARGET_ENV=<ENV> ./k6 run test/smoke/rtdCsvTransaction.js`
 
-
 ### Perform the whole suite of smoke tests on a target environment
 
 ```
@@ -48,6 +47,47 @@ To enable it just set the environment variable _REQ_DUMP_:
 ```sh
 REQ_DUMP=1 ./k6 run <TEST>
 ```
+
+## Configuration
+
+### Dynamic scenarios
+
+K6 allows to configure tests having a different [workloads](https://k6.io/docs/using-k6/scenarios/), or traffic patterns.
+Some tests inside this repo allow its dynamic configuration through environment variable.
+
+#### Scenarios
+
+All dynamic scenarios' tests as default will be executed simulating the following workloads:
+
+-   perVuIterations: a workloads having a fixed number of executions performed by a fixed number of users.
+    -   This scenario could be further configured to be run multiple times until consume all the provided test data (setting SCENARIO_PER_VU_SINGLE_ITERATION_ENV to false)
+-   rampingArrivalRate: a workloads having a variable number of parallel users which will run as many executions as allowed by the execution unit configured. Each variation of the number of users represent a stage. In this scenario. As default it will configure 3 stage (the minimum number) running a random number of parallel users at each stage (the last stage will always be 0, in order to wait previous stage executions).
+-   rampingGrowingArrivalRate: As previous scenario, but here it will be possible to configure a pool of virtual users, used to draw a growing ramp, maximizing the number of the parallel vu at the latest stages. As default it will configure 3 stage (the minimum number):
+    1. Starting from 0, it will grow the number of users in order to reach the maximum number of users
+    2. Next it will mantain constant the number of parallel users
+    3. Finally it will reduce the number of users until reach 0
+-   constantArrivalRate: a workloads having a fixed number of concurrent http requests: it will perform as many iterations as necessary to mantain the configured rate.
+
+#### Configuration
+
+The following environment variables allow to configure dynamic scenarios' tests behaviors:
+
+| ENV                                  | Description                                                                                                                   | Default |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- | ------- |
+| TARGET_ENV                           | The environment to test                                                                                                       |         |
+| RESULTS_DIR                          | The directory inside which create the results dir                                                                             | .       |
+| REQ_DUMP                             | A boolen to log all requests or not                                                                                           | false   |
+| VUS_MAX_ENV                          | The maximum number of parallel users to simulate                                                                              | 3       |
+| MAX_AVAILABLE_TEST_ENTITIES_ENV      | The maximum number of external provided test data to use (if any and if required by implemented test)                         | 3       |
+| SCENARIO_TYPE_ENV                    | The comma separated names of the scenarios to execute. Use the keys listed in [Scenarios](#scenarios) paragraph               | ALL     |
+| SCENARIO_PER_VU_SINGLE_ITERATION_ENV | perVuIterations scenario: if run a single iteration or multiple consecutive until consume all MAX_AVAILABLE_TEST_ENTITIES_ENV | false   |
+| SCENARIO_PER_VU_EXECUTIONS_ENV       | perVuIterations scenario: the number of executions which each user will perform                                               | 1       |
+| SCENARIO_DURATION_ENV                | perVuIterations,constantArrivalRate scenario: Duration in seconds of the scenario                                             | 10      |
+| SCENARIO_TIME_UNIT_ENV               | constantArrivalRate, rampingArrivalRate scenario: scenario time unit in seconds                                               | 1       |
+| SCENARIO_RAMP_STAGE_NUMBER_ENV       | rampingArrivalRate scenario: the number of stages of the ramp                                                                 | 3       |
+| THRESHOLDS_API_MAX_AVG_MS_ENV        | Max AVG duration applied as default to single API tests                                                                       | 500     |
+| THRESHOLDS_API_MAX_P90_MS_ENV        | Max P90 duration applied as default to single API tests                                                                       | 800     |
+| THRESHOLDS_API_MAX_P95_MS_ENV        | Max P95 duration applied as default to single API tests                                                                       | 1000    |
 
 ## Contributing
 
