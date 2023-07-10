@@ -21,7 +21,10 @@ import {
     IDPAY_CONFIG,
     buildIOAuthorizationHeader,
 } from '../../common/idpay/envVars.js'
-import { getScenarioTestEntity } from '../../common/dynamicScenarios/utils.js'
+import {
+    getScenarioTestEntity,
+    logErrorResult,
+} from '../../common/dynamicScenarios/utils.js'
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 const baseUrl = getBaseUrl(REGISTERED_ENVS, 'io')
@@ -56,9 +59,7 @@ export default () => {
                 )
                 assert(res, [statusNoContent()])
                 if (res.status != 204) {
-                    console.error(
-                        'PutOnboardingCitizen -> ' + JSON.stringify(res)
-                    )
+                    logErrorResult('PutOnboardingCitizen', res, true)
                     checked = false
                     return
                 }
@@ -78,7 +79,7 @@ export default () => {
                 ])
 
                 if (res.status != 200) {
-                    console.error('GetStatus -> ' + JSON.stringify(res))
+                    logErrorResult('GetStatus', res, true)
                     checked = false
                     return
                 }
@@ -99,9 +100,7 @@ export default () => {
                 assert(res, [statusOk()])
 
                 if (res.status != 200) {
-                    console.error(
-                        'PutCheckPrerequisites -> ' + JSON.stringify(res)
-                    )
+                    logErrorResult('PutCheckPrerequisites', res, true)
                     checked = false
                     return
                 }
@@ -124,7 +123,7 @@ export default () => {
                 assert(res, [statusAccepted()])
 
                 if (res.status != 202) {
-                    console.error('PutSaveConsent -> ' + JSON.stringify(res))
+                    logErrorResult('PutSaveConsent', res, true)
                     checked = false
                 }
             }

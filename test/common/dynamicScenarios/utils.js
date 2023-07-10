@@ -37,13 +37,18 @@ export function logResult(opName, result, expectedHttpState) {
         console.log(opName, JSON.stringify(result, null, 2))
     }
     if (expectedHttpState && result.status != expectedHttpState) {
-        const resultStr = JSON.stringify(result, (key, value) =>
-            key === 'Authorization'
-                ? 'AUTHORIZATION_TOKEN from ENV'
-                : key === 'Ocp-Apim-Subscription-Key'
-                ? 'Ocp-Apim-Subscription-Key from ENV'
-                : value
-        )
-        console.error(`${opName} -> ${result.status} - ${resultStr}`)
+        logErrorResult(opName, result, false)
     }
+}
+
+const secretHeaders = ['Authorization', 'Ocp-Apim-Subscription-Key']
+export const jsonStringifySecretRemoverFunction = (key, value) =>
+    secretHeaders.indexOf(key) > -1 ? `${key.toUpperCase()}_VALUE` : value
+
+export function logErrorResult(opName, result, printSecrets) {
+    const resultStr = JSON.stringify(
+        result,
+        printSecrets ? undefined : jsonStringifySecretRemoverFunction
+    )
+    console.error(`${opName} -> ${result.status} - ${resultStr}`)
 }

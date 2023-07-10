@@ -1,9 +1,9 @@
 import { coalesce } from '../utils.js'
 
-const vu = coalesce(__ENV.VUS_MAX_ENV, 3)
+const vu = parseInt(coalesce(__ENV.VUS_MAX_ENV, 3))
 
 const rampStageNumber = Math.max(
-    coalesce(__ENV.SCENARIO_RAMP_STAGE_NUMBER_ENV, 3),
+    parseInt(coalesce(__ENV.SCENARIO_RAMP_STAGE_NUMBER_ENV, 3)),
     3
 )
 
@@ -25,25 +25,31 @@ export const CONFIG = {
                 __ENV.SCENARIO_PER_VU_SINGLE_ITERATION_ENV &&
                 __ENV.SCENARIO_PER_VU_SINGLE_ITERATION_ENV.toLowerCase() !==
                     'false',
-            EXECUTIONS: coalesce(__ENV.SCENARIO_PER_VU_EXECUTIONS_ENV, 1),
-            DURATION: coalesce(__ENV.SCENARIO_DURATION_ENV, 3),
+            EXECUTIONS: parseInt(
+                coalesce(__ENV.SCENARIO_PER_VU_EXECUTIONS_ENV, 1)
+            ),
+            DURATION: parseInt(coalesce(__ENV.SCENARIO_DURATION_ENV, 3)),
         },
 
         constantArrivalRate: {
             RATE: vu,
-            DURATION: coalesce(__ENV.SCENARIO_DURATION_ENV, 3),
-            TIME_UNIT: coalesce(__ENV.SCENARIO_TIME_UNIT_ENV, 1),
+            DURATION: parseInt(coalesce(__ENV.SCENARIO_DURATION_ENV, 3)),
+            TIME_UNIT: parseInt(coalesce(__ENV.SCENARIO_TIME_UNIT_ENV, 1)),
         },
 
         RAMPS: {
             STAGES_NUMBER: rampStageNumber,
-            STAGE_SECONDS_DURATION: coalesce(__ENV.SCENARIO_TIME_UNIT_ENV, 1),
+            STAGE_SECONDS_DURATION: parseInt(
+                coalesce(__ENV.SCENARIO_TIME_UNIT_ENV, 1)
+            ),
 
             rampingGrowingArrivalRate: {
                 RAMP_BUILDING_VU_POOL: Math.min(
-                    coalesce(
-                        __ENV.SCENARIO_RAMP_GROWING_RAMP_BUILDING_VU_POOL,
-                        Math.ceil((vu * (rampStageNumber - 1)) / 2)
+                    parseInt(
+                        coalesce(
+                            __ENV.SCENARIO_RAMP_GROWING_RAMP_BUILDING_VU_POOL,
+                            Math.ceil((vu * (rampStageNumber - 1)) / 2)
+                        )
                     ),
                     Math.ceil((vu * (rampStageNumber - 1)) / 2)
                 ),
@@ -52,9 +58,9 @@ export const CONFIG = {
     },
 
     THRESHOLDS: {
-        AVG: coalesce(__ENV.THRESHOLDS_API_MAX_AVG_MS_ENV, 500),
-        P90: coalesce(__ENV.THRESHOLDS_API_MAX_P90_MS_ENV, 800),
-        P95: coalesce(__ENV.THRESHOLDS_API_MAX_P95_MS_ENV, 1000),
+        AVG: parseInt(coalesce(__ENV.THRESHOLDS_API_MAX_AVG_MS_ENV, 500)),
+        P90: parseInt(coalesce(__ENV.THRESHOLDS_API_MAX_P90_MS_ENV, 800)),
+        P95: parseInt(coalesce(__ENV.THRESHOLDS_API_MAX_P95_MS_ENV, 1000)),
     },
 
     SUMMARY: {

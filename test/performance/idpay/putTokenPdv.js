@@ -7,7 +7,10 @@ import { SharedArray } from 'k6/data'
 import defaultHandleSummaryBuilder from '../../common/handleSummaryBuilder.js'
 import { idpayDefaultHeaders } from '../../common/idpay/envVars.js'
 import { defaultApiOptionsBuilder } from '../../common/dynamicScenarios/defaultOptions.js'
-import { getScenarioTestEntity } from '../../common/dynamicScenarios/utils.js'
+import {
+    getScenarioTestEntity,
+    logErrorResult,
+} from '../../common/dynamicScenarios/utils.js'
 
 const REGISTERED_ENVS = [DEV, UAT, PROD]
 const baseUrl = getBaseUrl(REGISTERED_ENVS, 'pdv')
@@ -44,7 +47,7 @@ export default () => {
             )
 
             if (res.status != 200) {
-                console.error('ERROR-> ' + JSON.stringify(res))
+                logErrorResult('putToken', res, true)
                 return
             }
 
