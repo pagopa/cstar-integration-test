@@ -1,24 +1,47 @@
 export default function buildThresholds(
+    thresholdApiNames = [''],
+    maxAvgDurationMs,
+    maxP90DurationMs,
+    maxP95DurationMs
+) {
+    const httpReqDurationThresholds = thresholdApiNames.map((apiName) =>
+        buildHttpReqDurationThresholds(
+            apiName !== '' ? `{apiName:${apiName}}` : '',
+            maxAvgDurationMs,
+            maxP90DurationMs,
+            maxP95DurationMs
+        )
+    )
+
+    return Object.assign(
+        {
+            checks: [
+                {
+                    threshold: 'rate==1', // pass all checks
+                    abortOnFail: false,
+                    delayAbortEval: '10s',
+                },
+            ],
+            http_req_failed: [
+                {
+                    threshold: 'rate<0.05', // http errors should be less than 5%
+                    abortOnFail: false,
+                    delayAbortEval: '10s',
+                },
+            ],
+        },
+        httpReqDurationThresholds
+    )
+}
+
+function buildHttpReqDurationThresholds(
+    apiSelector,
     maxAvgDurationMs,
     maxP90DurationMs,
     maxP95DurationMs
 ) {
     return {
-        checks: [
-            {
-                threshold: 'rate==1', // pass all checks
-                abortOnFail: false,
-                delayAbortEval: '10s',
-            },
-        ],
-        http_req_failed: [
-            {
-                threshold: 'rate<0.05', // http errors should be less than 5%
-                abortOnFail: false,
-                delayAbortEval: '10s',
-            },
-        ],
-        http_req_duration: [
+        [`http_req_duration${apiSelector}`]: [
             {
                 threshold: `avg<${maxAvgDurationMs}`, // the avg of requests should be below maxAvgDurationMs
                 abortOnFail: false,

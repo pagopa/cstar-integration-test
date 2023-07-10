@@ -2,7 +2,7 @@ import { group, sleep } from 'k6'
 import { assert, statusOk } from '../../common/assertions.js'
 import { DEV, getBaseUrl } from '../../common/envs.js'
 
-import { getWalletDetail } from '../../common/api/idpay/idPayWallet.js'
+import { getWalletDetail } from '../../common/api/idpay/iddayWallet.js'
 import { getFCPanList } from '../../common/utils.js'
 import { SharedArray } from 'k6/data'
 import {

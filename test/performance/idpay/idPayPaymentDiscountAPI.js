@@ -33,6 +33,7 @@ let cfList = new SharedArray('cfList', getFCList)
 export const options = defaultApiOptionsBuilder(
     application,
     testName,
+    ['payment/createTransaction', 'payment/preAuth', 'payment/authTrx'],
     250,
     250,
     250
