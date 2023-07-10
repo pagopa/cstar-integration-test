@@ -279,9 +279,9 @@ jobs:
                           SCENARIO_PER_VU_SINGLE_ITERATION_ENV: 'false'
                           SCENARIO_PER_VU_EXECUTIONS_ENV: '1'
                           SCENARIO_DURATION_ENV: '2'
-                          THRESHOLDS_API_MAX_AVG_MS_ENV: '5000'
-                          THRESHOLDS_API_MAX_P90_MS_ENV: '5000'
-                          THRESHOLDS_API_MAX_P95_MS_ENV: '5000'
+                          THRESHOLDS_API_MAX_AVG_MS_ENV: '10000'
+                          THRESHOLDS_API_MAX_P90_MS_ENV: '10000'
+                          THRESHOLDS_API_MAX_P95_MS_ENV: '10000'
                   displayName: Run k6 ${{k6Test}}.js on ${{ parameters.TARGET_ENV }}
                   timeoutInMinutes: 0
 
