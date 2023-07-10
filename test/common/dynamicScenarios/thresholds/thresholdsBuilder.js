@@ -1,3 +1,5 @@
+import { coalesce } from '../../utils.js'
+
 export default function buildThresholds(
     thresholdApiNames,
     maxAvgDurationMs,
