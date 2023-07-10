@@ -1,6 +1,7 @@
 # cstar-integration-test
 
 A collection of integration tests for the CentroStella infrastructure.
+For IDPay domain, see [Confluece page](https://pagopa.atlassian.net/wiki/spaces/IDPAY/pages/612466897/PerformanceTests)
 
 ## Tests layout
 
