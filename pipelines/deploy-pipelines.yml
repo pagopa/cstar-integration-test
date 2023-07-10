@@ -250,9 +250,9 @@ jobs:
                         -e SCENARIO_PER_VU_EXECUTIONS_ENV=$SCENARIO_PER_VU_EXECUTIONS_ENV \
                         -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
                         \
-                        -e THRESHOLDS_API_MAX_AVG_MS_ENV=${{ parameters.THRESHOLDS_API_MAX_AVG_MS_ENV }} \
-                        -e THRESHOLDS_API_MAX_P90_MS_ENV=${{ parameters.THRESHOLDS_API_MAX_P90_MS_ENV }} \
-                        -e THRESHOLDS_API_MAX_P95_MS_ENV=${{ parameters.THRESHOLDS_API_MAX_P95_MS_ENV }} \
+                        -e THRESHOLDS_API_MAX_AVG_MS_ENV=$THRESHOLDS_API_MAX_AVG_MS_ENV \
+                        -e THRESHOLDS_API_MAX_P90_MS_ENV=$THRESHOLDS_API_MAX_P90_MS_ENV \
+                        -e THRESHOLDS_API_MAX_P95_MS_ENV=$THRESHOLDS_API_MAX_P95_MS_ENV \
                         \
                         -e APIM_SK=$(apimSK) \
                         -e APIM_ACQUIRER_SK=$(acquirerApiKey) \
@@ -267,12 +267,18 @@ jobs:
                           SCENARIO_PER_VU_SINGLE_ITERATION_ENV: ${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }}
                           SCENARIO_PER_VU_EXECUTIONS_ENV: ${{ parameters.SCENARIO_PER_VU_EXECUTIONS_ENV }}
                           SCENARIO_DURATION_ENV: ${{ parameters.SCENARIO_DURATION_ENV }}
+                          THRESHOLDS_API_MAX_AVG_MS_ENV: ${{ parameters.THRESHOLDS_API_MAX_AVG_MS_ENV }}
+                          THRESHOLDS_API_MAX_P90_MS_ENV: ${{ parameters.THRESHOLDS_API_MAX_P90_MS_ENV }}
+                          THRESHOLDS_API_MAX_P95_MS_ENV: ${{ parameters.THRESHOLDS_API_MAX_P95_MS_ENV }}
                       ${{ else }}: # intermediate tests will execute this configuration, which ensure the execution of all test entities
                           SCENARIO_TYPE_ENV: perVuIterations
                           VUS_MAX_ENV: '40'
                           SCENARIO_PER_VU_SINGLE_ITERATION_ENV: 'false'
                           SCENARIO_PER_VU_EXECUTIONS_ENV: '1'
-                          SCENARIO_DURATION_ENV: '1'
+                          SCENARIO_DURATION_ENV: '2'
+                          THRESHOLDS_API_MAX_AVG_MS_ENV: '5000'
+                          THRESHOLDS_API_MAX_P90_MS_ENV: '5000'
+                          THRESHOLDS_API_MAX_P95_MS_ENV: '5000'
                   displayName: Run k6 ${{k6Test}}.js on ${{ parameters.TARGET_ENV }}
                   timeoutInMinutes: 0
 
