@@ -261,7 +261,7 @@ jobs:
                         grafana/k6:latest \
                         run /app/test/performance/idpay/${{k6Test}}.js
                   env:
-                      ${{ if (eq(k6Test, parameters.SCRIPT)) }}:
+                      ${{ if eq(k6Test, parameters.SCRIPT) }}:
                           SCENARIO_TYPE_ENV: ${{ parameters.SCENARIO_TYPE_ENV }}
                           SCENARIO_PER_VU_SINGLE_ITERATION_ENV: ${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }}
                           SCENARIO_PER_VU_EXECUTIONS_ENV: ${{ parameters.SCENARIO_PER_VU_EXECUTIONS_ENV }}
