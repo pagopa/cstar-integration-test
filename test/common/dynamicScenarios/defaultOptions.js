@@ -10,6 +10,7 @@ function applyTags(options, tags) {
 }
 
 export const defaultApiOptions = buildOption(
+    undefined,
     CONFIG.THRESHOLDS.AVG,
     CONFIG.THRESHOLDS.P90,
     CONFIG.THRESHOLDS.P95
