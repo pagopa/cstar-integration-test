@@ -23,12 +23,12 @@ export const CONFIG = {
         perVuIterations: {
             ONESHOT: !(__ENV.SCENARIO_PER_VU_SINGLE_ITERATION_ENV === 'false'),
             EXECUTIONS: coalesce(__ENV.SCENARIO_PER_VU_EXECUTIONS_ENV, 1),
-            DURATION: coalesce(__ENV.SCENARIO_PER_VU_DURATION_ENV, 1),
+            DURATION: coalesce(__ENV.SCENARIO_DURATION_ENV, 3),
         },
 
         constantArrivalRate: {
             RATE: vu,
-            DURATION: coalesce(__ENV.SCENARIO_PER_VU_DURATION_ENV, 1),
+            DURATION: coalesce(__ENV.SCENARIO_DURATION_ENV, 3),
             TIME_UNIT: coalesce(__ENV.SCENARIO_TIME_UNIT_ENV, 1),
         },
 
