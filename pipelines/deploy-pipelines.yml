@@ -237,7 +237,7 @@ jobs:
                         \
                         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
                         -e SCENARIO_TYPE_ENV=$SCENARIO_TYPE_ENV \
-                        -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
+                        -e VUS_MAX_ENV=$VUS_MAX_ENV \
                         -e MAX_AVAILABLE_TEST_ENTITIES_ENV=${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} \
                         \
                         -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
@@ -263,14 +263,16 @@ jobs:
                   env:
                       ${{ if eq(k6Test, parameters.SCRIPT) }}:
                           SCENARIO_TYPE_ENV: ${{ parameters.SCENARIO_TYPE_ENV }}
+                          VUS_MAX_ENV: ${{ parameters.VUS_MAX_ENV }}
                           SCENARIO_PER_VU_SINGLE_ITERATION_ENV: ${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }}
                           SCENARIO_PER_VU_EXECUTIONS_ENV: ${{ parameters.SCENARIO_PER_VU_EXECUTIONS_ENV }}
                           SCENARIO_DURATION_ENV: ${{ parameters.SCENARIO_DURATION_ENV }}
                       ${{ else }}: # intermediate tests will execute this configuration, which ensure the execution of all test entities
                           SCENARIO_TYPE_ENV: perVuIterations
+                          VUS_MAX_ENV: '40'
                           SCENARIO_PER_VU_SINGLE_ITERATION_ENV: 'false'
                           SCENARIO_PER_VU_EXECUTIONS_ENV: '1'
-                          SCENARIO_DURATION_ENV: '3'
+                          SCENARIO_DURATION_ENV: '2'
                   displayName: Run k6 ${{k6Test}}.js on ${{ parameters.TARGET_ENV }}
                   timeoutInMinutes: 0
 
