@@ -3,6 +3,7 @@ import {
     createTransaction,
     preAuth,
     authTrx,
+    PAYMENT_API_NAMES,
 } from '../../common/api/idpay/idPayPaymentDiscount.js'
 import { assert, statusCreated, statusOk } from '../../common/assertions.js'
 import { DEV, UAT, PROD, getBaseUrl } from '../../common/envs.js'
@@ -33,7 +34,7 @@ let cfList = new SharedArray('cfList', getFCList)
 export const options = defaultApiOptionsBuilder(
     application,
     testName,
-    ['payment/createTransaction', 'payment/preAuth', 'payment/authTrx'],
+    Object.values(PAYMENT_API_NAMES),
     250,
     250,
     250

@@ -1,10 +1,16 @@
 import http from 'k6/http'
 import { logResult } from '../../dynamicScenarios/utils.js'
 
+export const PAYMENT_API_NAMES = {
+    createTransaction: 'payment/createTransaction',
+    preAuth: 'payment/preAuth',
+    authTrx: 'payment/authTrx',
+}
+
 const API_PREFIX = '/idpay/payment/qr-code'
 const API_MIL_PREFIX = '/idpay/mil/payment/qr-code/merchant'
 export function createTransaction(baseUrl, body, params) {
-    const apiName = 'payment/createTransaction'
+    const apiName = PAYMENT_API_NAMES.createTransaction
     const myParams = Object.assign({}, params, { tags: { apiName } })
     const res = http.post(`${baseUrl}${API_MIL_PREFIX}`, body, myParams)
 
@@ -13,7 +19,7 @@ export function createTransaction(baseUrl, body, params) {
 }
 
 export function preAuth(baseUrl, trxCode, params) {
-    const apiName = 'payment/preAuth'
+    const apiName = PAYMENT_API_NAMES.preAuth
     const myParams = Object.assign({}, params, { tags: { apiName } })
     const res = http.put(
         `${baseUrl}${API_PREFIX}/${trxCode}/relate-user`,
@@ -26,7 +32,7 @@ export function preAuth(baseUrl, trxCode, params) {
 }
 
 export function authTrx(baseUrl, trxCode, params) {
-    const apiName = 'payment/authTrx'
+    const apiName = PAYMENT_API_NAMES.authTrx
     const myParams = Object.assign({}, params, { tags: { apiName } })
     const res = http.put(
         `${baseUrl}${API_PREFIX}/${trxCode}/authorize`,

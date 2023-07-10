@@ -4,6 +4,7 @@ import {
     putCheckPrerequisites,
     getStatus,
     putSaveConsent,
+    ONBOARDING_API_NAMES,
 } from '../../common/api/idpay/idpayOnboardingCitizen.js'
 import {
     assert,
@@ -36,7 +37,11 @@ const testName = 'idpayOnboardingAPI'
 const cfList = new SharedArray('cfList', getFCList)
 
 // K6 configurations
-export const options = defaultApiOptionsBuilder(application, testName)
+export const options = defaultApiOptionsBuilder(
+    application,
+    testName,
+    Object.values(ONBOARDING_API_NAMES)
+)
 
 export const handleSummary = defaultHandleSummaryBuilder(application, testName)
 
