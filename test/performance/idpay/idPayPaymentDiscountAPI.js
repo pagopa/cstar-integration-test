@@ -30,7 +30,13 @@ const testName = 'idpayPaymentDiscountAPI'
 let cfList = new SharedArray('cfList', getFCList)
 
 // K6 configurations
-export const options = defaultApiOptionsBuilder(application, testName)
+export const options = defaultApiOptionsBuilder(
+    application,
+    testName,
+    250,
+    250,
+    250
+)
 
 export const handleSummary = defaultHandleSummaryBuilder(application, testName)
 
