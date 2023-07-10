@@ -272,7 +272,7 @@ jobs:
                           VUS_MAX_ENV: '40'
                           SCENARIO_PER_VU_SINGLE_ITERATION_ENV: 'false'
                           SCENARIO_PER_VU_EXECUTIONS_ENV: '1'
-                          SCENARIO_DURATION_ENV: '2'
+                          SCENARIO_DURATION_ENV: '1'
                   displayName: Run k6 ${{k6Test}}.js on ${{ parameters.TARGET_ENV }}
                   timeoutInMinutes: 0
 
