@@ -1,5 +1,5 @@
 import http from 'k6/http'
-import { logResult } from '../../dynamicScenarios/utils'
+import { logResult } from '../../dynamicScenarios/utils.js'
 
 const API_PREFIX = '/idpay/payment/qr-code'
 const API_MIL_PREFIX = '/idpay/mil/payment/qr-code/merchant'
