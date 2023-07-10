@@ -4,7 +4,7 @@ import { testEntitiesBasedScenarioPrefix } from '../utils.js'
 
 const scenarios = {}
 
-if (CONFIG.SCENARIOS.perVuIterations.ONESHOT) {
+if (!CONFIG.SCENARIOS.perVuIterations.ONESHOT) {
     let counter = 0
     let startTime = 0
     let availableEntitiesData = CONFIG.MAX_AVAILABLE_TEST_ENTITIES_ENV
