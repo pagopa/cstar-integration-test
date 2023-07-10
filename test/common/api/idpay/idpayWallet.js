@@ -1,4 +1,5 @@
 import http from 'k6/http'
+import { logResult } from '../../dynamicScenarios/utils'
 
 const API_PREFIX = '/idpay'
 
@@ -13,7 +14,7 @@ export function putEnrollInstrumentIssuer(
         body,
         { headers }
     )
-    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
+    logResult('wallet/putEnrollInstrumentIssuer', res)
     return res
 }
 
@@ -23,7 +24,7 @@ export function putEnrollIbanIssuer(baseUrl, body, headers, initiativeId) {
         body,
         { headers }
     )
-    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
+    logResult('wallet/putEnrollIbanIssuer', res)
     return res
 }
 
@@ -34,7 +35,7 @@ export function putEnrollIban(baseUrl, initiativeId, params, body) {
         body,
         myParams
     )
-    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
+    logResult('wallet/putEnrollIban', res)
     return res
 }
 
@@ -45,6 +46,6 @@ export function getWalletDetail(baseUrl, headers, params, initiativeId) {
         myParams,
         { headers }
     )
-    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
+    logResult('wallet/getWalletDetail', res)
     return res
 }

@@ -268,9 +268,9 @@ jobs:
                           SCENARIO_DURATION_ENV: ${{ parameters.SCENARIO_DURATION_ENV }}
                       ${{ else }}: # intermediate tests will execute this configuration, which ensure the execution of all test entities
                           SCENARIO_TYPE_ENV: perVuIterations
-                          SCENARIO_PER_VU_SINGLE_ITERATION_ENV: false
-                          SCENARIO_PER_VU_EXECUTIONS_ENV: 1
-                          SCENARIO_DURATION_ENV: 3
+                          SCENARIO_PER_VU_SINGLE_ITERATION_ENV: 'false'
+                          SCENARIO_PER_VU_EXECUTIONS_ENV: '1'
+                          SCENARIO_DURATION_ENV: '3'
                   displayName: Run k6 ${{k6Test}}.js on ${{ parameters.TARGET_ENV }}
                   timeoutInMinutes: 0
 

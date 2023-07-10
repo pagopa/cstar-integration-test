@@ -9,7 +9,7 @@ const rampStageNumber = Math.max(
 
 export const CONFIG = {
     TARGET_ENV: __ENV.TARGET_ENV,
-    DUMP_REQUESTS: __ENV.REQ_DUMP,
+    DUMP_REQUESTS: __ENV.REQ_DUMP && __ENV.REQ_DUMP.toLowerCase() === 'true',
 
     VIRTUAL_USERS: vu,
     MAX_AVAILABLE_TEST_ENTITIES_ENV: coalesce(
@@ -21,7 +21,10 @@ export const CONFIG = {
         TYPES: coalesce(__ENV.SCENARIO_TYPE_ENV, 'ALL').split(','),
 
         perVuIterations: {
-            ONESHOT: !(__ENV.SCENARIO_PER_VU_SINGLE_ITERATION_ENV === 'false'),
+            ONESHOT:
+                __ENV.SCENARIO_PER_VU_SINGLE_ITERATION_ENV &&
+                __ENV.SCENARIO_PER_VU_SINGLE_ITERATION_ENV.toLowerCase() !==
+                    'false',
             EXECUTIONS: coalesce(__ENV.SCENARIO_PER_VU_EXECUTIONS_ENV, 1),
             DURATION: coalesce(__ENV.SCENARIO_DURATION_ENV, 3),
         },

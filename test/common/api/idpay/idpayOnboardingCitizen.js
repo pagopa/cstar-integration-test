@@ -1,4 +1,5 @@
 import http from 'k6/http'
+import { logResult } from '../../dynamicScenarios/utils'
 
 const API_PREFIX = '/idpay'
 export function getInitiative(baseUrl, params, serviceId, headers) {
@@ -8,18 +9,14 @@ export function getInitiative(baseUrl, params, serviceId, headers) {
         myParams,
         headers
     )
-    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
+    logResult('onboarding/getInitiative', res)
     return res
 }
 
 export function putOnboardingCitizen(baseUrl, body, params) {
     const myParams = Object.assign({}, params)
-    const res = http.put(
-        `${baseUrl}${API_PREFIX}/onboarding/`,
-        body,
-        myParams
-    )  
-    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
+    const res = http.put(`${baseUrl}${API_PREFIX}/onboarding/`, body, myParams)
+    logResult('onboarding/putOnboardingCitizen', res)
     return res
 }
 
@@ -30,7 +27,7 @@ export function putCheckPrerequisites(baseUrl, body, params) {
         body,
         myParams
     )
-    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
+    logResult('onboarding/putCheckPrerequisites', res)
     return res
 }
 
@@ -40,10 +37,9 @@ export function getStatus(baseUrl, params, initiativeId) {
         `${baseUrl}${API_PREFIX}/onboarding/${initiativeId}/status`,
         myParams
     )
-    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
+    logResult('onboarding/getStatus', res)
     return res
 }
-
 
 export function putSaveConsent(baseUrl, body, params) {
     const myParams = Object.assign({}, params)
@@ -52,6 +48,6 @@ export function putSaveConsent(baseUrl, body, params) {
         body,
         myParams
     )
-    __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
+    logResult('onboarding/putSaveConsent', res)
     return res
 }
