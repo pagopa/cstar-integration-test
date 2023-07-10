@@ -16,6 +16,9 @@ export const IDPAY_CONFIG = {
         APIM_SK: __ENV.APIM_SK,
         APIM_MIL_SK: __ENV.APIM_MIL_SK,
         APIM_ACQUIRER_SK: __ENV.APIM_ACQUIRER_SK,
+        APIM_ISSUER_SK: __ENV.APIM_ISSUER_SK,
+        APIM_RTD_SK: __ENV.APIM_RTD_SK,
+        PDV_API_KEY: __ENV.PDV_API_KEY,
     },
 }
 

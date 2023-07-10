@@ -71,11 +71,11 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
 
     params.headers = {
         'Ocp-Apim-Trace': 'true',
-        'Ocp-Apim-Subscription-Key': __ENV.APIM_SK,
+        'Ocp-Apim-Subscription-Key': __ENV.APIM_RTD_SK,
     }
 
     param.headers = {
-        'Ocp-Apim-Subscription-Key': __ENV.APIM_SK,
+        'Ocp-Apim-Subscription-Key': __ENV.APIM_RTD_SK,
         'x-ms-blob-type': 'BlockBlob',
         'x-ms-version': '2020-12-06',
         'Content-Type': 'text/csv',

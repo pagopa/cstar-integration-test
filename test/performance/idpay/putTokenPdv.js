@@ -29,12 +29,15 @@ export const handleSummary = defaultHandleSummaryBuilder(application, testName)
 export default () => {
     const scenarioEntity = getScenarioTestEntity(cfList)
     const uniqueCF = scenarioEntity.FC
+    const headers = Object.assign({}, idpayDefaultHeaders, {
+        'Ocp-Apim-Subscription-Key': IDPAY_CONFIG.AUTH_KEYS.PDV_API_KEY,
+    })
 
     //UPSERT TOKEN
     group('Should onboard Citizen', () => {
         group('When the inititive and consents exist', () => {
             const params = {
-                headers: idpayDefaultHeaders,
+                headers,
                 body: {
                     pii: uniqueCF,
                 },

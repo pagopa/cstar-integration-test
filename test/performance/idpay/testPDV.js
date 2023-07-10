@@ -45,7 +45,7 @@ const random = (length = 8) => {
 
 export default function () {
     baseUrl = services[`${__ENV.TARGET_ENV}_pdv`].baseUrl
-    var apiKey = `${__ENV.APIM_SK}`
+    var apiKey = `${__ENV.PDV_API_KEY}`
 
     var params = {
         headers: {

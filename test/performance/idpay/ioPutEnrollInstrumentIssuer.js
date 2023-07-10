@@ -41,6 +41,8 @@ export default () => {
                     {
                         'Accept-Language': 'it_IT',
                         'Fiscal-Code': cf,
+                        'Ocp-Apim-Subscription-Key':
+                            IDPAY_CONFIG.AUTH_KEYS.APIM_ISSUER_SK,
                     },
                     idpayDefaultHeaders
                 ),
