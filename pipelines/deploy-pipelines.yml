@@ -244,7 +244,7 @@ jobs:
                         -e ACQUIRER_ID=${{ parameters.ACQUIRER_ID }} \
                         -e MERCHANT_FISCALCODE=${{ parameters.MERCHANT_FISCALCODE }} \
                         \
-                        -e SCENARIO_DURATION_ENV=parameters.SCENARIO_DURATION_ENV \
+                        -e SCENARIO_DURATION_ENV=$SCENARIO_DURATION_ENV \
                         -e SCENARIO_TIME_UNIT_ENV=${{ parameters.SCENARIO_TIME_UNIT_ENV }} \
                         -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=$SCENARIO_PER_VU_SINGLE_ITERATION_ENV \
                         -e SCENARIO_PER_VU_EXECUTIONS_ENV=$SCENARIO_PER_VU_EXECUTIONS_ENV \
