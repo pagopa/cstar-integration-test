@@ -6,8 +6,8 @@ export default function buildThresholds(
     maxP90DurationMs,
     maxP95DurationMs
 ) {
-    const httpReqDurationThresholds = Object.fromEntries(
-        coalesce(thresholdApiNames, ['']).map((apiName) =>
+    const httpReqDurationThresholds = coalesce(thresholdApiNames, [''])
+        .map((apiName) =>
             buildHttpReqDurationThresholds(
                 apiName !== '' ? `{apiName:${apiName}}` : '',
                 maxAvgDurationMs,
@@ -15,7 +15,7 @@ export default function buildThresholds(
                 maxP95DurationMs
             )
         )
-    )
+        .reduce((out, i) => Object.assign(out, i))
 
     return Object.assign(
         {
