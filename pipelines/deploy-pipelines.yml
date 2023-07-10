@@ -123,7 +123,7 @@ variables:
     - name: k6Test_ioPutEnrollIban
       value: idpayOnboardingAPI,ioPutEnrollIban
     - name: k6Test_rtdTransactionsFile
-      value: idpayOnboardingAPI,idPayPaymentDiscountAPI,ioPutEnrollInstrumentIssuer,ioPutEnrollIban,../rtdTransactionsFile
+      value: idpayOnboardingAPI,ioPutEnrollInstrumentIssuer,ioPutEnrollIban,../rtdTransactionsFile
     - name: k6Test_testPDV
       value: testPDV
 
@@ -234,22 +234,40 @@ jobs:
                         -v $(pwd):/app \
                         --workdir "/app" \
                         -e RESULTS_DIR=/app \
+
                         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
-                        -e SCENARIO_TYPE_ENV=${{ parameters.SCENARIO_TYPE_ENV }} \
-                        -e MAX_AVAILABLE_TEST_ENTITIES_ENV=${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} \
-                        -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
+                        -e SCENARIO_TYPE_ENV=$SCENARIO_TYPE_ENV \
                         -e VUS_MAX_ENV=${{ parameters.VUS_MAX_ENV }} \
+                        -e MAX_AVAILABLE_TEST_ENTITIES_ENV=${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} \
+                        
+                        -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
+                        -e ACQUIRER_ID=${{ parameters.ACQUIRER_ID }} \
+                        -e MERCHANT_FISCALCODE=${{ parameters.MERCHANT_FISCALCODE }} \
+                        
                         -e SCENARIO_DURATION_ENV=${{ parameters.SCENARIO_DURATION_ENV }} \
-                        -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }} \
+                        -e SCENARIO_TIME_UNIT_ENV=${{ parameters.SCENARIO_TIME_UNIT_ENV }} \
+                        -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=$SCENARIO_PER_VU_SINGLE_ITERATION_ENV \
+                        -e SCENARIO_PER_VU_EXECUTIONS_ENV=${{ parameters.SCENARIO_PER_VU_EXECUTIONS_ENV }} \
+                        -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
+
+                        -e THRESHOLDS_API_MAX_AVG_MS_ENV=${{ parameters.THRESHOLDS_API_MAX_AVG_MS_ENV }} \
+                        -e THRESHOLDS_API_MAX_P90_MS_ENV=${{ parameters.THRESHOLDS_API_MAX_P90_MS_ENV }} \
+                        -e THRESHOLDS_API_MAX_P95_MS_ENV=${{ parameters.THRESHOLDS_API_MAX_P95_MS_ENV }} \
+
                         -e APIM_SK=$(apimSK) \
                         -e APIM_ACQUIRER_SK=$(acquirerApiKey) \
                         -e APIM_MIL_SK=$(milApiKey) \
-                        -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
-                        -e MERCHANT_FISCALCODE=${{ parameters.MERCHANT_FISCALCODE }} \
-                        -e ACQUIRER_ID=${{ parameters.ACQUIRER_ID }} \
+
                         grafana/k6:latest \
                         run /app/test/performance/idpay/${{k6Test}}.js
-                  displayName: Run k6 ${{k6Test}}.js
+                  env:
+                      ${{ if (eq(k6Test, parameters.SCRIPT)) }}:
+                          SCENARIO_TYPE_ENV: ${{ parameters.SCENARIO_TYPE_ENV }}
+                          SCENARIO_PER_VU_SINGLE_ITERATION_ENV: ${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }}
+                      ${{ else }}:
+                          SCENARIO_TYPE_ENV: perVuIterations
+                          SCENARIO_PER_VU_SINGLE_ITERATION_ENV: false
+                  displayName: Run k6 ${{k6Test}}.js on ${{ parameters.TARGET_ENV }}
                   timeoutInMinutes: 0
 
           - task: PublishTestResults@2
