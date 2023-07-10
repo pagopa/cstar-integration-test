@@ -62,6 +62,8 @@ export const CONFIG = {
     },
 }
 
+console.log('Running performance test with CONFIG: ', JSON.stringify(CONFIG))
+
 export const defaultHeaders = {
     'Content-Type': 'application/json',
 }
