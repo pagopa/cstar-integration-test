@@ -3,6 +3,7 @@ import {
     randomIntBetween,
 } from 'https://jslib.k6.io/k6-utils/1.1.0/index.js'
 import papaparse from 'https://jslib.k6.io/papaparse/5.1.1/index.js'
+import exec from 'k6/execution'
 
 export function randomFiscalCode() {
     '^([A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST]{1}[0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z]{1}[0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]{1})$'
@@ -37,15 +38,44 @@ export function chooseRandomPanFromList(panList) {
     return panList.list[index]
 }
 
+export function getRelativePathToRootFolder() {
+    try {
+        open('.')
+    } catch (error) {
+        const testFolderMatch = error.message.match('(?:\\\\|/)test(?:\\\\|/)')
+        if (!testFolderMatch) {
+            console.log(
+                'WARNING! Unexpected folder structure, cannot found test folder'
+            )
+            return '../..'
+        }
+        const path = error.message.substr(testFolderMatch.index - 1)
+        return path
+            .match(/(\\\\|\/)/g)
+            .map((x) => '..')
+            .join('/')
+    }
+    return '../..'
+}
+
 export function getFCList() {
-    return papaparse.parse(open('../../assets/fc_pgpans.csv'), { header: true }).data;
+    return papaparse.parse(
+        open(`${getRelativePathToRootFolder()}/assets/fc_pgpans.csv`),
+        { header: true }
+    ).data
 }
 
 export function getFCPanList() {
-    return papaparse.parse(open('../../assets/fc_pgpans.csv'), { header: true }).data;
+    return papaparse.parse(
+        open(`${getRelativePathToRootFolder()}/assets/fc_pgpans.csv`),
+        { header: true }
+    ).data
 }
 export function getFCIbanList() {
-    return papaparse.parse(open('../../assets/fc_iban.csv'), { header: true }).data;
+    return papaparse.parse(
+        open(`${getRelativePathToRootFolder()}/assets/fc_iban.csv`),
+        { header: true }
+    ).data
 }
 
 function getFiscalCodeMonth(month) {
@@ -68,4 +98,14 @@ function getFiscalCodeMonth(month) {
 
 export function coalesce(o1, o2) {
     return o1 !== undefined && o1 !== null ? o1 : o2
+}
+
+export function abort(description) {
+    description = `Aborting execution due to: ${description}`
+    if (exec) {
+        console.error(description)
+        exec.test.abort()
+    } else {
+        throw new Error(description)
+    }
 }

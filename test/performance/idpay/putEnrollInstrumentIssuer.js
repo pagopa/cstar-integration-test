@@ -1,19 +1,13 @@
 import { group, sleep } from 'k6'
-import { getHashedPan } from '../common/api/rtdPaymentInstrumentManager.js'
-import { assert, statusOk, bodyLengthBetween } from '../common/assertions.js'
-import {
-    isEnvValid,
-    isTestEnabledOnEnv,
-    DEV,
-    UAT,
-    PROD,
-} from '../common/envs.js'
+import { getHashedPan } from '../../common/api/rtdPaymentInstrumentManager.js'
+import { assert, statusOk, bodyLengthBetween } from '../../common/assertions.js'
+import { isEnvValid, isTestEnabledOnEnv, DEV, UAT } from '../../common/envs.js'
 import dotenv from 'k6/x/dotenv'
 import exec from 'k6/execution'
 
-const REGISTERED_ENVS = [DEV, UAT, PROD]
+const REGISTERED_ENVS = [DEV, UAT]
 
-const services = JSON.parse(open('../../services/environments.json'))
+const services = JSON.parse(open('../../../services/environments.json'))
 export let options = {
     stages: [
         { duration: '1m', target: 3 },
@@ -29,14 +23,14 @@ let baseUrl
 let myEnv
 
 if (isEnvValid(__ENV.TARGET_ENV)) {
-    myEnv = dotenv.parse(open(`../../.env.${__ENV.TARGET_ENV}.local`))
+    myEnv = dotenv.parse(open(`../../../.env.${__ENV.TARGET_ENV}.local`))
     baseUrl = services[`${__ENV.TARGET_ENV}_issuer`].baseUrl
 
     options.tlsAuth = [
         {
             domains: [baseUrl],
-            cert: open(`../../certs/${myEnv.MAUTH_CERT_NAME}`),
-            key: open(`../../certs/${myEnv.MAUTH_PRIVATE_KEY_NAME}`),
+            cert: open(`../../../certs/${myEnv.MAUTH_CERT_NAME}`),
+            key: open(`../../../certs/${myEnv.MAUTH_PRIVATE_KEY_NAME}`),
         },
     ]
 
