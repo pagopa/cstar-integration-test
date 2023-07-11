@@ -236,10 +236,12 @@ jobs:
                       secureFile: 'merchantList.csv'
                 - script: |
                       cp $(merchantList.secureFilePath) ./assets
-                      curl -X PUT https://api-io.${{ parameters.TARGET_ENV}}.cstar.pagopa.it/idpay/mil/payment/qr-code/merchant/initiative/${{ parameters.INITIATIVE_ID }}/upload \
+                      response=$(curl -X PUT https://api-io.${{ parameters.TARGET_ENV}}.cstar.pagopa.it/idpay/mil/payment/qr-code/merchant/initiative/${{ parameters.INITIATIVE_ID }}/upload \
                         -H 'x-acquirer-id: ${{ parameters.ACQUIRER_ID }}' \
                         -H 'Ocp-Apim-Subscription-Key: $(milApiKey)' \
-                        -F 'file=@$(merchantList.secureFilePath)'
+                        -F 'file=@$(merchantList.secureFilePath)')
+                      echo "Onboarding result: " $response
+                      echo $response | grep \"OK\"
                   displayName: onboarding merchantList on input initiative
                   timeoutInMinutes: 0
 
