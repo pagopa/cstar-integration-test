@@ -1,6 +1,6 @@
 import { group, sleep } from 'k6'
 import { assert, statusOk } from '../../common/assertions.js'
-import { DEV, UAT, PROD, getBaseUrl } from '../../common/envs.js'
+import { DEV, UAT, getBaseUrl } from '../../common/envs.js'
 import { putEnrollIban } from '../../common/api/idpay/idPayWallet.js'
 import { getFCIbanList } from '../../common/utils.js'
 import { SharedArray } from 'k6/data'
@@ -15,7 +15,7 @@ import {
     logErrorResult,
 } from '../../common/dynamicScenarios/utils.js'
 
-const REGISTERED_ENVS = [DEV, UAT, PROD]
+const REGISTERED_ENVS = [DEV, UAT]
 const baseUrl = getBaseUrl(REGISTERED_ENVS, 'io')
 
 const application = 'idpay'

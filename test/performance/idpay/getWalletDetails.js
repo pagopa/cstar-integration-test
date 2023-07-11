@@ -1,6 +1,6 @@
 import { group, sleep } from 'k6'
 import { assert, statusOk } from '../../common/assertions.js'
-import { DEV, getBaseUrl } from '../../common/envs.js'
+import { DEV, UAT, getBaseUrl } from '../../common/envs.js'
 
 import { getWalletDetail } from '../../common/api/idpay/iddayWallet.js'
 import { getFCPanList } from '../../common/utils.js'
@@ -8,7 +8,6 @@ import { SharedArray } from 'k6/data'
 import {
     IDPAY_CONFIG,
     buildIOAuthorizationHeader,
-    idpayDefaultHeaders,
 } from '../../common/idpay/envVars.js'
 import defaultHandleSummaryBuilder from '../../common/handleSummaryBuilder.js'
 import { defaultApiOptionsBuilder } from '../../common/dynamicScenarios/defaultOptions.js'
@@ -17,7 +16,7 @@ import {
     logErrorResult,
 } from '../../common/dynamicScenarios/utils.js'
 
-const REGISTERED_ENVS = [DEV, UAT, PROD]
+const REGISTERED_ENVS = [DEV, UAT]
 const baseUrl = getBaseUrl(REGISTERED_ENVS, 'io')
 
 const application = 'idpay'

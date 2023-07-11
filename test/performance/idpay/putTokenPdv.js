@@ -1,7 +1,7 @@
 import { group, sleep } from 'k6'
 import { upsertToken } from '../../common/api/pdv.js'
 import { assert, statusOk } from '../../common/assertions.js'
-import { DEV, UAT, PROD } from '../../common/envs.js'
+import { DEV, UAT } from '../../common/envs.js'
 import { getFCList } from '../../common/utils.js'
 import { SharedArray } from 'k6/data'
 import defaultHandleSummaryBuilder from '../../common/handleSummaryBuilder.js'
@@ -12,7 +12,7 @@ import {
     logErrorResult,
 } from '../../common/dynamicScenarios/utils.js'
 
-const REGISTERED_ENVS = [DEV, UAT, PROD]
+const REGISTERED_ENVS = [DEV, UAT]
 const baseUrl = getBaseUrl(REGISTERED_ENVS, 'pdv')
 
 const application = 'pdv'
