@@ -29,9 +29,13 @@ export function testEntitiesBasedScenariosBaseIndexRetriever() {
 }
 export function getScenarioTestEntity(testEntities) {
     const baseIndex = testEntitiesBasedScenariosBaseIndexRetriever()
-    return testEntities[
-        (baseIndex + scenario.iterationInTest) % testEntities.length
-    ]
+    const index = baseIndex + scenario.iterationInTest
+    if (index > testEntities.length) {
+        console.log(
+            'Reached the end of the provided test entities! reading from start!'
+        )
+    }
+    return testEntities[index % testEntities.length]
 }
 
 export function logResult(opName, result, expectedHttpState) {
