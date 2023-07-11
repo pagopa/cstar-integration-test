@@ -29,7 +29,9 @@ export function testEntitiesBasedScenariosBaseIndexRetriever() {
 }
 export function getScenarioTestEntity(testEntities) {
     const baseIndex = testEntitiesBasedScenariosBaseIndexRetriever()
-    return testEntities[baseIndex + scenario.iterationInTest]
+    return testEntities[
+        (baseIndex + scenario.iterationInTest) % testEntities.length
+    ]
 }
 
 export function logResult(opName, result, expectedHttpState) {
