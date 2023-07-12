@@ -11,10 +11,10 @@ export function login(baseUrl, fiscalCode) {
     return res.body
 }
 
-export function loginFullUrl(url, fiscalCode) {
+export function loginFullUrl(url, fiscalCode, subscriptionKey) {
     const myUrl = new URL(url)
     myUrl.searchParams.append('fiscalCode', fiscalCode)
-    const res = http.post(myUrl.toString(), {})
+    const res = http.post(myUrl.toString(), {},{headers: { 'Ocp-Apim-Subscription-Key': subscriptionKey }})
     __ENV.REQ_DUMP === undefined || console.log(JSON.stringify(res, null, 2))
     return res.body
 }

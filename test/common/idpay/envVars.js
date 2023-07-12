@@ -19,6 +19,7 @@ export const IDPAY_CONFIG = {
         APIM_ISSUER_SK: __ENV.APIM_ISSUER_SK,
         APIM_RTD_SK: __ENV.APIM_RTD_SK,
         PDV_API_KEY: __ENV.PDV_API_KEY,
+        APIM_LOGIN_KEY: __ENV.APIM_LOGIN_KEY,
     },
 }
 
@@ -33,8 +34,9 @@ export const idpayDefaultHeaders = Object.assign(
 const ioBaseUrl = getBaseUrl([DEV, UAT, PROD], 'io')
 export function buildIOAuthorizationHeader(fiscalCode) {
     const authToken = loginFullUrl(
-        `${ioBaseUrl}/bpd/pagopa/api/v1/login`,
-        fiscalCode
+        `${ioBaseUrl}/rtd/mock-io/login`,
+        fiscalCode,
+        IDPAY_CONFIG.AUTH_KEYS.APIM_LOGIN_KEY
     )
 
     return Object.assign(
