@@ -313,7 +313,7 @@ jobs:
           displayName: 'Forcing refund file export on ${{ variables.environment }} using date ${{ parameters.DATE_REFUND }}'
           pool:
             name: $(selfHostedAgentPool)
-          environment: '$(environment)'
+          environment: '${{ upper(parameters.TARGET_ENV) }}'
           strategy:
             runOnce:
               deploy:
