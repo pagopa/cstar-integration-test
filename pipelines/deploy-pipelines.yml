@@ -46,7 +46,7 @@ parameters:
     - name: 'DATE_REFUND'
       displayName: 'Expected refund notification date when testing payments (if empty it will be skipped)'
       type: string
-      default: ${{ format('{0:yyyyMMdd}', pipeline.startTime.AddDays(1)) }}
+      default: ${{ format('{0:yyyyMMdd}', pipeline.startTime) }}
 
     - name: 'SCENARIO_TYPE_ENV'
       displayName: 'Scenario type'
