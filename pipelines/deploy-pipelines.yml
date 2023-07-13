@@ -308,14 +308,17 @@ jobs:
                 targetPath: 'results'
                 publishLocation: 'pipeline'
     - ${{ if and( containsValue(split(variables[format('k6Test_{0}', parameters.SCRIPT)], ','), 'idPayPaymentDiscountAPI'), ne(parameters.DATE_REFUND, '')) }}:
-        - job: ForceExportRefund
+        - deployment: ForceExportRefund
           timeoutInMinutes: 0
           displayName: 'Forcing refund file export on ${{ variables.environment }} using date ${{ parameters.DATE_REFUND }}'
           pool:
             name: $(selfHostedAgentPool)
           environment: '$(environment)'
-          steps:
-            - script: |
-                response=$(curl -X GET https://${{ parameter.TARGET_ENV }}01.idpay.internal.${{ parameter.TARGET_ENV }}.cstar.pagopa.it/idpayrewardnotification/idpay/reward/notification/exports/start?notificationDateToSearch=${{ parameters.DATE_REFUND }} -H 'accept: */*' )
-                echo "Refund result: " $response
-#                echo $response | grep \"VALIDATED\" TODO validate expression
+          strategy:
+            runOnce:
+              deploy:
+                steps:
+                  - script: |
+                      response=$(curl -X GET https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpayrewardnotification/idpay/reward/notification/exports/start?notificationDateToSearch=${{ parameters.DATE_REFUND }} -H 'accept: */*' )
+                      echo "Refund result: " $response
+      #                echo $response | grep \"VALIDATED\" TODO validate expression
