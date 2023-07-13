@@ -1,4 +1,4 @@
-# Run Automated Test in UAT environment
+ # Run Automated Test in UAT environment
 
 trigger: none
 
@@ -41,6 +41,10 @@ parameters:
       default: 'IGNORE_IF_NOT_idPayPaymentDiscountAPI'
     - name: 'ASYNC_TRX_DATE'
       displayName: 'Async transactions date'
+      type: string
+      default: '2023-01-01T00:00:00.000Z'
+    - name: 'DATE_REFUND'
+      displayName: 'Date request'
       type: string
       default: '2023-01-01T00:00:00.000Z'
 
@@ -141,6 +145,8 @@ variables:
             value: $(acquirer_apikey_dev)
           - name: milApiKey
             value: $(mil_apikey_dev)
+          - name: selfHostedAgentPool
+            value: cstar-dev-linux
     - ${{ else }}:
           - name: rtdSK
             value: $(rtd_sk_uat)
@@ -154,6 +160,8 @@ variables:
             value: $(acquirer_apikey_uat)
           - name: milApiKey
             value: $(mil_apikey_uat)
+          - name: selfHostedAgentPool
+            value: uat cstar-uat-linux
 
 jobs:
     - job:
@@ -299,3 +307,16 @@ jobs:
                 artifact: 'results'
                 targetPath: 'results'
                 publishLocation: 'pipeline'
+    - ${{ if containsValue(split(variables['k6TestRequiringMerchantList'], ','), 'idPayPaymentDiscountAPI') }}:
+        - job:
+          timeoutInMinutes: 0
+          displayName: 'Deploy to ${{ variables.environment }} K8S'
+          pool:
+            name: $(selfHostedAgentPool)
+          environment: '$(environment)'
+          steps:
+            - script: |
+                response=$(curl -X GET https://${{ parameter.TARGET_ENV }}01.idpay.internal.${{ parameter.TARGET_ENV }}.cstar.pagopa.it/idpayrewardnotification/idpay/reward/notification/exports/start?${{ parameters.DATE_REFUND }} -H 'accept: */*' 
+                  -H 'notificationDateToSearch: ${{ parameters.DATE_REFUND }}' \
+                echo "Refund result: " $response
+#                echo $response | grep \"VALIDATED\" TODO validate expression
