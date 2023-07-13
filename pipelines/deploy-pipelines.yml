@@ -46,7 +46,7 @@ parameters:
     - name: 'DATE_REFUND'
       displayName: 'Expected refund notification date when testing payments (if empty it will be skipped)'
       type: string
-      default: ${{ format('{0:yyyyMMdd}', pipeline.startTime +1) }}
+      default: ${{ format('{0:yyyyMMdd}', pipeline.startTime.AddDays(1)) }}
 
     - name: 'SCENARIO_TYPE_ENV'
       displayName: 'Scenario type'
@@ -307,7 +307,7 @@ jobs:
                 artifact: 'results'
                 targetPath: 'results'
                 publishLocation: 'pipeline'
-    - ${{ if and( containsValue(split(variables[format('k6Test_{0}', parameters.SCRIPT)], ','), 'idPayPaymentDiscountAPI'), parameters.DATE_REFUND != '') }}:
+    - ${{ if and( containsValue(split(variables[format('k6Test_{0}', parameters.SCRIPT)], ','), 'idPayPaymentDiscountAPI'), ne(parameters.DATE_REFUND, '')) }}:
         - job:
           timeoutInMinutes: 0
           displayName: 'Forcing refund file export on ${{ variables.environment }} using date ${{ parameters.DATE_REFUND }}'
