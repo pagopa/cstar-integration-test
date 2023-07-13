@@ -44,9 +44,9 @@ parameters:
       type: string
       default: '2023-01-01T00:00:00.000Z'
     - name: 'DATE_REFUND'
-      displayName: 'Expected refund notification date when testing payments (if empty it will be skipped)'
+      displayName: 'Expected refund notification date when testing payments (if " " it will be skipped) (yyyy-MM-dd)'
       type: string
-      default: '2027-01-01'
+      default: ' '
 
     - name: 'SCENARIO_TYPE_ENV'
       displayName: 'Scenario type'
