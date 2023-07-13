@@ -34,7 +34,7 @@ export const idpayDefaultHeaders = Object.assign(
 const ioBaseUrl = getBaseUrl([DEV, UAT, PROD], 'io')
 export function buildIOAuthorizationHeader(fiscalCode) {
     const authToken = getMockedIoToken(
-        `${ioBaseUrl}/bpd/pagopa/api/v1/login`,
+        ioBaseUrl,
         IDPAY_CONFIG.AUTH_KEYS.APIM_RTD_MOCK_API_SK,
         fiscalCode
     )
