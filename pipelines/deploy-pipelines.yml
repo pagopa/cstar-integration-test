@@ -43,10 +43,10 @@ parameters:
       displayName: 'Async transactions date'
       type: string
       default: '2023-01-01T00:00:00.000Z'
-    - name: 'DATE_REFUND'
-      displayName: 'Expected refund notification date when testing payments (if " " it will be skipped) (yyyy-MM-dd)'
-      type: string
-      default: ' '
+    - name: 'DAYS_TO_ADD'
+      displayName: 'Expected number of days to add to the notification date when testing payments (if -1 it will be skipped) (default 7)'
+      type: number
+      default: 7
 
     - name: 'SCENARIO_TYPE_ENV'
       displayName: 'Scenario type'
@@ -164,7 +164,7 @@ variables:
             value: cstar-uat-linux
 
 jobs:
-    - job: PerformanceTest
+    - job: PerformanceTest on ${{ upper(parameters.TARGET_ENV) }}
       timeoutInMinutes: 0
       steps:
           - task: UsePythonVersion@0
@@ -308,11 +308,11 @@ jobs:
                 targetPath: 'results'
                 publishLocation: 'pipeline'
 
-    - ${{ if and( containsValue(split(variables[format('k6Test_{0}', parameters.SCRIPT)], ','), 'idPayPaymentDiscountAPI'), ne(parameters.DATE_REFUND, ' ')) }}:
-        - deployment: ForceExportRefund
+    - ${{ if and( containsValue(split(variables[format('k6Test_{0}', parameters.SCRIPT)], ','), 'idPayPaymentDiscountAPI'), ne(parameters.DAYS_TO_ADD, -1)) }}:
+        - deployment: ForceExportRefund on ${{ upper(parameters.TARGET_ENV) }}
           dependsOn: PerformanceTest
           timeoutInMinutes: 0
-          displayName: 'Forcing refund file export on ${{ variables.environment }} using date ${{ parameters.DATE_REFUND }}'
+          displayName: 'Forcing refund file export on ${{ variables.environment }} using date ${{ format('{0:yyyy-MM-dd}', pipeline.startTime.AddDays(parameters.DAYS_TO_ADD) }}'
           pool:
             name: $(selfHostedAgentPool)
           environment: '${{ upper(parameters.TARGET_ENV) }}'
@@ -321,6 +321,6 @@ jobs:
               deploy:
                 steps:
                   - script: |
-                      response=$(curl -X GET https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpayrewardnotification/idpay/reward/notification/exports/start?notificationDateToSearch=${{ parameters.DATE_REFUND }} -H 'accept: */*' )
+                      response=$(curl -X GET https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpayrewardnotification/idpay/reward/notification/exports/start?notificationDateToSearch=${{ format('{0:yyyy-MM-dd}', pipeline.startTime.AddDays(parameters.DAYS_TO_ADD) }} -H 'accept: */*' )
                       echo "Refund result: " $response
-      #                echo $response | grep \"VALIDATED\" TODO validate expression
+                      echo $response | grep \""initiativeId\":\"${{ parameters.INITIATIVE_ID }}\"
