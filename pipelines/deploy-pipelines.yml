@@ -131,7 +131,7 @@ variables:
     - name: k6Test_testPDV
       value: testPDV
     - name: k6Test_currentDate
-      value: $(Get-Date -Format yyyy-MM-dd).AddHours(24)
+      value: ${{ format('{0:yyyyMMdd}', pipeline.startTime.AddDays(parameters.DAYS_TO_ADD)) }}
 
     #Setting Api Key
     - ${{ if eq(parameters.TARGET_ENV, 'dev') }}:
