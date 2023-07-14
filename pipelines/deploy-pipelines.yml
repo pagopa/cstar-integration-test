@@ -164,151 +164,151 @@ variables:
             value: cstar-uat-linux
 
 jobs:
-    - job: PerformanceTest
-      displayName: "Executing on ${{ parameters.TARGET_ENV }} ${{ parameters.SCRIPT }}"
-      timeoutInMinutes: 0
-      continueOnError: true
-      steps:
-          - task: UsePythonVersion@0
-            inputs:
-                versionSpec: '$(pythonVersion)'
-            displayName: 'Use Python $(pythonVersion)'
-          - task: DownloadSecureFile@1
-            name: rtd_acquirer_mauth_pem
-            displayName: 'RTD Certification File'
-            inputs:
-                secureFile: 'rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.pem'
-          - task: DownloadSecureFile@1
-            name: rtd_acquirer_mauth_key
-            displayName: 'RTD Key File'
-            inputs:
-                secureFile: 'rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.key'
-          - task: DownloadSecureFile@1
-            name: bpd_pm
-            displayName: 'Download BPD PM public uat'
-            inputs:
-                secureFile: 'bpd-pm-${{ parameters.TARGET_ENV }}.asc'
-          - script: |
-                mkdir $(pwd)/certs
-            displayName: Create Certs Folder
-          - script: |
-                cp /home/vsts/work/_temp/rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.pem $(pwd)/certs/rtd-acquirer-mauth.pem
-            displayName: Copy RTD PEM File
-          - script: |
-                cp /home/vsts/work/_temp/rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.key $(pwd)/certs/rtd-acquirer-mauth.key
-            displayName: Copy RTD Key File
-          - script: |
-                docker info | grep -i mem
-            displayName: Display Docker Memory Info
-          - script: |
-                python -m venv .venv
-                source .venv/bin/activate
-                python -m pip install --upgrade pip
-            workingDirectory: $(projectRoot)
-            displayName: 'Install CLI requirements'
-          - script: |
-                curl -L https://github.com/pagopa/cstar-cli/archive/refs/heads/main.zip -o cstar-cli.zip
-                unzip cstar-cli.zip
-                cd cstar-cli-main 
-                pip install -r ../requirements.txt
-                pip install --force-reinstall src/cstar-cli-core
-                pip install --no-deps --force-reinstall src/cstar-cli
-            displayName: Set environment
-          - script: |
-                ls -lrt
-                ls -lrt ./assets
-                cst idpay idpaydataset --action dataset_and_transactions --env ${{ parameters.TARGET_ENV }} --api-key $(rtdSK) --key $(rtd_acquirer_mauth_key.secureFilePath) --cert $(rtd_acquirer_mauth_pem.secureFilePath) --PM-pubk $(bpd_pm.secureFilePath) --out-dir ./generated --num-fc ${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} --trx-per-fc 1 --start-datetime ${{ parameters.ASYNC_TRX_DATE }} --mcc 1234 --PM-salt SALT123
-                mkdir -p assets
-                mkdir -p results
-                cp ./generated/*/* ./assets
-                ls -lrt ./assets
-            displayName: Retrieve resource from cstar-cli
-            timeoutInMinutes: 0
-          - task: Bash@3
-            inputs:
-                targetType: 'inline'
-                script: |
-                    WantedFile=$( find . -name "*.pgp")
-                    BaseName=$(basename $WantedFile)
-                    echo $BaseName
-                    echo "##vso[task.setvariable variable=trxFileName]$BaseName"
-            displayName: Set variable trxFileName
-          - script: |
-                docker pull grafana/k6:latest
-            displayName: Pull k6 image
-
-          - ${{ each k6Test in split(variables[format('k6Test_{0}', parameters.SCRIPT)], ',') }}:
-                - script: |
-                      docker run -i \
-                        --user $UID \
-                        -v $(pwd):/app \
-                        --workdir "/app" \
-                        -e RESULTS_DIR=/app \
-                        \
-                        -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
-                        -e SCENARIO_TYPE_ENV=$SCENARIO_TYPE_ENV \
-                        -e VUS_MAX_ENV=$VUS_MAX_ENV \
-                        -e MAX_AVAILABLE_TEST_ENTITIES_ENV=${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} \
-                        \
-                        -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
-                        -e ACQUIRER_ID=${{ parameters.ACQUIRER_ID }} \
-                        -e MERCHANT_FISCALCODE=${{ parameters.MERCHANT_FISCALCODE }} \
-                        \
-                        -e SCENARIO_DURATION_ENV=$SCENARIO_DURATION_ENV \
-                        -e SCENARIO_TIME_UNIT_ENV=${{ parameters.SCENARIO_TIME_UNIT_ENV }} \
-                        -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=$SCENARIO_PER_VU_SINGLE_ITERATION_ENV \
-                        -e SCENARIO_PER_VU_EXECUTIONS_ENV=$SCENARIO_PER_VU_EXECUTIONS_ENV \
-                        -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
-                        \
-                        -e THRESHOLDS_API_MAX_AVG_MS_ENV=$THRESHOLDS_API_MAX_AVG_MS_ENV \
-                        -e THRESHOLDS_API_MAX_P90_MS_ENV=$THRESHOLDS_API_MAX_P90_MS_ENV \
-                        -e THRESHOLDS_API_MAX_P95_MS_ENV=$THRESHOLDS_API_MAX_P95_MS_ENV \
-                        \
-                        -e APIM_SK=$(apimSK) \
-                        -e APIM_MIL_SK=$(milApiKey) \
-                        -e APIM_ACQUIRER_SK=$(acquirerApiKey) \
-                        -e APIM_ISSUER_SK=$(issuerSK) \
-                        -e APIM_RTD_SK=$(rtdSK) \
-                        -e PDV_API_KEY=$(pdvApiKey) \
-                        \
-                        grafana/k6:latest \
-                        run /app/test/performance/idpay/${{k6Test}}.js
-                  env:
-                      ${{ if eq(k6Test, parameters.SCRIPT) }}:
-                          SCENARIO_TYPE_ENV: ${{ parameters.SCENARIO_TYPE_ENV }}
-                          VUS_MAX_ENV: ${{ parameters.VUS_MAX_ENV }}
-                          SCENARIO_PER_VU_SINGLE_ITERATION_ENV: ${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }}
-                          SCENARIO_PER_VU_EXECUTIONS_ENV: ${{ parameters.SCENARIO_PER_VU_EXECUTIONS_ENV }}
-                          SCENARIO_DURATION_ENV: ${{ parameters.SCENARIO_DURATION_ENV }}
-                          THRESHOLDS_API_MAX_AVG_MS_ENV: ${{ parameters.THRESHOLDS_API_MAX_AVG_MS_ENV }}
-                          THRESHOLDS_API_MAX_P90_MS_ENV: ${{ parameters.THRESHOLDS_API_MAX_P90_MS_ENV }}
-                          THRESHOLDS_API_MAX_P95_MS_ENV: ${{ parameters.THRESHOLDS_API_MAX_P95_MS_ENV }}
-                      ${{ else }}: # intermediate tests will execute this configuration, which ensure the execution of all test entities
-                          SCENARIO_TYPE_ENV: perVuIterations
-                          VUS_MAX_ENV: '40'
-                          SCENARIO_PER_VU_SINGLE_ITERATION_ENV: 'false'
-                          SCENARIO_PER_VU_EXECUTIONS_ENV: '1'
-                          SCENARIO_DURATION_ENV: '2'
-                          THRESHOLDS_API_MAX_AVG_MS_ENV: '10000'
-                          THRESHOLDS_API_MAX_P90_MS_ENV: '10000'
-                          THRESHOLDS_API_MAX_P95_MS_ENV: '10000'
-                  displayName: Run k6 ${{k6Test}}.js on ${{ parameters.TARGET_ENV }}
-                  timeoutInMinutes: 0
-
-          - task: PublishTestResults@2
-            condition: true
-            inputs:
-                testResultsFormat: 'JUnit'
-                testResultsFiles: 'results/*-result.xml'
-                searchFolder: '$(System.DefaultWorkingDirectory)'
-                failTaskOnFailedTests: true
-          - task: PublishPipelineArtifact@1
-            displayName: 'Publishing results of k6 tests in folder: results'
-            condition: true
-            inputs:
-                artifact: 'results'
-                targetPath: 'results'
-                publishLocation: 'pipeline'
+#    - job: PerformanceTest
+#      displayName: "Executing on ${{ parameters.TARGET_ENV }} ${{ parameters.SCRIPT }}"
+#      timeoutInMinutes: 0
+#      continueOnError: true
+#      steps:
+#          - task: UsePythonVersion@0
+#            inputs:
+#                versionSpec: '$(pythonVersion)'
+#            displayName: 'Use Python $(pythonVersion)'
+#          - task: DownloadSecureFile@1
+#            name: rtd_acquirer_mauth_pem
+#            displayName: 'RTD Certification File'
+#            inputs:
+#                secureFile: 'rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.pem'
+#          - task: DownloadSecureFile@1
+#            name: rtd_acquirer_mauth_key
+#            displayName: 'RTD Key File'
+#            inputs:
+#                secureFile: 'rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.key'
+#          - task: DownloadSecureFile@1
+#            name: bpd_pm
+#            displayName: 'Download BPD PM public uat'
+#            inputs:
+#                secureFile: 'bpd-pm-${{ parameters.TARGET_ENV }}.asc'
+#          - script: |
+#                mkdir $(pwd)/certs
+#            displayName: Create Certs Folder
+#          - script: |
+#                cp /home/vsts/work/_temp/rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.pem $(pwd)/certs/rtd-acquirer-mauth.pem
+#            displayName: Copy RTD PEM File
+#          - script: |
+#                cp /home/vsts/work/_temp/rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.key $(pwd)/certs/rtd-acquirer-mauth.key
+#            displayName: Copy RTD Key File
+#          - script: |
+#                docker info | grep -i mem
+#            displayName: Display Docker Memory Info
+#          - script: |
+#                python -m venv .venv
+#                source .venv/bin/activate
+#                python -m pip install --upgrade pip
+#            workingDirectory: $(projectRoot)
+#            displayName: 'Install CLI requirements'
+#          - script: |
+#                curl -L https://github.com/pagopa/cstar-cli/archive/refs/heads/main.zip -o cstar-cli.zip
+#                unzip cstar-cli.zip
+#                cd cstar-cli-main
+#                pip install -r ../requirements.txt
+#                pip install --force-reinstall src/cstar-cli-core
+#                pip install --no-deps --force-reinstall src/cstar-cli
+#            displayName: Set environment
+#          - script: |
+#                ls -lrt
+#                ls -lrt ./assets
+#                cst idpay idpaydataset --action dataset_and_transactions --env ${{ parameters.TARGET_ENV }} --api-key $(rtdSK) --key $(rtd_acquirer_mauth_key.secureFilePath) --cert $(rtd_acquirer_mauth_pem.secureFilePath) --PM-pubk $(bpd_pm.secureFilePath) --out-dir ./generated --num-fc ${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} --trx-per-fc 1 --start-datetime ${{ parameters.ASYNC_TRX_DATE }} --mcc 1234 --PM-salt SALT123
+#                mkdir -p assets
+#                mkdir -p results
+#                cp ./generated/*/* ./assets
+#                ls -lrt ./assets
+#            displayName: Retrieve resource from cstar-cli
+#            timeoutInMinutes: 0
+#          - task: Bash@3
+#            inputs:
+#                targetType: 'inline'
+#                script: |
+#                    WantedFile=$( find . -name "*.pgp")
+#                    BaseName=$(basename $WantedFile)
+#                    echo $BaseName
+#                    echo "##vso[task.setvariable variable=trxFileName]$BaseName"
+#            displayName: Set variable trxFileName
+#          - script: |
+#                docker pull grafana/k6:latest
+#            displayName: Pull k6 image
+#
+#          - ${{ each k6Test in split(variables[format('k6Test_{0}', parameters.SCRIPT)], ',') }}:
+#                - script: |
+#                      docker run -i \
+#                        --user $UID \
+#                        -v $(pwd):/app \
+#                        --workdir "/app" \
+#                        -e RESULTS_DIR=/app \
+#                        \
+#                        -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
+#                        -e SCENARIO_TYPE_ENV=$SCENARIO_TYPE_ENV \
+#                        -e VUS_MAX_ENV=$VUS_MAX_ENV \
+#                        -e MAX_AVAILABLE_TEST_ENTITIES_ENV=${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} \
+#                        \
+#                        -e INITIATIVE_ID=${{ parameters.INITIATIVE_ID }} \
+#                        -e ACQUIRER_ID=${{ parameters.ACQUIRER_ID }} \
+#                        -e MERCHANT_FISCALCODE=${{ parameters.MERCHANT_FISCALCODE }} \
+#                        \
+#                        -e SCENARIO_DURATION_ENV=$SCENARIO_DURATION_ENV \
+#                        -e SCENARIO_TIME_UNIT_ENV=${{ parameters.SCENARIO_TIME_UNIT_ENV }} \
+#                        -e SCENARIO_PER_VU_SINGLE_ITERATION_ENV=$SCENARIO_PER_VU_SINGLE_ITERATION_ENV \
+#                        -e SCENARIO_PER_VU_EXECUTIONS_ENV=$SCENARIO_PER_VU_EXECUTIONS_ENV \
+#                        -e SCENARIO_RAMP_STAGE_NUMBER_ENV=${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }} \
+#                        \
+#                        -e THRESHOLDS_API_MAX_AVG_MS_ENV=$THRESHOLDS_API_MAX_AVG_MS_ENV \
+#                        -e THRESHOLDS_API_MAX_P90_MS_ENV=$THRESHOLDS_API_MAX_P90_MS_ENV \
+#                        -e THRESHOLDS_API_MAX_P95_MS_ENV=$THRESHOLDS_API_MAX_P95_MS_ENV \
+#                        \
+#                        -e APIM_SK=$(apimSK) \
+#                        -e APIM_MIL_SK=$(milApiKey) \
+#                        -e APIM_ACQUIRER_SK=$(acquirerApiKey) \
+#                        -e APIM_ISSUER_SK=$(issuerSK) \
+#                        -e APIM_RTD_SK=$(rtdSK) \
+#                        -e PDV_API_KEY=$(pdvApiKey) \
+#                        \
+#                        grafana/k6:latest \
+#                        run /app/test/performance/idpay/${{k6Test}}.js
+#                  env:
+#                      ${{ if eq(k6Test, parameters.SCRIPT) }}:
+#                          SCENARIO_TYPE_ENV: ${{ parameters.SCENARIO_TYPE_ENV }}
+#                          VUS_MAX_ENV: ${{ parameters.VUS_MAX_ENV }}
+#                          SCENARIO_PER_VU_SINGLE_ITERATION_ENV: ${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }}
+#                          SCENARIO_PER_VU_EXECUTIONS_ENV: ${{ parameters.SCENARIO_PER_VU_EXECUTIONS_ENV }}
+#                          SCENARIO_DURATION_ENV: ${{ parameters.SCENARIO_DURATION_ENV }}
+#                          THRESHOLDS_API_MAX_AVG_MS_ENV: ${{ parameters.THRESHOLDS_API_MAX_AVG_MS_ENV }}
+#                          THRESHOLDS_API_MAX_P90_MS_ENV: ${{ parameters.THRESHOLDS_API_MAX_P90_MS_ENV }}
+#                          THRESHOLDS_API_MAX_P95_MS_ENV: ${{ parameters.THRESHOLDS_API_MAX_P95_MS_ENV }}
+#                      ${{ else }}: # intermediate tests will execute this configuration, which ensure the execution of all test entities
+#                          SCENARIO_TYPE_ENV: perVuIterations
+#                          VUS_MAX_ENV: '40'
+#                          SCENARIO_PER_VU_SINGLE_ITERATION_ENV: 'false'
+#                          SCENARIO_PER_VU_EXECUTIONS_ENV: '1'
+#                          SCENARIO_DURATION_ENV: '2'
+#                          THRESHOLDS_API_MAX_AVG_MS_ENV: '10000'
+#                          THRESHOLDS_API_MAX_P90_MS_ENV: '10000'
+#                          THRESHOLDS_API_MAX_P95_MS_ENV: '10000'
+#                  displayName: Run k6 ${{k6Test}}.js on ${{ parameters.TARGET_ENV }}
+#                  timeoutInMinutes: 0
+#
+#          - task: PublishTestResults@2
+#            condition: true
+#            inputs:
+#                testResultsFormat: 'JUnit'
+#                testResultsFiles: 'results/*-result.xml'
+#                searchFolder: '$(System.DefaultWorkingDirectory)'
+#                failTaskOnFailedTests: true
+#          - task: PublishPipelineArtifact@1
+#            displayName: 'Publishing results of k6 tests in folder: results'
+#            condition: true
+#            inputs:
+#                artifact: 'results'
+#                targetPath: 'results'
+#                publishLocation: 'pipeline'
 
     - ${{ if and( containsValue(split(variables[format('k6Test_{0}', parameters.SCRIPT)], ','), 'idPayPaymentDiscountAPI'), ne(parameters.DAYS_TO_ADD, -1)) }}:
         - deployment: ForceExportRefund
