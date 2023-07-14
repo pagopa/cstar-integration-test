@@ -135,6 +135,8 @@ variables:
     - ${{ if eq(parameters.TARGET_ENV, 'dev') }}:
           - name: rtdSK
             value: $(rtd_sk_dev)
+          - name: rtdMockApiSK
+            value: $(rtd_mock_api_dev)
           - name: apimSK
             value: $(apim_sk_dev)
           - name: issuerSK
@@ -150,6 +152,8 @@ variables:
     - ${{ else }}:
           - name: rtdSK
             value: $(rtd_sk_uat)
+          - name: rtdMockApiSK
+            value: $(rtd_mock_api_uat)
           - name: apimSK
             value: $(apim_sk_uat)
           - name: issuerSK
@@ -264,11 +268,12 @@ jobs:
                         -e THRESHOLDS_API_MAX_P90_MS_ENV=$THRESHOLDS_API_MAX_P90_MS_ENV \
                         -e THRESHOLDS_API_MAX_P95_MS_ENV=$THRESHOLDS_API_MAX_P95_MS_ENV \
                         \
-                        -e APIM_SK=$(apimSK) \
+                        -e APIM_PORTAL_SK=$(apimSK) \
                         -e APIM_MIL_SK=$(milApiKey) \
                         -e APIM_ACQUIRER_SK=$(acquirerApiKey) \
                         -e APIM_ISSUER_SK=$(issuerSK) \
                         -e APIM_RTD_SK=$(rtdSK) \
+                        -e APIM_RTD_MOCK_API_SK=$(rtdMockApiSK) \
                         -e PDV_API_KEY=$(pdvApiKey) \
                         \
                         grafana/k6:latest \
