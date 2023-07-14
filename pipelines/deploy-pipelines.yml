@@ -314,7 +314,7 @@ jobs:
           timeoutInMinutes: 0
           variables:
             currentDate: $[ format('{0:yyyy}.{0:MM}.{0:dd}', pipeline.startTime) ]
-          displayName: 'Forcing refund file export on ${{ variables.environment }} using date ${{ currentDate }}'
+          displayName: 'Forcing refund file export on ${{ variables.environment }} using date ${{ variables.currentDate }}'
           pool:
             name: $(selfHostedAgentPool)
           environment: '${{ upper(parameters.TARGET_ENV) }}'
