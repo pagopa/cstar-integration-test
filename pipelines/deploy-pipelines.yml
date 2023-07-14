@@ -308,7 +308,7 @@ jobs:
                 targetPath: 'results'
                 publishLocation: 'pipeline'
 
-    - ${{ if and( containsValue(split(variables[format('k6Test_{0}', parameters.SCRIPT)], ','), 'idPayPaymentDiscountAPI'), ne(parameters.DATE_REFUND, '')) }}:
+    - ${{ if and( containsValue(split(variables[format('k6Test_{0}', parameters.SCRIPT)], ','), 'idPayPaymentDiscountAPI'), ne(parameters.DATE_REFUND, ' ')) }}:
         - deployment: ForceExportRefund
           dependsOn: PerformanceTest
           timeoutInMinutes: 0
