@@ -7,7 +7,7 @@ import {
 } from '../../common/api/idpay/idPayPaymentDiscount.js'
 import { assert, statusCreated, statusOk } from '../../common/assertions.js'
 import { DEV, UAT, getBaseUrl } from '../../common/envs.js'
-import { getFCList } from '../../common/utils.js'
+import { getFCList, getMerchantList } from '../../common/utils.js'
 import { SharedArray } from 'k6/data'
 import defaultHandleSummaryBuilder from '../../common/handleSummaryBuilder.js'
 import {
@@ -30,7 +30,8 @@ const application = 'idpay'
 const testName = 'idpayPaymentDiscountAPI'
 
 // Set up data for processing, share data among VUs
-let cfList = new SharedArray('cfList', getFCList)
+const cfList = new SharedArray('cfList', getFCList)
+const merchantList = new SharedArray('merchantList', getMerchantList)
 
 // Dynamic scenarios' K6 configuration
 export const options = defaultApiOptionsBuilder(
@@ -52,10 +53,12 @@ export default () => {
     // selecting current scenario/iteration test entity
     const cf = getScenarioTestEntity(cfList).FC
     const citizenParams = { headers: buildIOAuthorizationHeader(cf) }
+
+    const merchantFiscalCode = getScenarioTestEntity(merchantList).CF
+
     const merchantHeaders = Object.assign(
         {
-            'x-merchant-fiscalcode':
-                IDPAY_CONFIG.CONTEXT_DATA.merchantFiscalCode,
+            'x-merchant-fiscalcode': merchantFiscalCode,
             'x-acquirer-id': IDPAY_CONFIG.CONTEXT_DATA.acquirerId,
         },
         idpayDefaultHeaders,

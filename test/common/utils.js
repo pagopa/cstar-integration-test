@@ -78,6 +78,13 @@ export function getFCIbanList() {
     ).data
 }
 
+export function getMerchantList() {
+    return papaparse.parse(
+        open(`${getRelativePathToRootFolder()}/assets/merchantList.csv`),
+        { header: true }
+    ).data
+}
+
 function getFiscalCodeMonth(month) {
     const monthDict = {
         1: 'A',

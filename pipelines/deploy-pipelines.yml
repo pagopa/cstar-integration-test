@@ -38,7 +38,7 @@ parameters:
     - name: 'MERCHANT_FISCALCODE'
       displayName: 'merchant fiscalCode'
       type: string
-      default: 'IGNORE_IF_NOT_idPayPaymentDiscountAPI'
+      default: 'IGNORE'
     - name: 'ASYNC_TRX_DATE'
       displayName: 'Async transactions date'
       type: string
@@ -113,6 +113,10 @@ variables:
     # Project root folder
     - name: projectRoot
       value: $(System.DefaultWorkingDirectory)/$(working-dir)
+
+    # comma separated list of tests requiring to download and onboard merchants on input initiative
+    - name: k6TestRequiringMerchantList
+      value: idPayPaymentDiscountAPI
 
     - name: k6Test_putTokenMockedPdv
       value: putTokenMockedPdv
@@ -237,6 +241,24 @@ jobs:
                     echo $BaseName
                     echo "##vso[task.setvariable variable=trxFileName]$BaseName"
             displayName: Set variable trxFileName
+
+          - ${{ if containsValue(split(variables['k6TestRequiringMerchantList'], ','), parameters.SCRIPT) }}:
+                - task: DownloadSecureFile@1
+                  name: merchantList
+                  displayName: 'Download merchant list file'
+                  inputs:
+                      secureFile: 'merchantList.csv'
+                - script: |
+                      cp $(merchantList.secureFilePath) ./assets
+                      response=$(curl -X PUT https://api-io.${{ parameters.TARGET_ENV}}.cstar.pagopa.it/idpay/mil/payment/qr-code/merchant/initiative/${{ parameters.INITIATIVE_ID }}/upload \
+                        -H 'x-acquirer-id: ${{ parameters.ACQUIRER_ID }}' \
+                        -H 'Ocp-Apim-Subscription-Key: $(milApiKey)' \
+                        -F 'file=@$(merchantList.secureFilePath);type=text/csv;fileName=merchantList_$(Build.BuildNumber).csv')
+                      echo "Onboarding result: " $response
+                      echo $response | grep \"VALIDATED\"
+                  displayName: onboarding merchantList on input initiative
+                  timeoutInMinutes: 0
+
           - script: |
                 docker pull grafana/k6:latest
             displayName: Pull k6 image
