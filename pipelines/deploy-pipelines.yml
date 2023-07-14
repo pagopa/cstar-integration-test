@@ -46,7 +46,7 @@ parameters:
     - name: 'DAYS_TO_ADD'
       displayName: 'Expected number of days to add to the current date when forcing refunds export (if -1 it will be skipped)'
       type: number
-      default: 7
+      default: 6
 
     - name: 'SCENARIO_TYPE_ENV'
       displayName: 'Scenario type'
