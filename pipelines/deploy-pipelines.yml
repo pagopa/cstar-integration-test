@@ -130,8 +130,6 @@ variables:
       value: idpayOnboardingAPI,ioPutEnrollInstrumentIssuer,ioPutEnrollIban,../rtdTransactionsFile
     - name: k6Test_testPDV
       value: testPDV
-    - name: k6Test_currentDate
-      value: format('{0:yyyy}.{0:MM}.{0:dd}', pipeline.startTime)
 
     #Setting Api Key
     - ${{ if eq(parameters.TARGET_ENV, 'dev') }}:
@@ -314,7 +312,9 @@ jobs:
         - deployment: ForceExportRefund
           dependsOn: PerformanceTest
           timeoutInMinutes: 0
-          displayName: 'Forcing refund file export on ${{ variables.environment }} using date ${{ variables.k6Test_currentDate }}'
+          variables:
+            currentDate: $[ format('{0:yyyy}.{0:MM}.{0:dd}', pipeline.startTime) ]
+          displayName: 'Forcing refund file export on ${{ variables.environment }} using date $(currentDate)'
           pool:
             name: $(selfHostedAgentPool)
           environment: '${{ upper(parameters.TARGET_ENV) }}'
