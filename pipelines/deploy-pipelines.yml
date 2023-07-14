@@ -317,11 +317,13 @@ jobs:
           pool:
             name: $(selfHostedAgentPool)
           environment: '${{ upper(parameters.TARGET_ENV) }}'
+          variables:
+            notificationDate: $[ format('{0:yyyy-MM-dd}', pipeline.startTime) ]
           strategy:
             runOnce:
               deploy:
                 steps:
                   - script: |
-                      response=$(curl -X GET https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpayrewardnotification/idpay/reward/notification/exports/start?notificationDateToSearch=${{ format('{0:yyyy-MM-dd}', pipeline.startTime) }} -H 'accept: */*' )
+                      response=$(curl -X GET https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpayrewardnotification/idpay/reward/notification/exports/start?notificationDateToSearch=$(notificationDate) -H 'accept: */*' )
                       echo "Refund result: " $response
                       echo $response | grep \""initiativeId\":\"${{ parameters.INITIATIVE_ID }}\"
