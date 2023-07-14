@@ -131,7 +131,7 @@ variables:
     - name: k6Test_testPDV
       value: testPDV
     - name: k6Test_currentDate
-      value: $[ format('{0:yyyy}.{0:MM}.{0:dd}', pipeline.startTime) ]
+      value: $[ format('{0:yyyy}.{0:MM}.{0:dd}', pipeline.startTime).addDays(parameters.DAYS_TO_ADD) ]
 
     #Setting Api Key
     - ${{ if eq(parameters.TARGET_ENV, 'dev') }}:
@@ -314,7 +314,7 @@ jobs:
         - deployment: ForceExportRefund on ${{ upper(parameters.TARGET_ENV) }}
           dependsOn: PerformanceTest
           timeoutInMinutes: 0
-          displayName: 'Forcing refund file export on ${{ variables.environment }} using date ${{ variables.k6Test_currentDate.addHours(parameters.DAYS_TO_ADD) }}'
+          displayName: 'Forcing refund file export on ${{ variables.environment }} using date ${{ variables.k6Test_currentDate }}'
           pool:
             name: $(selfHostedAgentPool)
           environment: '${{ upper(parameters.TARGET_ENV) }}'
