@@ -320,7 +320,7 @@ jobs:
             name: $(selfHostedAgentPool)
           environment: '${{ upper(parameters.TARGET_ENV) }}'
           variables:
-            notificationDate: $[ format('{0:yyyy-MM-dd}', pipeline.startTime) ]
+            notificationDate: $[ format('{0:yyyy}.{0:MM}.{0:dd}', pipeline.startTime) ]
           strategy:
             runOnce:
               deploy:
