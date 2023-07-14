@@ -11,9 +11,12 @@ export default {
     rampingArrivalRate: {
         executor: 'ramping-arrival-rate', //Number of VUs to pre-allocate before test start to preserve runtime resources
         timeUnit: `${CONFIG.SCENARIOS.RAMPS.STAGE_SECONDS_DURATION}s`, //period of time to apply the iteration
-        preAllocatedVUs: Math.ceil(0.01 * CONFIG.VIRTUAL_USERS),
         preAllocatedVUs: CONFIG.VIRTUAL_USERS,
-        maxVUs: Math.min(CONFIG.VIRTUAL_USERS * 2, 500),
+        maxVUs: Math.min(
+            CONFIG.VIRTUAL_USERS * 2,
+            Math.max(500, CONFIG.VIRTUAL_USERS)
+        ),
+        stages: scenarioRampCustomStages,
     },
 }
 
