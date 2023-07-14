@@ -166,7 +166,7 @@ variables:
             value: cstar-uat-linux
 
 jobs:
-    - job: PerformanceTest on '${{ upper(parameters.TARGET_ENV) }}'
+    - job: PerformanceTest
       timeoutInMinutes: 0
       steps:
           - task: UsePythonVersion@0
@@ -311,7 +311,7 @@ jobs:
                 publishLocation: 'pipeline'
 
     - ${{ if and( containsValue(split(variables[format('k6Test_{0}', parameters.SCRIPT)], ','), 'idPayPaymentDiscountAPI'), ne(parameters.DAYS_TO_ADD, -1)) }}:
-        - deployment: ForceExportRefund on '${{ upper(parameters.TARGET_ENV) }}'
+        - deployment: ForceExportRefund
           dependsOn: PerformanceTest
           timeoutInMinutes: 0
           displayName: 'Forcing refund file export on ${{ variables.environment }} using date ${{ variables.k6Test_currentDate }}'
