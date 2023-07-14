@@ -319,8 +319,6 @@ jobs:
           pool:
             name: $(selfHostedAgentPool)
           environment: '${{ upper(parameters.TARGET_ENV) }}'
-          variables:
-            notificationDate: $[ addDays(format('{0:yyyy}-{0:MM}-{0:dd}', pipeline.startTime), parameters.DAYS_TO_ADD) ]
           strategy:
             runOnce:
               deploy:
@@ -329,6 +327,7 @@ jobs:
                       response=$(curl -X PUT https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpaypayment/idpay/payment/qr-code/force-expiration/confirm/${{ parameters.INITIATIVE_ID }} -H 'accept: */*' )
                       echo "Forcing confirm expiration result: " $response 
                       
-                      response=$(curl -X GET https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpayrewardnotification/idpay/reward/notification/exports/start?notificationDateToSearch=$(notificationDate) -H 'accept: */*' )
+                      NOTIFICATION_DATE=$(date +%Y-%m-%d -d "$(date) + ${{ parameters.DAY_TO_ADD }} day")
+                      response=$(curl -X GET https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpayrewardnotification/idpay/reward/notification/exports/start?notificationDateToSearch=$NOTIFICATION_DATE -H 'accept: */*' )
                       echo "Refund result: " $response
                       echo $response | grep \""initiativeId\":\"${{ parameters.INITIATIVE_ID }}\"
