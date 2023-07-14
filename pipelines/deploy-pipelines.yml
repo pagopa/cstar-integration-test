@@ -312,7 +312,7 @@ jobs:
 
     - ${{ if and( containsValue(split(variables[format('k6Test_{0}', parameters.SCRIPT)], ','), 'idPayPaymentDiscountAPI'), ne(parameters.DAYS_TO_ADD, -1)) }}:
         - deployment: ForceExportRefund
-          dependsOn: PerformanceTest
+#          dependsOn: PerformanceTest TODO enable
           condition: true
           timeoutInMinutes: 0
           displayName: 'Forcing refund file export on ${{ parameters.TARGET_ENV }}'
