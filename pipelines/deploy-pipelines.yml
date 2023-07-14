@@ -313,7 +313,7 @@ jobs:
         - deployment: ForceExportRefund
           dependsOn: PerformanceTest
           timeoutInMinutes: 0
-          displayName: 'Forcing refund file export on ${{ parameters.TARGET_ENV }}'
+          displayName: 'Forcing refund file export on ${{ parameters.TARGET_ENV }} using notificationDate $(notificationDate)'
           pool:
             name: $(selfHostedAgentPool)
           environment: '${{ upper(parameters.TARGET_ENV) }}'
