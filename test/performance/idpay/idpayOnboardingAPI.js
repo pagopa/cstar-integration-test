@@ -6,6 +6,7 @@ import {
     putSaveConsent,
     ONBOARDING_API_NAMES,
 } from '../../common/api/idpay/idpayOnboardingCitizen.js'
+import { getWalletDetail } from '../../common/api/idpay/idpayWallet.js'
 import {
     assert,
     statusNoContent,
