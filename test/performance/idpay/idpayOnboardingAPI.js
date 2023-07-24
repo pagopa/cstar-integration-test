@@ -1,4 +1,4 @@
-import { group, sleep } from 'k6'
+import { group, sleep, check } from 'k6'
 import {
     putOnboardingCitizen,
     putCheckPrerequisites,
