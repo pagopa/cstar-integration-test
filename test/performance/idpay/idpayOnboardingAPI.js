@@ -137,6 +137,26 @@ export default () => {
                 }
             }
         })
+
+        group('When onboarding is completed, get wallet detail', () => {
+            if(checked) {
+                sleep(.5)
+
+                const res = getWalletDetail(
+                    baseUrl,
+                    IDPAY_CONFIG.CONTEXT_DATA.initiativeId,
+                    params
+                )
+
+                check(res, {
+                    'HTTP status is 200 or 404': (r) => r.status === 202 || r.status === 404
+                })
+
+                if(res.status === 404) {
+                    logErrorResult(`Wallet associated to user with cf [${cf}] not found`, res, true)
+                }
+            }
+        })
     })
     sleep(1)
 }

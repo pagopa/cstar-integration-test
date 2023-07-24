@@ -46,7 +46,7 @@ export function getWalletDetail(baseUrl, initiativeId, params) {
     const apiName = 'wallet/getWalletDetail'
     const myParams = Object.assign(params, { tags: { apiName } })
     const res = http.put(
-        `${baseUrl}${API_PREFIX}/hb/wallet/${initiativeId}/instruments`,
+        `${baseUrl}${API_PREFIX}/wallet/${initiativeId}`,
         null,
         myParams
     )
