@@ -150,7 +150,7 @@ export default () => {
                 )
 
                 check(res, {
-                    'HTTP status is 200 or 404': (r) => r.status === 202 || r.status === 404
+                    'HTTP status is 200 or 404': (r) => r.status === 200 || r.status === 404
                 })
 
                 if(res.status === 404) {
