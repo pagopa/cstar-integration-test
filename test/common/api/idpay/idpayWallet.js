@@ -45,7 +45,7 @@ export function putEnrollIban(baseUrl, initiativeId, params, body) {
 export function getWalletDetail(baseUrl, initiativeId, params) {
     const apiName = 'wallet/getWalletDetail'
     const myParams = Object.assign(params, { tags: { apiName } })
-    const res = http.put(
+    const res = http.get(
         `${baseUrl}${API_PREFIX}/wallet/${initiativeId}`,
         null,
         myParams
