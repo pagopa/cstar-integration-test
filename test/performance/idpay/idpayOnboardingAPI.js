@@ -141,7 +141,7 @@ export default () => {
 
         group('When onboarding is completed, get wallet detail', () => {
             if(checked) {
-                sleep(.5)
+                sleep(2)
 
                 const res = getWalletDetail(
                     baseUrl,
@@ -152,6 +152,8 @@ export default () => {
                 check(res, {
                     'HTTP status is 200 or 404': (r) => r.status === 200 || r.status === 404
                 })
+
+                logErrorResult(`[${cf}]`, res, true)
 
                 if(res.status === 404) {
                     logErrorResult(`Wallet associated to user with cf [${cf}] not found`, res, true)
