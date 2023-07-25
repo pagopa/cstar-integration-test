@@ -30,7 +30,7 @@ import {
 
 // Environments allowed to be tested
 const REGISTERED_ENVS = [DEV, UAT]
-const baseUrl = getBaseUrl(REGISTERED_ENVS) // api-io services baseUrl
+const baseUrl = getBaseUrl(REGISTERED_ENVS, "io") // api-io services baseUrl
 
 // test tags
 const application = 'idpay'
