@@ -39,11 +39,13 @@ const testName = 'idpayOnboardingAPI'
 // Set up data for processing, share data among VUs
 const cfList = new SharedArray('cfList', getFCList)
 
+
+
 // Dynamic scenarios' K6 configuration
 export const options = defaultApiOptionsBuilder(
     application,
     testName,
-    Object.values({...ONBOARDING_API_NAMES, ...WALLET_API_NAMES.getWalletDetail}) // applying apiName tags to thresholds
+    Object.values({...ONBOARDING_API_NAMES, getWalletDetail: WALLET_API_NAMES.getWalletDetail}) // applying apiName tags to thresholds
 )
 
 // K6 summary configuration
