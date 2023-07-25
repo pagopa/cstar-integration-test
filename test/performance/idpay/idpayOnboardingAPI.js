@@ -6,7 +6,7 @@ import {
     putSaveConsent,
     ONBOARDING_API_NAMES,
 } from '../../common/api/idpay/idpayOnboardingCitizen.js'
-import { getWalletDetail } from '../../common/api/idpay/idpayWallet.js'
+import { getWalletDetail, WALLET_API_NAMES } from '../../common/api/idpay/idpayWallet.js'
 import {
     assert,
     statusNoContent,
@@ -30,7 +30,7 @@ import {
 
 // Environments allowed to be tested
 const REGISTERED_ENVS = [DEV, UAT]
-const baseUrl = getBaseUrl(REGISTERED_ENVS, 'io') // api-io services baseUrl
+const baseUrl = getBaseUrl(REGISTERED_ENVS) // api-io services baseUrl
 
 // test tags
 const application = 'idpay'
@@ -43,7 +43,7 @@ const cfList = new SharedArray('cfList', getFCList)
 export const options = defaultApiOptionsBuilder(
     application,
     testName,
-    Object.values(ONBOARDING_API_NAMES) // applying apiName tags to thresholds
+    Object.values(ONBOARDING_API_NAMES, WALLET_API_NAMES.getWalletDetail) // applying apiName tags to thresholds
 )
 
 // K6 summary configuration
