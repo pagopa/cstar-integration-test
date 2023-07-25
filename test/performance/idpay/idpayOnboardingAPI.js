@@ -143,7 +143,7 @@ export default () => {
 
         group('When onboarding is completed, get wallet detail', () => {
             if(checked) {
-                sleep(.5)
+                sleep(1)
 
                 const res = getWalletDetail(
                     baseUrl,
