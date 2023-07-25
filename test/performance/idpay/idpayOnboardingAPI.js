@@ -39,13 +39,13 @@ const testName = 'idpayOnboardingAPI'
 // Set up data for processing, share data among VUs
 const cfList = new SharedArray('cfList', getFCList)
 
-ONBOARDING_API_NAMES.getWalletDetail = WALLET_API_NAMES.getWalletDetail;
+const apiNames = Object.values(ONBOARDING_API_NAMES).concat(WALLET_API_NAMES.getWalletDetail);
 
 // Dynamic scenarios' K6 configuration
 export const options = defaultApiOptionsBuilder(
     application,
     testName,
-    Object.values(ONBOARDING_API_NAMES) // applying apiName tags to thresholds
+    apiNames // applying apiName tags to thresholds
 )
 
 // K6 summary configuration
@@ -143,7 +143,7 @@ export default () => {
 
         group('When onboarding is completed, get wallet detail', () => {
             if(checked) {
-                sleep(2)
+                sleep(.5)
 
                 const res = getWalletDetail(
                     baseUrl,
