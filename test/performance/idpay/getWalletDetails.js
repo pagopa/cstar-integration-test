@@ -30,7 +30,7 @@ const cfList = new SharedArray('cfList', getFCList)
 export const options = defaultApiOptionsBuilder(
     application,
     testName,
-    new Object(WALLET_API_NAMES.getWalletDetail) // applying apiName tags to thresholds
+    Object(WALLET_API_NAMES.getWalletDetail) // applying apiName tags to thresholds
 )
 
 // K6 summary configuration
