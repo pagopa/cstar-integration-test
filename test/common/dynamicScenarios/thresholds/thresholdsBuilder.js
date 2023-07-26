@@ -3,15 +3,15 @@ import { CONFIG } from '../envVars.js'
 
 /**
  * thresholdApiConfigs is an array containing:
- * - string element, in order to apply default thresholds to tagged api
+ * - string element, in order to apply defaultThresholdsConfig to tagged api
  * - object element, in order to override defaultThresholdsConfig to tagged api. The object could contain the following properties:
  * -- apiName: api tag name, mandatory
  *
  * defaultThresholdsConfig is an object containing optionally the following properties:
- * -- maxAvgDurationMs: To override default maxAvgDurationMs
- * -- maxP90DurationMs: To override default maxP90DurationMs
- * -- maxP95DurationMs: To override default maxP95DurationMs
- * -- maxHttpReqFailedRate: To override default maxHttpReqFailedRate
+ * -- maxAvgDurationMs: To override default maxAvgDurationMs setted through ENV
+ * -- maxP90DurationMs: To override default maxP90DurationMs setted through ENV
+ * -- maxP95DurationMs: To override default maxP95DurationMs setted through ENV
+ * -- maxHttpReqFailedRate: To override default maxHttpReqFailedRate setted through ENV
  *
  **/
 export default function buildThresholds(
@@ -74,7 +74,7 @@ function buildHttpReqDurationThresholds(apiSelector, thresholdsConfig) {
             {
                 threshold: `avg<${coalesce(
                     thresholdsConfig.maxAvgDurationMs,
-                    CONFIG.THRESHOLDS.AVG
+                    CONFIG.THRESHOLDS.DURATIONS.AVG
                 )}`, // the avg of requests should be below maxAvgDurationMs
                 abortOnFail: false,
                 delayAbortEval: '10s',
@@ -82,7 +82,7 @@ function buildHttpReqDurationThresholds(apiSelector, thresholdsConfig) {
             {
                 threshold: `p(90)<${coalesce(
                     thresholdsConfig.maxP90DurationMs,
-                    CONFIG.THRESHOLDS.P90
+                    CONFIG.THRESHOLDS.DURATIONS.P90
                 )}`, // 90% of requests should be below maxP90DurationMs
                 abortOnFail: false,
                 delayAbortEval: '10s',
@@ -90,7 +90,7 @@ function buildHttpReqDurationThresholds(apiSelector, thresholdsConfig) {
             {
                 threshold: `p(95)<${coalesce(
                     thresholdsConfig.maxP95DurationMs,
-                    CONFIG.THRESHOLDS.P95
+                    CONFIG.THRESHOLDS.DURATIONS.P95
                 )}`, // 95% of requests should be below maxP95DurationMs
                 abortOnFail: false,
                 delayAbortEval: '10s',
@@ -105,7 +105,7 @@ function buildhttpReqFailedThresholds(apiSelector, thresholdsConfig) {
             {
                 threshold: `rate<${coalesce(
                     thresholdsConfig.maxHttpReqFailedRate,
-                    '0.05'
+                    CONFIG.THRESHOLDS.REQ_FAILED.RATE
                 )}`,
                 abortOnFail: false,
                 delayAbortEval: '10s',

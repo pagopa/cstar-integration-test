@@ -1,5 +1,3 @@
-import { coalesce } from '../utils.js'
-import { CONFIG } from './envVars.js'
 import buildScenarios from './scenarios/scenariosBuilder.js'
 import buildThresholds from './thresholds/thresholdsBuilder.js'
 
@@ -9,11 +7,7 @@ function applyTags(options, tags) {
     })
 }
 
-export const defaultApiOptions = buildOption(undefined, {
-    maxAvgDurationMs: CONFIG.THRESHOLDS.AVG,
-    maxP90DurationMs: CONFIG.THRESHOLDS.P90,
-    maxP95DurationMs: CONFIG.THRESHOLDS.P95,
-})
+export const defaultApiOptions = buildOption()
 
 function buildOption(thresholdApiConfigs, defaultThresholdsConfig) {
     return {
@@ -26,7 +20,7 @@ function buildOption(thresholdApiConfigs, defaultThresholdsConfig) {
 }
 
 /**
- * To see how to use thresholdApiConfigs: {@link buildThresholds}
+ * To see how to use thresholdApiConfigs and defaultThresholdsConfig: {@link buildThresholds}
  **/
 export function defaultApiOptionsBuilder(
     application,
