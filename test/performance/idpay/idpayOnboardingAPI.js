@@ -160,12 +160,8 @@ export default () => {
                         r.status === 200 || r.status === 404,
                 })
 
-                if (res.status === 404) {
-                    logErrorResult(
-                        `Wallet associated to user with cf [${cf}] not found`,
-                        res,
-                        true
-                    )
+                if (r.status !== 200 && r.status !== 404) {
+                    logErrorResult('getWalletDetail', res, true)
                 }
             }
         })
