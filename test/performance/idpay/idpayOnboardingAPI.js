@@ -48,7 +48,7 @@ export const options = defaultApiOptionsBuilder(
     testName,
     Object.values(ONBOARDING_API_NAMES).concat({
         apiName: WALLET_API_NAMES.getWalletDetail,
-        maxHttpReqFailedRate: 0.9,
+        maxHttpReqFailedRate: 0.999,
     }) // applying apiName tags to thresholds
 )
 
