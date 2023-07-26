@@ -17,7 +17,7 @@ export const defaultApiOptions = buildOption(
 )
 
 function buildOption(
-    thresholdApiNames,
+    thresholdApiConfigs,
     thresholdAvg,
     thresholdP90,
     thresholdP95
@@ -25,7 +25,7 @@ function buildOption(
     return {
         scenarios: buildScenarios(),
         thresholds: buildThresholds(
-            thresholdApiNames,
+            thresholdApiConfigs,
             thresholdAvg,
             thresholdP90,
             thresholdP95
@@ -33,17 +33,20 @@ function buildOption(
     }
 }
 
+/**
+ * To see how to use thresholdApiConfigs: {@link buildThresholds}
+ **/
 export function defaultApiOptionsBuilder(
     application,
     testName,
-    thresholdApiNames,
+    thresholdApiConfigs,
     thresholdAvg,
     thresholdP90,
     thresholdP95
 ) {
     return applyTags(
         buildOption(
-            thresholdApiNames,
+            thresholdApiConfigs,
             coalesce(thresholdAvg, CONFIG.THRESHOLDS.AVG),
             coalesce(thresholdP90, CONFIG.THRESHOLDS.P90),
             coalesce(thresholdP95, CONFIG.THRESHOLDS.P95)

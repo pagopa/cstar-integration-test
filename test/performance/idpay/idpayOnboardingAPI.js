@@ -6,7 +6,10 @@ import {
     putSaveConsent,
     ONBOARDING_API_NAMES,
 } from '../../common/api/idpay/idpayOnboardingCitizen.js'
-import { getWalletDetail, WALLET_API_NAMES } from '../../common/api/idpay/idpayWallet.js'
+import {
+    getWalletDetail,
+    WALLET_API_NAMES,
+} from '../../common/api/idpay/idpayWallet.js'
 import {
     assert,
     statusNoContent,
@@ -30,7 +33,7 @@ import {
 
 // Environments allowed to be tested
 const REGISTERED_ENVS = [DEV, UAT]
-const baseUrl = getBaseUrl(REGISTERED_ENVS, "io") // api-io services baseUrl
+const baseUrl = getBaseUrl(REGISTERED_ENVS, 'io') // api-io services baseUrl
 
 // test tags
 const application = 'idpay'
@@ -43,7 +46,10 @@ const cfList = new SharedArray('cfList', getFCList)
 export const options = defaultApiOptionsBuilder(
     application,
     testName,
-    Object.values(ONBOARDING_API_NAMES).concat(WALLET_API_NAMES.getWalletDetail) // applying apiName tags to thresholds
+    Object.values(ONBOARDING_API_NAMES).concat({
+        apiName: WALLET_API_NAMES.getWalletDetail,
+        maxHttpReqFailedRate: 0.8,
+    }) // applying apiName tags to thresholds
 )
 
 // K6 summary configuration
@@ -140,7 +146,7 @@ export default () => {
         })
 
         group('When onboarding is completed, get wallet detail', () => {
-            if(checked) {
+            if (checked) {
                 sleep(1)
 
                 const res = getWalletDetail(
@@ -150,11 +156,16 @@ export default () => {
                 )
 
                 check(res, {
-                    'HTTP status is 200 or 404': (r) => r.status === 200 || r.status === 404
+                    'HTTP status is 200 or 404': (r) =>
+                        r.status === 200 || r.status === 404,
                 })
 
-                if(res.status === 404) {
-                    logErrorResult(`Wallet associated to user with cf [${cf}] not found`, res, true)
+                if (res.status === 404) {
+                    logErrorResult(
+                        `Wallet associated to user with cf [${cf}] not found`,
+                        res,
+                        true
+                    )
                 }
             }
         })
