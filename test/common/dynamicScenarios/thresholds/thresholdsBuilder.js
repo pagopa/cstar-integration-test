@@ -39,6 +39,7 @@ export default function buildThresholds(
 
     const httpReqFailedThresholds = thresholdApiConfigs
         .map((apiName) => {
+            let maxHttpReqFailedRate = '0.05'
             if (typeof apiName !== 'string') {
                 maxHttpReqFailedRate = coalesce(apiName.maxHttpReqFailedRate)
                 apiName = apiName.apiName
