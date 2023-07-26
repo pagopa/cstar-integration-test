@@ -1,6 +1,13 @@
 import http from 'k6/http'
 import { logResult } from '../../dynamicScenarios/utils.js'
 
+export const WALLET_API_NAMES = {
+    putEnrollInstrumentIssuer: 'wallet/putEnrollInstrumentIssuer',
+    putEnrollIbanIssuer: 'wallet/putEnrollIbanIssuer',
+    putEnrollIban: 'wallet/putEnrollIban',
+    getWalletDetail: 'wallet/getWalletDetail'
+}
+
 const API_PREFIX = '/idpay'
 
 export function putEnrollInstrumentIssuer(
@@ -9,7 +16,7 @@ export function putEnrollInstrumentIssuer(
     headers,
     initiativeId
 ) {
-    const apiName = 'wallet/putEnrollInstrumentIssuer'
+    const apiName = WALLET_API_NAMES.putEnrollInstrumentIssuer
     const res = http.put(
         `${baseUrl}${API_PREFIX}/hb/wallet/${initiativeId}/instruments`,
         body,
@@ -20,7 +27,7 @@ export function putEnrollInstrumentIssuer(
 }
 
 export function putEnrollIbanIssuer(baseUrl, body, headers, initiativeId) {
-    const apiName = 'wallet/putEnrollIbanIssuer'
+    const apiName = WALLET_API_NAMES.putEnrollIbanIssuer
     const res = http.put(
         `${baseUrl}${API_PREFIX}/hb/wallet/${initiativeId}/iban`,
         body,
@@ -31,7 +38,7 @@ export function putEnrollIbanIssuer(baseUrl, body, headers, initiativeId) {
 }
 
 export function putEnrollIban(baseUrl, initiativeId, params, body) {
-    const apiName = 'wallet/putEnrollIban'
+    const apiName = WALLET_API_NAMES.putEnrollIban
     const myParams = Object.assign({}, params, { tags: { apiName } })
     const res = http.put(
         `${baseUrl}${API_PREFIX}/wallet/${initiativeId}/iban`,
@@ -43,11 +50,10 @@ export function putEnrollIban(baseUrl, initiativeId, params, body) {
 }
 
 export function getWalletDetail(baseUrl, initiativeId, params) {
-    const apiName = 'wallet/getWalletDetail'
-    const myParams = Object.assign(params, { tags: { apiName } })
-    const res = http.put(
-        `${baseUrl}${API_PREFIX}/hb/wallet/${initiativeId}/instruments`,
-        null,
+    const apiName = WALLET_API_NAMES.getWalletDetail
+    const myParams = Object.assign({}, params, { tags: { apiName } })
+    const res = http.get(
+        `${baseUrl}${API_PREFIX}/wallet/${initiativeId}`,
         myParams
     )
     logResult(apiName, res)
