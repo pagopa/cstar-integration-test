@@ -78,7 +78,7 @@ The following environment variables allow to configure dynamic scenarios' tests 
 | TARGET_ENV                           | The environment to test                                                                                                       |         |
 | RESULTS_DIR                          | The directory inside which create the results dir                                                                             | .       |
 | REQ_DUMP                             | A boolen to log all requests or not                                                                                           | false   |
-| VUS_MAX_ENV                          | The maximum number of parallel users to simulate                                                                              | 3       |
+| VUS_MAX_ENV                          | The maximum number of parallel users to simulate                                                                              | 20       |
 | MAX_AVAILABLE_TEST_ENTITIES_ENV      | The maximum number of external provided test data to use (if any and if required by implemented test)                         | 3       |
 | SCENARIO_TYPE_ENV                    | The comma separated names of the scenarios to execute. Use the keys listed in [Scenarios](#scenarios) paragraph               | ALL     |
 | SCENARIO_PER_VU_SINGLE_ITERATION_ENV | perVuIterations scenario: if run a single iteration or multiple consecutive until consume all MAX_AVAILABLE_TEST_ENTITIES_ENV | false   |

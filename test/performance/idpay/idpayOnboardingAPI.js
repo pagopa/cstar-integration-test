@@ -27,6 +27,7 @@ import {
     getScenarioTestEntity,
     logErrorResult,
 } from '../../common/dynamicScenarios/utils.js'
+import { CONFIG } from '../../common/dynamicScenarios/envVars.js'
 
 // Environments allowed to be tested
 const REGISTERED_ENVS = [DEV, UAT]
@@ -139,25 +140,28 @@ export default () => {
             }
         })
 
-        group('When onboarding is completed, get wallet detail', () => {
-            if(checked) {
-                sleep(1)
-
-                const res = getWalletDetail(
-                    baseUrl,
-                    IDPAY_CONFIG.CONTEXT_DATA.initiativeId,
-                    params
-                )
-
-                check(res, {
-                    'HTTP status is 200 or 404': (r) => r.status === 200 || r.status === 404
-                })
-
-                if(res.status === 404) {
-                    logErrorResult(`Wallet associated to user with cf [${cf}] not found`, res, true)
+        if(CONFIG.SCRIPT_ENV === 'idpayOnboardingAPI') {
+            group('When onboarding is completed, get wallet detail', () => {
+                if(checked) {
+                    sleep(1)
+    
+                    const res = getWalletDetail(
+                        baseUrl,
+                        IDPAY_CONFIG.CONTEXT_DATA.initiativeId,
+                        params
+                    )
+    
+                    check(res, {
+                        'HTTP status is 200 or 404': (r) => r.status === 200 || r.status === 404
+                    })
+    
+                    if(res.status === 404) {
+                        logErrorResult(`Wallet associated to user with cf [${cf}] not found`, res, true)
+                    }
                 }
-            }
-        })
+            })
+        }
+        
     })
     sleep(1)
 }

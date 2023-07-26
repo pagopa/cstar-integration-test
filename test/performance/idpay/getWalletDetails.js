@@ -2,8 +2,8 @@ import { group, sleep } from 'k6'
 import { assert, statusOk } from '../../common/assertions.js'
 import { DEV, UAT, getBaseUrl } from '../../common/envs.js'
 
-import { getWalletDetail } from '../../common/api/idpay/iddayWallet.js'
-import { getFCPanList } from '../../common/utils.js'
+import { getWalletDetail } from '../../common/api/idpay/idpayWallet.js'
+import { getFCList } from '../../common/utils.js'
 import { SharedArray } from 'k6/data'
 import {
     IDPAY_CONFIG,
@@ -16,6 +16,7 @@ import {
     logErrorResult,
 } from '../../common/dynamicScenarios/utils.js'
 
+// Environments allowed to be tested
 const REGISTERED_ENVS = [DEV, UAT]
 const baseUrl = getBaseUrl(REGISTERED_ENVS, 'io')
 
@@ -23,33 +24,36 @@ const application = 'idpay'
 const testName = 'getWalletDetail'
 
 // Set up data for processing, share data among VUs
-const cfPanList = new SharedArray('cfPanList', getFCPanList)
+const cfPanList = new SharedArray('cfList', getFCList)
 
-// K6 configurations
-export const options = defaultApiOptionsBuilder(application, testName)
+// Dynamic scenarios' K6 configuration
+export const options = defaultApiOptionsBuilder(
+    application,
+    testName,
+    Object.values(WALLET_API_NAMES.getWalletDetail) // applying apiName tags to thresholds
+)
 
+// K6 summary configuration
 export const handleSummary = defaultHandleSummaryBuilder(application, testName)
 
 export default () => {
-    const scenarioEntity = getScenarioTestEntity(cfPanList)
-    const cf = scenarioEntity.cf
+    const cf = getScenarioTestEntity(cfList).FC
     const params = { headers: buildIOAuthorizationHeader(cf) }
 
-    group('Payment Instrument API', () => {
-        group('Should enroll pgpan', () => {
-            const res = getWalletDetail(
-                baseUrl,
-                IDPAY_CONFIG.CONTEXT_DATA.initiativeId,
-                params
-            )
 
-            if (res.status != 200) {
-                logErrorResult('Enrollment Carte', res, true)
-                return
-            }
+    group('When onboarding is completed, get wallet detail', () => {
+        const res = getWalletDetail(
+            baseUrl,
+            IDPAY_CONFIG.CONTEXT_DATA.initiativeId,
+            params
+        )
 
-            assert(res, [statusOk()])
-        })
+        if (res.status != 200) {
+            logErrorResult(`Wallet associated to user with cf [${cf}] not found`, res, true)
+            return
+        }
+
+        assert(res, [statusOk()])
     })
     sleep(1)
 }
