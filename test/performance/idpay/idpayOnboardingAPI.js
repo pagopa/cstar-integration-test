@@ -160,7 +160,7 @@ export default () => {
                         r.status === 200 || r.status === 404,
                 })
 
-                if (r.status !== 200 && r.status !== 404) {
+                if (res.status !== 200 && res.status !== 404) {
                     logErrorResult('getWalletDetail', res, true)
                 }
             }
