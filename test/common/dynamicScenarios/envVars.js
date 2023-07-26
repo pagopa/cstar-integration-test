@@ -64,7 +64,7 @@ export const CONFIG = {
             P95: parseInt(coalesce(__ENV.THRESHOLDS_API_MAX_P95_MS_ENV, 1000)),
         },
         REQ_FAILED: {
-            RATE: parseInt(
+            RATE: parseFloat(
                 coalesce(__ENV.THRESHOLDS_API_MAX_FAILED_REQ_RATE_ENV, 0.05)
             ),
         },

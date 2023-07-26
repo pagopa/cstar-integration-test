@@ -72,7 +72,7 @@ function buildHttpReqDurationThresholds(apiSelector, thresholdsConfig) {
     return {
         [`http_req_duration${apiSelector}`]: [
             {
-                threshold: `avg<${coalesce(
+                threshold: `avg<=${coalesce(
                     thresholdsConfig.maxAvgDurationMs,
                     CONFIG.THRESHOLDS.DURATIONS.AVG
                 )}`, // the avg of requests should be below maxAvgDurationMs
@@ -80,7 +80,7 @@ function buildHttpReqDurationThresholds(apiSelector, thresholdsConfig) {
                 delayAbortEval: '10s',
             },
             {
-                threshold: `p(90)<${coalesce(
+                threshold: `p(90)<=${coalesce(
                     thresholdsConfig.maxP90DurationMs,
                     CONFIG.THRESHOLDS.DURATIONS.P90
                 )}`, // 90% of requests should be below maxP90DurationMs
@@ -88,7 +88,7 @@ function buildHttpReqDurationThresholds(apiSelector, thresholdsConfig) {
                 delayAbortEval: '10s',
             },
             {
-                threshold: `p(95)<${coalesce(
+                threshold: `p(95)<=${coalesce(
                     thresholdsConfig.maxP95DurationMs,
                     CONFIG.THRESHOLDS.DURATIONS.P95
                 )}`, // 95% of requests should be below maxP95DurationMs
@@ -103,7 +103,7 @@ function buildhttpReqFailedThresholds(apiSelector, thresholdsConfig) {
     return {
         [`http_req_failed${apiSelector}`]: [
             {
-                threshold: `rate<${coalesce(
+                threshold: `rate<=${coalesce(
                     thresholdsConfig.maxHttpReqFailedRate,
                     CONFIG.THRESHOLDS.REQ_FAILED.RATE
                 )}`,
