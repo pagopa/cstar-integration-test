@@ -136,7 +136,7 @@ variables:
     - name: k6Test_testPDV
       value: testPDV
     - name: k6Test_getWalletDetails
-      value: idpayOnboardingAPI, getWalletDetails
+      value: idpayOnboardingAPI,getWalletDetails
 
     #Setting Api Key
     - ${{ if eq(parameters.TARGET_ENV, 'dev') }}:
