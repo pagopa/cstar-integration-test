@@ -9,26 +9,18 @@ function applyTags(options, tags) {
     })
 }
 
-export const defaultApiOptions = buildOption(
-    undefined,
-    CONFIG.THRESHOLDS.AVG,
-    CONFIG.THRESHOLDS.P90,
-    CONFIG.THRESHOLDS.P95
-)
+export const defaultApiOptions = buildOption(undefined, {
+    maxAvgDurationMs: CONFIG.THRESHOLDS.AVG,
+    maxP90DurationMs: CONFIG.THRESHOLDS.P90,
+    maxP95DurationMs: CONFIG.THRESHOLDS.P95,
+})
 
-function buildOption(
-    thresholdApiConfigs,
-    thresholdAvg,
-    thresholdP90,
-    thresholdP95
-) {
+function buildOption(thresholdApiConfigs, defaultThresholdsConfig) {
     return {
         scenarios: buildScenarios(),
         thresholds: buildThresholds(
             thresholdApiConfigs,
-            thresholdAvg,
-            thresholdP90,
-            thresholdP95
+            defaultThresholdsConfig
         ),
     }
 }
@@ -40,17 +32,10 @@ export function defaultApiOptionsBuilder(
     application,
     testName,
     thresholdApiConfigs,
-    thresholdAvg,
-    thresholdP90,
-    thresholdP95
+    defaultThresholdsConfig
 ) {
     return applyTags(
-        buildOption(
-            thresholdApiConfigs,
-            coalesce(thresholdAvg, CONFIG.THRESHOLDS.AVG),
-            coalesce(thresholdP90, CONFIG.THRESHOLDS.P90),
-            coalesce(thresholdP95, CONFIG.THRESHOLDS.P95)
-        ),
+        buildOption(thresholdApiConfigs, defaultThresholdsConfig),
         {
             application,
             testName,

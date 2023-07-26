@@ -1,7 +1,7 @@
 import { group, sleep } from 'k6'
 import { assert, statusOk } from '../../common/assertions.js'
 import { DEV, UAT, getBaseUrl } from '../../common/envs.js'
-import { putEnrollInstrumentIssuer } from '../../common/api/idpay/idPayWallet.js'
+import { putEnrollInstrumentIssuer } from '../../common/api/idpay/idpayWallet.js'
 import { getFCPanList } from '../../common/utils.js'
 import { SharedArray } from 'k6/data'
 import defaultHandleSummaryBuilder from '../../common/handleSummaryBuilder.js'

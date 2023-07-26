@@ -38,9 +38,12 @@ export const options = defaultApiOptionsBuilder(
     application,
     testName,
     Object.values(PAYMENT_API_NAMES), // applying apiName tags to thresholds
-    250, // configuring specific http request duration thresholds
-    250,
-    250
+    {
+        // configuring specific http request duration thresholds
+        maxAvgDurationMs: 250,
+        maxP90DurationMs: 250,
+        maxP95DurationMs: 250,
+    }
 )
 
 // K6 summary configuration
