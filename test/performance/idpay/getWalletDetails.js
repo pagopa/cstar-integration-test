@@ -2,7 +2,7 @@ import { group, sleep } from 'k6'
 import { assert, statusOk } from '../../common/assertions.js'
 import { DEV, UAT, getBaseUrl } from '../../common/envs.js'
 
-import { getWalletDetail } from '../../common/api/idpay/idpayWallet.js'
+import { getWalletDetail, WALLET_API_NAMES } from '../../common/api/idpay/idpayWallet.js'
 import { getFCList } from '../../common/utils.js'
 import { SharedArray } from 'k6/data'
 import {
@@ -24,7 +24,7 @@ const application = 'idpay'
 const testName = 'getWalletDetail'
 
 // Set up data for processing, share data among VUs
-const cfPanList = new SharedArray('cfList', getFCList)
+const cfList = new SharedArray('cfList', getFCList)
 
 // Dynamic scenarios' K6 configuration
 export const options = defaultApiOptionsBuilder(
