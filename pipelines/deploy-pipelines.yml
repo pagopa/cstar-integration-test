@@ -21,6 +21,7 @@ parameters:
           - putTokenMockedPdv
           - putTokenPdv
           - idpayOnboardingAPI
+          - getWalletDetails
           - idPayPaymentDiscountAPI
           - ioPutEnrollInstrumentIssuer
           - ioPutEnrollIban
@@ -134,6 +135,8 @@ variables:
       value: idpayOnboardingAPI,ioPutEnrollInstrumentIssuer,ioPutEnrollIban,../rtdTransactionsFile
     - name: k6Test_testPDV
       value: testPDV
+    - name: k6Test_getWalletDetails
+      value: idpayOnboardingAPI,getWalletDetails
 
     #Setting Api Key
     - ${{ if eq(parameters.TARGET_ENV, 'dev') }}:
@@ -272,6 +275,7 @@ jobs:
                         -e RESULTS_DIR=/app \
                         \
                         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
+                        -e SCRIPT_ENV=${{ parameters.SCRIPT }} \
                         -e SCENARIO_TYPE_ENV=$SCENARIO_TYPE_ENV \
                         -e VUS_MAX_ENV=$VUS_MAX_ENV \
                         -e MAX_AVAILABLE_TEST_ENTITIES_ENV=${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} \
@@ -312,7 +316,7 @@ jobs:
                           THRESHOLDS_API_MAX_P95_MS_ENV: ${{ parameters.THRESHOLDS_API_MAX_P95_MS_ENV }}
                       ${{ else }}: # intermediate tests will execute this configuration, which ensure the execution of all test entities
                           SCENARIO_TYPE_ENV: perVuIterations
-                          VUS_MAX_ENV: '40'
+                          VUS_MAX_ENV: '20'
                           SCENARIO_PER_VU_SINGLE_ITERATION_ENV: 'false'
                           SCENARIO_PER_VU_EXECUTIONS_ENV: '1'
                           SCENARIO_DURATION_ENV: '2'
