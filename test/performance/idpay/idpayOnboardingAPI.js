@@ -30,6 +30,7 @@ import {
     getScenarioTestEntity,
     logErrorResult,
 } from '../../common/dynamicScenarios/utils.js'
+import { CONFIG } from '../../common/dynamicScenarios/envVars.js'
 
 // Environments allowed to be tested
 const REGISTERED_ENVS = [DEV, UAT]
@@ -62,6 +63,8 @@ export default () => {
     const cf = getScenarioTestEntity(cfList).FC
     const params = { headers: buildIOAuthorizationHeader(cf) }
 
+    const isOnboardingTestScript = CONFIG.SCRIPT_ENV === 'idpayOnboardingAPI'
+
     group('Should onboard Citizen', () => {
         group('When the inititive exists, put t&c', () => {
             if (checked) {
@@ -81,26 +84,29 @@ export default () => {
                 }
             }
         })
-        group('Check accepted status', () => {
-            if (checked) {
-                const res = getStatus(
-                    baseUrl,
-                    params,
-                    IDPAY_CONFIG.CONTEXT_DATA.initiativeId
-                )
 
-                assert(res, [
-                    statusOk(),
-                    bodyJsonSelectorValue('status', 'ACCEPTED_TC'),
-                ])
+        if (isOnboardingTestScript) {
+            group('Check accepted status', () => {
+                if (checked) {
+                    const res = getStatus(
+                        baseUrl,
+                        params,
+                        IDPAY_CONFIG.CONTEXT_DATA.initiativeId
+                    )
 
-                if (res.status != 200) {
-                    logErrorResult('GetStatus', res, true)
-                    checked = false
-                    return
+                    assert(res, [
+                        statusOk(),
+                        bodyJsonSelectorValue('status', 'ACCEPTED_TC'),
+                    ])
+
+                    if (res.status != 200) {
+                        logErrorResult('GetStatus', res, true)
+                        checked = false
+                        return
+                    }
                 }
-            }
-        })
+            })
+        }
 
         group('When the TC consent exists, check the prerequisites', () => {
             if (checked) {
@@ -145,26 +151,32 @@ export default () => {
             }
         })
 
-        group('When onboarding is completed, get wallet detail', () => {
-            if (checked) {
-                sleep(1)
+        if (isOnboardingTestScript) {
+            group('When onboarding is completed, get wallet detail', () => {
+                if (checked) {
+                    sleep(1)
 
-                const res = getWalletDetail(
-                    baseUrl,
-                    IDPAY_CONFIG.CONTEXT_DATA.initiativeId,
-                    params
-                )
+                    const res = getWalletDetail(
+                        baseUrl,
+                        IDPAY_CONFIG.CONTEXT_DATA.initiativeId,
+                        params
+                    )
 
-                check(res, {
-                    'HTTP status is 200 or 404': (r) =>
-                        r.status === 200 || r.status === 404,
-                })
+                    check(res, {
+                        'HTTP status is 200 or 404': (r) =>
+                            r.status === 200 || r.status === 404,
+                    })
 
-                if (res.status !== 200 && res.status !== 404) {
-                    logErrorResult('getWalletDetail', res, true)
+                    if (res.status === 404) {
+                        logErrorResult(
+                            `Wallet associated to user with cf [${cf}] not found`,
+                            res,
+                            true
+                        )
+                    }
                 }
-            }
-        })
+            })
+        }
     })
     sleep(1)
 }
