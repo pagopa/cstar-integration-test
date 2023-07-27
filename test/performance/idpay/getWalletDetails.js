@@ -48,9 +48,8 @@ export default () => {
             params
         )
 
-        if (res.status != 200) {
+        if (res.status !== 200) {
             logErrorResult(`Wallet associated to user with cf [${cf}] not found`, res, true)
-            return
         }
 
         assert(res, [statusOk()])
