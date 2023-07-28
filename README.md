@@ -132,7 +132,7 @@ let cfList = new SharedArray('cfList', getFCList)
 export const options = defaultApiOptionsBuilder(
     application,
     testName,
-    Object.values(PAYMENT_API_NAMES), // applying apiName tags to thresholds (usefull if the test is composed of more than 1 API to invoke)
+    Object.values(PAYMENT_API_NAMES), // applying apiName tags to thresholds (usefull if the test is composed of more than 1 API to invoke, it could be used to configure different settings based on the api, see test\common\dynamicScenarios\thresholds\thresholdsBuilder javadoc)
     250, // configuring specific http request duration thresholds
     250,
     250
