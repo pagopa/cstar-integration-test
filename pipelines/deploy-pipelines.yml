@@ -14,7 +14,7 @@ parameters:
           - 'dev'
           - 'uat'
 
-    - name: 'SCRIPT'
+    - name: 'SCRIPT_ENV'
       displayName: 'Script name'
       type: string
       values:
@@ -176,7 +176,7 @@ variables:
 
 jobs:
     - job: PerformanceTest
-      displayName: "Executing on ${{ parameters.TARGET_ENV }} ${{ parameters.SCRIPT }}"
+      displayName: "Executing on ${{ parameters.TARGET_ENV }} ${{ parameters.SCRIPT_ENV }}"
       timeoutInMinutes: 0
       continueOnError: true
       steps:
@@ -245,7 +245,7 @@ jobs:
                     echo "##vso[task.setvariable variable=trxFileName]$BaseName"
             displayName: Set variable trxFileName
 
-          - ${{ if containsValue(split(variables['k6TestRequiringMerchantList'], ','), parameters.SCRIPT) }}:
+          - ${{ if containsValue(split(variables['k6TestRequiringMerchantList'], ','), parameters.SCRIPT_ENV) }}:
                 - task: DownloadSecureFile@1
                   name: merchantList
                   displayName: 'Download merchant list file'
@@ -266,7 +266,7 @@ jobs:
                 docker pull grafana/k6:latest
             displayName: Pull k6 image
 
-          - ${{ each k6Test in split(variables[format('k6Test_{0}', parameters.SCRIPT)], ',') }}:
+          - ${{ each k6Test in split(variables[format('k6Test_{0}', parameters.SCRIPT_ENV)], ',') }}:
                 - script: |
                       docker run -i \
                         --user $UID \
@@ -275,7 +275,7 @@ jobs:
                         -e RESULTS_DIR=/app \
                         \
                         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
-                        -e SCRIPT_ENV=${{ parameters.SCRIPT }} \
+                        -e SCRIPT_ENV=${{ parameters.SCRIPT_ENV }} \
                         -e SCENARIO_TYPE_ENV=$SCENARIO_TYPE_ENV \
                         -e VUS_MAX_ENV=$VUS_MAX_ENV \
                         -e MAX_AVAILABLE_TEST_ENTITIES_ENV=${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} \
@@ -305,7 +305,7 @@ jobs:
                         grafana/k6:latest \
                         run /app/test/performance/idpay/${{k6Test}}.js
                   env:
-                      ${{ if eq(k6Test, parameters.SCRIPT) }}:
+                      ${{ if eq(k6Test, parameters.SCRIPT_ENV) }}:
                           SCENARIO_TYPE_ENV: ${{ parameters.SCENARIO_TYPE_ENV }}
                           VUS_MAX_ENV: ${{ parameters.VUS_MAX_ENV }}
                           SCENARIO_PER_VU_SINGLE_ITERATION_ENV: ${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }}
@@ -341,7 +341,7 @@ jobs:
                 targetPath: 'results'
                 publishLocation: 'pipeline'
 
-    - ${{ if and( containsValue(split(variables[format('k6Test_{0}', parameters.SCRIPT)], ','), 'idPayPaymentDiscountAPI'), ne(parameters.DAYS_TO_ADD, -1)) }}:
+    - ${{ if and( containsValue(split(variables[format('k6Test_{0}', parameters.SCRIPT_ENV)], ','), 'idPayPaymentDiscountAPI'), ne(parameters.DAYS_TO_ADD, -1)) }}:
         - deployment: ForceExportRefund
           dependsOn: PerformanceTest
           condition: true
