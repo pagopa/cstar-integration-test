@@ -140,6 +140,7 @@ export default () => {
             }
         })
 
+        console.log("TARGET_ENV -> [" + CONFIG.TARGET_ENV + "]")
         console.log("SCRIPT_ENV -> [" + CONFIG.SCRIPT_ENV + "]")
 
         if(CONFIG.SCRIPT_ENV === 'idpayOnboardingAPI') {
