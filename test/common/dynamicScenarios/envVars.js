@@ -9,7 +9,7 @@ const rampStageNumber = Math.max(
 
 export const CONFIG = {
     TARGET_ENV: __ENV.TARGET_ENV,
-    SCRIPT_ENV: __ENV.SCRIPT,
+    SCRIPT_ENV: __ENV.SCRIPT_ENV,
     DUMP_REQUESTS: __ENV.REQ_DUMP && __ENV.REQ_DUMP.toLowerCase() === 'true',
 
     VIRTUAL_USERS: vu,
