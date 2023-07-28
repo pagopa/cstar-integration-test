@@ -18,15 +18,15 @@ parameters:
       displayName: 'Script name'
       type: string
       values:
-          - putTokenMockedPdv
-          - putTokenPdv
-          - idpayOnboardingAPI
-          - getWalletDetails
-          - idPayPaymentDiscountAPI
-          - ioPutEnrollInstrumentIssuer
-          - ioPutEnrollIban
-          - rtdTransactionsFile
-          - testPDV
+          - 'putTokenMockedPdv'
+          - 'putTokenPdv'
+          - 'idpayOnboardingAPI'
+          - 'getWalletDetails'
+          - 'idPayPaymentDiscountAPI'
+          - 'ioPutEnrollInstrumentIssuer'
+          - 'ioPutEnrollIban'
+          - 'rtdTransactionsFile'
+          - 'testPDV'
 
     - name: 'INITIATIVE_ID'
       displayName: 'InitiativeId'
