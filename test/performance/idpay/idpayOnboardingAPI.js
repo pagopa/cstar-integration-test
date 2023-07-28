@@ -140,6 +140,8 @@ export default () => {
             }
         })
 
+        console.log(CONFIG.SCRIPT_ENV)
+
         if(CONFIG.SCRIPT_ENV === 'idpayOnboardingAPI') {
             group('When onboarding is completed, get wallet detail', () => {
                 if(checked) {
