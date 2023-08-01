@@ -58,30 +58,32 @@ export function getRelativePathToRootFolder() {
     return '../..'
 }
 
+export const csvDelimiter = coalesce(__ENV.CSV_DELIMITER, '')
+
 export function getFCList() {
     return papaparse.parse(
         open(`${getRelativePathToRootFolder()}/assets/fc_pgpans.csv`),
-        { header: true }
+        { header: true, delimiter: csvDelimiter }
     ).data
 }
 
 export function getFCPanList() {
     return papaparse.parse(
         open(`${getRelativePathToRootFolder()}/assets/fc_pgpans.csv`),
-        { header: true }
+        { header: true, delimiter: csvDelimiter }
     ).data
 }
 export function getFCIbanList() {
     return papaparse.parse(
         open(`${getRelativePathToRootFolder()}/assets/fc_iban.csv`),
-        { header: true }
+        { header: true, delimiter: csvDelimiter }
     ).data
 }
 
 export function getMerchantList() {
     return papaparse.parse(
         open(`${getRelativePathToRootFolder()}/assets/merchantList.csv`),
-        { header: true }
+        { header: true, delimiter: csvDelimiter }
     ).data
 }
 

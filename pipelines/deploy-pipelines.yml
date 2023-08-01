@@ -17,6 +17,7 @@ parameters:
     - name: 'SCRIPT'
       displayName: 'Script name'
       type: string
+      default: 'idpayOnboardingAPI'
       values:
           - putTokenMockedPdv
           - putTokenPdv
@@ -31,7 +32,7 @@ parameters:
     - name: 'INITIATIVE_ID'
       displayName: 'InitiativeId'
       type: string
-      default: 'IGNORE_IF_NOT_idpayOnboardingAPI_and_ioPutEnrollInstrumentIssuer_and_ioPutEnrollIban'
+      default: 'IGNORE'
     - name: 'ACQUIRER_ID'
       displayName: 'acquirerId'
       type: string
@@ -245,14 +246,6 @@ jobs:
                     echo "##vso[task.setvariable variable=trxFileName]$BaseName"
             displayName: Set variable trxFileName
 
-          - task: PublishPipelineArtifact@1
-            displayName: 'TEMP'
-            condition: true
-            inputs:
-                artifact: 'assets'
-                targetPath: 'assets'
-                publishLocation: 'pipeline'
-
           - ${{ if containsValue(split(variables['k6TestRequiringMerchantList'], ','), parameters.SCRIPT) }}:
                 - task: DownloadSecureFile@1
                   name: merchantList
@@ -281,6 +274,7 @@ jobs:
                         -v $(pwd):/app \
                         --workdir "/app" \
                         -e RESULTS_DIR=/app \
+                        -e CSV_DELIMITER=; \
                         \
                         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
                         -e SCRIPT_ENV=${{ parameters.SCRIPT }} \
