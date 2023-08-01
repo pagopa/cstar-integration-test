@@ -274,7 +274,7 @@ jobs:
                         -v $(pwd):/app \
                         --workdir "/app" \
                         -e RESULTS_DIR=/app \
-                        -e CSV_DELIMITER=; \
+                        -e CSV_DELIMITER=";" \
                         \
                         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
                         -e SCRIPT_ENV=${{ parameters.SCRIPT }} \
