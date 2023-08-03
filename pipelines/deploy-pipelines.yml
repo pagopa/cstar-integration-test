@@ -1,4 +1,4 @@
- # Run Automated Test in UAT environment
+# Run Automated Test in UAT environment
 
 trigger: none
 
@@ -17,6 +17,7 @@ parameters:
     - name: 'SCRIPT'
       displayName: 'Script name'
       type: string
+      default: 'idpayOnboardingAPI'
       values:
           - putTokenMockedPdv
           - putTokenPdv
@@ -31,7 +32,7 @@ parameters:
     - name: 'INITIATIVE_ID'
       displayName: 'InitiativeId'
       type: string
-      default: 'IGNORE_IF_NOT_idpayOnboardingAPI_and_ioPutEnrollInstrumentIssuer_and_ioPutEnrollIban'
+      default: 'IGNORE'
     - name: 'ACQUIRER_ID'
       displayName: 'acquirerId'
       type: string
@@ -176,7 +177,7 @@ variables:
 
 jobs:
     - job: PerformanceTest
-      displayName: "Executing on ${{ parameters.TARGET_ENV }} ${{ parameters.SCRIPT }}"
+      displayName: 'Executing on ${{ parameters.TARGET_ENV }} ${{ parameters.SCRIPT }}'
       timeoutInMinutes: 0
       continueOnError: true
       steps:
@@ -273,6 +274,7 @@ jobs:
                         -v $(pwd):/app \
                         --workdir "/app" \
                         -e RESULTS_DIR=/app \
+                        -e CSV_DELIMITER=";" \
                         \
                         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
                         -e SCRIPT_ENV=${{ parameters.SCRIPT }} \
@@ -342,24 +344,24 @@ jobs:
                 publishLocation: 'pipeline'
 
     - ${{ if and( containsValue(split(variables[format('k6Test_{0}', parameters.SCRIPT)], ','), 'idPayPaymentDiscountAPI'), ne(parameters.DAYS_TO_ADD, -1)) }}:
-        - deployment: ForceExportRefund
-          dependsOn: PerformanceTest
-          condition: true
-          timeoutInMinutes: 0
-          displayName: 'Forcing refund file export on ${{ parameters.TARGET_ENV }}'
-          pool:
-            name: $(selfHostedAgentPool)
-          environment: '${{ upper(parameters.TARGET_ENV) }}'
-          strategy:
-            runOnce:
-              deploy:
-                steps:
-                  - script: |
-                      response=$(curl -s -X PUT https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpaypayment/idpay/payment/qr-code/force-expiration/confirm/${{ parameters.INITIATIVE_ID }} -H 'accept: */*' )
-                      echo "Forcing confirm expiration result: " $response 
-                      
-                      NOTIFICATION_DATE=$(date +%Y-%m-%d -d "$(date) + ${{ parameters.DAYS_TO_ADD }} day")
-                      echo "using notification date $NOTIFICATION_DATE"
-                      response=$(curl -s -X GET https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpayrewardnotification/idpay/reward/notification/exports/start?notificationDateToSearch=$NOTIFICATION_DATE -H 'accept: */*' )
-                      echo "Refund result: " $response
-                      echo $response | grep \"initiativeId\":\"${{ parameters.INITIATIVE_ID }}\" > /dev/null
+          - deployment: ForceExportRefund
+            dependsOn: PerformanceTest
+            condition: true
+            timeoutInMinutes: 0
+            displayName: 'Forcing refund file export on ${{ parameters.TARGET_ENV }}'
+            pool:
+                name: $(selfHostedAgentPool)
+            environment: '${{ upper(parameters.TARGET_ENV) }}'
+            strategy:
+                runOnce:
+                    deploy:
+                        steps:
+                            - script: |
+                                  response=$(curl -s -X PUT https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpaypayment/idpay/payment/qr-code/force-expiration/confirm/${{ parameters.INITIATIVE_ID }} -H 'accept: */*' )
+                                  echo "Forcing confirm expiration result: " $response 
+
+                                  NOTIFICATION_DATE=$(date +%Y-%m-%d -d "$(date) + ${{ parameters.DAYS_TO_ADD }} day")
+                                  echo "using notification date $NOTIFICATION_DATE"
+                                  response=$(curl -s -X GET https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpayrewardnotification/idpay/reward/notification/exports/start?notificationDateToSearch=$NOTIFICATION_DATE -H 'accept: */*' )
+                                  echo "Refund result: " $response
+                                  echo $response | grep \"initiativeId\":\"${{ parameters.INITIATIVE_ID }}\" > /dev/null
