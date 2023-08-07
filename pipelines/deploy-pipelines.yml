@@ -14,6 +14,11 @@ parameters:
           - 'dev'
           - 'uat'
 
+    - name: 'INTERNAL_ACCESS_ENV'
+      displayName: 'Internal access to k8s services'
+      type: boolean
+      default: false
+
     - name: 'SCRIPT'
       displayName: 'Script name'
       type: string
@@ -119,7 +124,11 @@ variables:
     # comma separated list of tests requiring to download and onboard merchants on input initiative
     - name: k6TestRequiringMerchantList
       value: idPayPaymentDiscountAPI
+    # resolved merchantList requirement
+    - name: MERCHANT_LIST_REQUIRED
+      value: ${{ containsValue(split(variables['k6TestRequiringMerchantList'], ','), parameters.SCRIPT) }}
 
+    # comma separated list of tests to execute based on the SCRIPT parameter
     - name: k6Test_putTokenMockedPdv
       value: putTokenMockedPdv
     - name: k6Test_putTokenPdv
@@ -138,6 +147,14 @@ variables:
       value: testPDV
     - name: k6Test_getWalletDetails
       value: idpayOnboardingAPI,getWalletDetails
+
+    # resolved list of k6 script to execute
+    - ${{ if and(parameters.INTERNAL_ACCESS_ENV, eq(variables.MERCHANT_LIST_REQUIRED, 'true') ) }}:
+          - name: SCRIPTS_TO_EXECUTE
+            value: retrieveMerchantId,${{ variables[format('k6Test_{0}', parameters.SCRIPT)] }}
+    - ${{ else }}:
+          - name: SCRIPTS_TO_EXECUTE
+            value: ${{ variables[format('k6Test_{0}', parameters.SCRIPT)] }}
 
     #Setting Api Key
     - ${{ if eq(parameters.TARGET_ENV, 'dev') }}:
@@ -246,7 +263,7 @@ jobs:
                     echo "##vso[task.setvariable variable=trxFileName]$BaseName"
             displayName: Set variable trxFileName
 
-          - ${{ if containsValue(split(variables['k6TestRequiringMerchantList'], ','), parameters.SCRIPT) }}:
+          - ${{ if eq(variables.MERCHANT_LIST_REQUIRED, 'true') }}:
                 - task: DownloadSecureFile@1
                   name: merchantList
                   displayName: 'Download merchant list file'
@@ -267,7 +284,7 @@ jobs:
                 docker pull grafana/k6:latest
             displayName: Pull k6 image
 
-          - ${{ each k6Test in split(variables[format('k6Test_{0}', parameters.SCRIPT)], ',') }}:
+          - ${{ each k6Test in split(variables.SCRIPTS_TO_EXECUTE, ',') }}:
                 - script: |
                       docker run -i \
                         --user $UID \
@@ -275,6 +292,7 @@ jobs:
                         --workdir "/app" \
                         -e RESULTS_DIR=/app \
                         -e CSV_DELIMITER=";" \
+                        -e ENABLE_FILE_WRITING=true \
                         \
                         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
                         -e SCRIPT_ENV=${{ parameters.SCRIPT }} \
