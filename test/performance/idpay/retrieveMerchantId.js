@@ -13,6 +13,7 @@ import {
 } from '../../common/api/idpay/idpayMerchant.js'
 import { getMerchantList } from '../../common/utils.js'
 import { appendString, writeString } from '../../common/xk6/file.js'
+import { CONFIG } from '../../common/dynamicScenarios/envVars.js'
 
 const application = 'idpay'
 const testName = 'retrieveMerchantId'
@@ -39,7 +40,7 @@ export default () => {
     const merchantFiscalCode = getScenarioTestEntity(merchantList).CF
 
     const res = retrieveMerchantId(
-        true,
+        CONFIG.USE_INTERNAL_ACCESS_ENV,
         IDPAY_CONFIG.CONTEXT_DATA.acquirerId,
         merchantFiscalCode
     )

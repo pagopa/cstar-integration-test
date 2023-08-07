@@ -14,7 +14,7 @@ parameters:
           - 'dev'
           - 'uat'
 
-    - name: 'INTERNAL_ACCESS_ENV'
+    - name: 'USE_INTERNAL_ACCESS_ENV'
       displayName: 'Internal access to k8s services'
       type: boolean
       default: false
@@ -149,12 +149,16 @@ variables:
       value: idpayOnboardingAPI,getWalletDetails
 
     # resolved list of k6 script to execute
-    - ${{ if and(parameters.INTERNAL_ACCESS_ENV, eq(variables.MERCHANT_LIST_REQUIRED, 'true') ) }}:
+    - ${{ if and(parameters.USE_INTERNAL_ACCESS_ENV, eq(variables.MERCHANT_LIST_REQUIRED, 'true') ) }}:
           - name: SCRIPTS_TO_EXECUTE
             value: retrieveMerchantId,${{ variables[format('k6Test_{0}', parameters.SCRIPT)] }}
     - ${{ else }}:
           - name: SCRIPTS_TO_EXECUTE
             value: ${{ variables[format('k6Test_{0}', parameters.SCRIPT)] }}
+            
+    # comma separated list of scripts requiring xk6
+    - name: xk6Tests
+      value: retrieveMerchantId
 
     #Setting Api Key
     - ${{ if eq(parameters.TARGET_ENV, 'dev') }}:
@@ -281,8 +285,13 @@ jobs:
                   timeoutInMinutes: 0
 
           - script: |
-                docker pull grafana/k6:latest
-            displayName: Pull k6 image
+                if [[ $SCRIPTS_TO_EXECUTE =~ ${xk6Tests//,/|} ]]; then
+                  echo "Building xk6 binary"
+                  docker run --rm -u "$(id -u):$(id -g)" -v "${PWD}:/xk6" grafana/xk6:latest build --output xk6 --with github.com/avitalique/xk6-file@latest
+                else
+                  echo "xk6 not necessary"
+                fi
+            displayName: Build xk6 binary
 
           - ${{ each k6Test in split(variables.SCRIPTS_TO_EXECUTE, ',') }}:
                 - script: |
@@ -295,6 +304,7 @@ jobs:
                         -e ENABLE_FILE_WRITING=true \
                         \
                         -e TARGET_ENV=${{ parameters.TARGET_ENV }} \
+                        -e USE_INTERNAL_ACCESS_ENV=${{ parameters.USE_INTERNAL_ACCESS_ENV }} \
                         -e SCRIPT_ENV=${{ parameters.SCRIPT }} \
                         -e SCENARIO_TYPE_ENV=$SCENARIO_TYPE_ENV \
                         -e VUS_MAX_ENV=$VUS_MAX_ENV \
@@ -322,7 +332,7 @@ jobs:
                         -e APIM_RTD_MOCK_API_SK=$(rtdMockApiSK) \
                         -e PDV_API_KEY=$(pdvApiKey) \
                         \
-                        grafana/k6:latest \
+                        $K6_DOCKER_IMAGE \
                         run /app/test/performance/idpay/${{k6Test}}.js
                   env:
                       ${{ if eq(k6Test, parameters.SCRIPT) }}:
@@ -343,6 +353,11 @@ jobs:
                           THRESHOLDS_API_MAX_AVG_MS_ENV: '10000'
                           THRESHOLDS_API_MAX_P90_MS_ENV: '10000'
                           THRESHOLDS_API_MAX_P95_MS_ENV: '10000'
+                      ${{ if containsValue(split(variables['xk6Tests'], ','), k6Test) }}:
+                          K6_DOCKER_IMAGE: bash:latest ./k6
+                      ${{ else }}:
+                          K6_DOCKER_IMAGE: grafana/k6:latest
+                          
                   displayName: Run k6 ${{k6Test}}.js on ${{ parameters.TARGET_ENV }}
                   timeoutInMinutes: 0
 
