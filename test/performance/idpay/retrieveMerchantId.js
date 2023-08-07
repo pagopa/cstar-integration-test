@@ -12,12 +12,18 @@ import {
     retrieveMerchantId,
 } from '../../common/api/idpay/idpayMerchant.js'
 import { getMerchantList } from '../../common/utils.js'
+import { appendString, writeString } from '../../common/xk6/file.js'
 
 const application = 'idpay'
 const testName = 'retrieveMerchantId'
 
 // Set up data for processing, share data among VUs
 const merchantList = new SharedArray('merchantList', getMerchantList)
+const merchantIdListFilePath = 'assets/merchantIdList.csv'
+
+export function setup() {
+    writeString(merchantIdListFilePath, 'ID;ACQUIRER_ID;MERCHANT_FISCAL_CODE\n')
+}
 
 // Dynamic scenarios' K6 configuration
 export const options = defaultApiOptionsBuilder(
@@ -43,4 +49,8 @@ export default () => {
         logErrorResult(testName, res, true)
         return
     }
+    appendString(
+        merchantIdListFilePath,
+        `${res.body};${IDPAY_CONFIG.CONTEXT_DATA.acquirerId};${merchantFiscalCode}\n`
+    )
 }
