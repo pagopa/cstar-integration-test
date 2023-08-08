@@ -191,14 +191,22 @@ variables:
             value: $(mil_apikey_uat)
           - name: selfHostedAgentPool
             value: cstar-uat-linux
+    - name: xk6CacheKey
+      value: '"xk6" | "0.45.1"'
 
 jobs:
+    - template: templates\xk6-build.yml
+      parameters:
+          xk6CacheKey: '$(xk6CacheKey)'
+          k6Version: v0.45.1
+
     - template: templates\job-type-switch.yml
       parameters:
           name: PerformanceTest
           displayName: 'Executing ${{ parameters.SCRIPT }} on ${{ parameters.TARGET_ENV }} (internal access: ${{ parameters.USE_INTERNAL_ACCESS_ENV }})'
           timeoutInMinutes: 0
           continueOnError: true
+          dependsOn: xk6Build
 
           isDeployment: ${{ parameters.USE_INTERNAL_ACCESS_ENV }}
           deploymentPoolName: $(selfHostedAgentPool)
@@ -286,9 +294,11 @@ jobs:
                       displayName: onboarding merchantList on input initiative
                       timeoutInMinutes: 0
 
-              - script: |
-                    docker run --rm -u "$(id -u):$(id -g)" -v "${PWD}:/xk6" grafana/xk6:latest build --output xk6 --with github.com/avitalique/xk6-file@latest
-                displayName: Build xk6 binary
+              - task: Cache@2
+                inputs:
+                    key: '$(xk6CacheKey)'
+                    path: '$(Build.SourcesDirectory)'
+                displayName: Retrieve xk6 from Cache
 
               - ${{ each k6Test in split(variables.SCRIPTS_TO_EXECUTE, ',') }}:
                     - script: ./xk6 run ./test/performance/idpay/${{k6Test}}.js

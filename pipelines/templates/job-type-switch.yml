@@ -18,6 +18,10 @@ parameters:
       type: string
       default: ''
 
+    - name: 'dependsOn'
+      type: object
+      default: []
+
     - name: 'steps'
       type: stepList
       default: []
@@ -41,3 +45,4 @@ jobs:
       displayName: ${{ parameters.displayName }}
       timeoutInMinutes: ${{ parameters.timeoutInMinutes }}
       continueOnError: ${{ parameters.continueOnError }}
+      dependsOn: ${{ parameters.dependsOn }}
