@@ -17,9 +17,10 @@ jobs:
             inputs:
                 key: '$(xk6CacheKey)'
                 path: '$(Build.SourcesDirectory)/xk6'
+                cacheHitVar: XK6_RESTORED
             displayName: Retrieve xk6 from Cache
           - script: |
                 mkdir xk6
                 docker run --rm -u "$(id -u):$(id -g)" -v "${PWD}/xk6:/xk6" grafana/xk6:latest build ${{ parameters.k6Version }} --output xk6 ${{ parameters.xk6Extensions }}
             displayName: Build xk6 binary
-            condition: ne(variables.CACHE_RESTORED, 'true')
+            condition: ne(variables.XK6_RESTORED, 'true')
