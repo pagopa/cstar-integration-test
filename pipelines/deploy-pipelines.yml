@@ -272,6 +272,7 @@ jobs:
                     echo PDV_ID > ./assets/userIdList.csv
                     for x in {0..${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }}}; do echo randomid-0000-0000-$(echo $RANDOM | md5sum | head -c 4)-$(echo $RANDOM | md5sum | head -c 12); done >> ./assets/userIdList.csv
                 displayName: TEMP RANDOM USERID GEN
+                condition: ${{ parameters.USE_INTERNAL_ACCESS_ENV }}
                 timeoutInMinutes: 0
 
               - task: Bash@3

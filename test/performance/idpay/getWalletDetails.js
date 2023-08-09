@@ -1,7 +1,5 @@
 import { group, sleep } from 'k6'
 import { assert, statusOk } from '../../common/assertions.js'
-import { DEV, UAT, getBaseUrl } from '../../common/envs.js'
-
 import {
     getWalletDetail,
     WALLET_API_NAMES,
@@ -9,19 +7,13 @@ import {
 import { getFCList } from '../../common/utils.js'
 import { SharedArray } from 'k6/data'
 import {
+    getIdPayScenarioUserToken,
     IDPAY_CONFIG,
-    retrieveAndBuildIOAuthorizationHeader,
 } from '../../common/idpay/envVars.js'
 import defaultHandleSummaryBuilder from '../../common/handleSummaryBuilder.js'
 import { defaultApiOptionsBuilder } from '../../common/dynamicScenarios/defaultOptions.js'
-import {
-    getScenarioTestEntity,
-    logErrorResult,
-} from '../../common/dynamicScenarios/utils.js'
-
-// Environments allowed to be tested
-const REGISTERED_ENVS = [DEV, UAT]
-const baseUrl = getBaseUrl(REGISTERED_ENVS, 'io')
+import { logErrorResult } from '../../common/dynamicScenarios/utils.js'
+import { CONFIG } from '../../common/dynamicScenarios/envVars.js'
 
 const application = 'idpay'
 const testName = 'getWalletDetail'
@@ -40,14 +32,14 @@ export const options = defaultApiOptionsBuilder(
 export const handleSummary = defaultHandleSummaryBuilder(application, testName)
 
 export default () => {
-    const cf = getScenarioTestEntity(cfList).FC
-    const params = { headers: retrieveAndBuildIOAuthorizationHeader(cf) }
+    // selecting current scenario/iteration test token
+    const token = getIdPayScenarioUserToken(cfList)
 
     group('When onboarding is completed, get wallet detail', () => {
         const res = getWalletDetail(
-            baseUrl,
-            IDPAY_CONFIG.CONTEXT_DATA.initiativeId,
-            params
+            CONFIG.USE_INTERNAL_ACCESS_ENV,
+            token,
+            IDPAY_CONFIG.CONTEXT_DATA.initiativeId
         )
 
         if (res.status !== 200) {

@@ -144,9 +144,9 @@ export default () => {
                     sleep(1)
 
                     const res = getWalletDetail(
-                        baseUrl,
-                        IDPAY_CONFIG.CONTEXT_DATA.initiativeId,
-                        params
+                        CONFIG.USE_INTERNAL_ACCESS_ENV,
+                        token,
+                        IDPAY_CONFIG.CONTEXT_DATA.initiativeId
                     )
 
                     check(res, {
@@ -156,7 +156,7 @@ export default () => {
 
                     if (res.status === 404) {
                         logErrorResult(
-                            `Wallet associated to user with cf [${cf}] not found`,
+                            `Wallet associated to user with token [${token}] not found`,
                             res,
                             true
                         )
