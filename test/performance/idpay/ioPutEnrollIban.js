@@ -8,7 +8,7 @@ import defaultHandleSummaryBuilder from '../../common/handleSummaryBuilder.js'
 import { defaultApiOptionsBuilder } from '../../common/dynamicScenarios/defaultOptions.js'
 import {
     IDPAY_CONFIG,
-    buildIOAuthorizationHeader,
+    retrieveAndBuildIOAuthorizationHeader,
 } from '../../common/idpay/envVars.js'
 import {
     getScenarioTestEntity,
@@ -36,7 +36,7 @@ export default () => {
     const cf = scenarioEntity.FC
     const iban = scenarioEntity.IBAN
 
-    const params = { headers: buildIOAuthorizationHeader(cf) }
+    const params = { headers: retrieveAndBuildIOAuthorizationHeader(cf) }
 
     group('Iban API', () => {
         group('Should enroll iban', () => {

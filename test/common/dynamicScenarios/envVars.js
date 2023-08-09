@@ -83,3 +83,10 @@ export const CONFIG = {
 export const defaultHeaders = {
     'Content-Type': 'application/json',
 }
+
+export function buildDefaultParams(apiName) {
+    return {
+        headers: defaultHeaders,
+        tags: { apiName },
+    }
+}

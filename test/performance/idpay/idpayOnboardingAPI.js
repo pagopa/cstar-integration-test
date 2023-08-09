@@ -18,18 +18,15 @@ import {
     bodyJsonSelectorValue,
 } from '../../common/assertions.js'
 import { DEV, UAT, getBaseUrl } from '../../common/envs.js'
-import { getFCList } from '../../common/utils.js'
+import { getFCList, getUserIdsList } from '../../common/utils.js'
 import { SharedArray } from 'k6/data'
 import defaultHandleSummaryBuilder from '../../common/handleSummaryBuilder.js'
 import { defaultApiOptionsBuilder } from '../../common/dynamicScenarios/defaultOptions.js'
 import {
     IDPAY_CONFIG,
-    buildIOAuthorizationHeader,
+    getIdPayScenarioUserToken,
 } from '../../common/idpay/envVars.js'
-import {
-    getScenarioTestEntity,
-    logErrorResult,
-} from '../../common/dynamicScenarios/utils.js'
+import { logErrorResult } from '../../common/dynamicScenarios/utils.js'
 import { CONFIG } from '../../common/dynamicScenarios/envVars.js'
 
 // Environments allowed to be tested
@@ -41,7 +38,10 @@ const application = 'idpay'
 const testName = 'idpayOnboardingAPI'
 
 // Set up data for processing, share data among VUs
-const cfList = new SharedArray('cfList', getFCList)
+const usersList = new SharedArray(
+    'usersList',
+    CONFIG.USE_INTERNAL_ACCESS_ENV ? getUserIdsList : getFCList
+)
 
 // Dynamic scenarios' K6 configuration
 export const options = defaultApiOptionsBuilder(
@@ -58,23 +58,18 @@ export const handleSummary = defaultHandleSummaryBuilder(application, testName)
 
 export default () => {
     let checked = true
-
-    // selecting current scenario/iteration test entity
-    const cf = getScenarioTestEntity(cfList).FC
-    const params = { headers: buildIOAuthorizationHeader(cf) }
-
     const isOnboardingTestScript = CONFIG.SCRIPT_ENV === 'idpayOnboardingAPI'
+
+    // selecting current scenario/iteration test token
+    const token = getIdPayScenarioUserToken(usersList)
 
     group('Should onboard Citizen', () => {
         group('When the inititive exists, put t&c', () => {
             if (checked) {
-                const body = {
-                    initiativeId: IDPAY_CONFIG.CONTEXT_DATA.initiativeId,
-                }
                 const res = putOnboardingCitizen(
-                    baseUrl,
-                    JSON.stringify(body),
-                    params
+                    CONFIG.USE_INTERNAL_ACCESS_ENV,
+                    token,
+                    IDPAY_CONFIG.CONTEXT_DATA.initiativeId
                 )
                 assert(res, [statusNoContent()])
                 if (res.status != 204) {
@@ -89,8 +84,8 @@ export default () => {
             group('Check accepted status', () => {
                 if (checked) {
                     const res = getStatus(
-                        baseUrl,
-                        params,
+                        CONFIG.USE_INTERNAL_ACCESS_ENV,
+                        token,
                         IDPAY_CONFIG.CONTEXT_DATA.initiativeId
                     )
 
@@ -110,13 +105,10 @@ export default () => {
 
         group('When the TC consent exists, check the prerequisites', () => {
             if (checked) {
-                const body = {
-                    initiativeId: IDPAY_CONFIG.CONTEXT_DATA.initiativeId,
-                }
                 const res = putCheckPrerequisites(
-                    baseUrl,
-                    JSON.stringify(body),
-                    params
+                    CONFIG.USE_INTERNAL_ACCESS_ENV,
+                    token,
+                    IDPAY_CONFIG.CONTEXT_DATA.initiativeId
                 )
 
                 assert(res, [statusOk()])
@@ -131,15 +123,10 @@ export default () => {
 
         group('When the inititive and consents exist, save consent', () => {
             if (checked) {
-                const body = {
-                    initiativeId: IDPAY_CONFIG.CONTEXT_DATA.initiativeId,
-                    pdndAccept: true,
-                    selfDeclarationList: [],
-                }
                 const res = putSaveConsent(
-                    baseUrl,
-                    JSON.stringify(body),
-                    params
+                    CONFIG.USE_INTERNAL_ACCESS_ENV,
+                    token,
+                    IDPAY_CONFIG.CONTEXT_DATA.initiativeId
                 )
 
                 assert(res, [statusAccepted()])

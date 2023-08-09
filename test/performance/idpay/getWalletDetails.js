@@ -2,12 +2,15 @@ import { group, sleep } from 'k6'
 import { assert, statusOk } from '../../common/assertions.js'
 import { DEV, UAT, getBaseUrl } from '../../common/envs.js'
 
-import { getWalletDetail, WALLET_API_NAMES } from '../../common/api/idpay/idpayWallet.js'
+import {
+    getWalletDetail,
+    WALLET_API_NAMES,
+} from '../../common/api/idpay/idpayWallet.js'
 import { getFCList } from '../../common/utils.js'
 import { SharedArray } from 'k6/data'
 import {
     IDPAY_CONFIG,
-    buildIOAuthorizationHeader,
+    retrieveAndBuildIOAuthorizationHeader,
 } from '../../common/idpay/envVars.js'
 import defaultHandleSummaryBuilder from '../../common/handleSummaryBuilder.js'
 import { defaultApiOptionsBuilder } from '../../common/dynamicScenarios/defaultOptions.js'
@@ -38,8 +41,7 @@ export const handleSummary = defaultHandleSummaryBuilder(application, testName)
 
 export default () => {
     const cf = getScenarioTestEntity(cfList).FC
-    const params = { headers: buildIOAuthorizationHeader(cf) }
-
+    const params = { headers: retrieveAndBuildIOAuthorizationHeader(cf) }
 
     group('When onboarding is completed, get wallet detail', () => {
         const res = getWalletDetail(
@@ -49,7 +51,11 @@ export default () => {
         )
 
         if (res.status !== 200) {
-            logErrorResult(`Wallet associated to user with cf [${cf}] not found`, res, true)
+            logErrorResult(
+                `Wallet associated to user with cf [${cf}] not found`,
+                res,
+                true
+            )
         }
 
         assert(res, [statusOk()])
