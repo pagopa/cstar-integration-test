@@ -77,6 +77,10 @@ export function getFCList() {
     return getCsvData(`${getRelativePathToRootFolder()}/assets/fc_pgpans.csv`)
 }
 
+export function getUserIdsList() {
+    return getCsvData(`${getRelativePathToRootFolder()}/assets/userIdList.csv`)
+}
+
 export function getFCPanList() {
     return getCsvData(`${getRelativePathToRootFolder()}/assets/fc_pgpans.csv`)
 }

@@ -108,7 +108,7 @@ import { SharedArray } from 'k6/data'
 import defaultHandleSummaryBuilder from '../../common/handleSummaryBuilder.js'
 import {
     IDPAY_CONFIG,
-    buildIOAuthorizationHeader,
+    retrieveAndBuildIOAuthorizationHeader,
     idpayDefaultHeaders,
 } from '../../common/idpay/envVars.js'
 import { defaultApiOptionsBuilder } from '../../common/dynamicScenarios/defaultOptions.js'
@@ -147,7 +147,7 @@ export default () => {
 
     // selecting current scenario/iteration test entity
     const cf = getScenarioTestEntity(cfList).FC
-    const citizenParams = { headers: buildIOAuthorizationHeader(cf) }
+    const citizenParams = { headers: retrieveAndBuildIOAuthorizationHeader(cf) }
 
     // API invocation, each tagged with proper PAYMENT_API_NAMES name
 }

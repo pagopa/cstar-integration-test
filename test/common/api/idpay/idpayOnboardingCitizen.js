@@ -1,5 +1,8 @@
 import http from 'k6/http'
 import { logResult } from '../../dynamicScenarios/utils.js'
+import { buildIOAuthorizationHeader } from '../../idpay/envVars.js'
+import { DEV, UAT, getBaseUrl } from '../../envs.js'
+import { buildDefaultParams } from '../../dynamicScenarios/envVars.js'
 
 export const ONBOARDING_API_NAMES = {
     getInitiative: 'onboarding/getInitiative',
@@ -9,62 +12,110 @@ export const ONBOARDING_API_NAMES = {
     putSaveConsent: 'onboarding/putSaveConsent',
 }
 
-const API_PREFIX = '/idpay'
-export function getInitiative(baseUrl, params, serviceId, headers) {
+// Environments allowed to be tested
+const REGISTERED_ENVS = [DEV, UAT]
+
+const innerBaseUrl = `${getBaseUrl(
+    REGISTERED_ENVS,
+    'internal'
+)}/idpayonboardingworkflow`
+const apimBaseUrl = getBaseUrl(REGISTERED_ENVS, 'io') // api-io services baseUrl
+
+const API_PREFIX = '/idpay/onboarding'
+
+export function getInitiative(useInnerAccess, token, serviceId) {
     const apiName = ONBOARDING_API_NAMES.getInitiative
 
-    const myParams = Object.assign({}, params)
-    const res = http.get(
-        `${baseUrl}${API_PREFIX}/onboarding/service/${serviceId}`,
-        myParams,
-        {
-            headers,
-            tags: { apiName },
-        }
-    )
+    let url
+    const myParams = buildDefaultParams(apiName)
+
+    if (useInnerAccess) {
+        throw new Error('getInitiative inner invoke not implemented!')
+    } else {
+        url = `${apimBaseUrl}${API_PREFIX}/service/${serviceId}`
+        myParams.headers = buildIOAuthorizationHeader(token)
+    }
+
+    const res = http.get(url, myParams)
     logResult(apiName, res)
     return res
 }
 
-export function putOnboardingCitizen(baseUrl, body, params) {
+export function putOnboardingCitizen(useInnerAccess, token, initiativeId) {
     const apiName = ONBOARDING_API_NAMES.putOnboardingCitizen
-    const myParams = Object.assign({}, params, { tags: { apiName } })
-    const res = http.put(`${baseUrl}${API_PREFIX}/onboarding/`, body, myParams)
+
+    let url
+    const myParams = buildDefaultParams(apiName)
+    const body = { initiativeId }
+
+    if (useInnerAccess) {
+        url = `${innerBaseUrl}${API_PREFIX}/${token}`
+    } else {
+        url = `${apimBaseUrl}${API_PREFIX}/`
+        myParams.headers = buildIOAuthorizationHeader(token)
+    }
+
+    const res = http.put(url, JSON.stringify(body), myParams)
     logResult(apiName, res)
     return res
 }
 
-export function putCheckPrerequisites(baseUrl, body, params) {
+export function putCheckPrerequisites(useInnerAccess, token, initiativeId) {
     const apiName = ONBOARDING_API_NAMES.putCheckPrerequisites
-    const myParams = Object.assign({}, params, { tags: { apiName } })
-    const res = http.put(
-        `${baseUrl}${API_PREFIX}/onboarding/initiative`,
-        body,
-        myParams
-    )
+
+    let url
+    const myParams = buildDefaultParams(apiName)
+    const body = { initiativeId }
+
+    if (useInnerAccess) {
+        url = `${innerBaseUrl}${API_PREFIX}/initiative/${token}`
+        body.channel = 'APP_IO'
+    } else {
+        url = `${apimBaseUrl}${API_PREFIX}/initiative`
+        myParams.headers = buildIOAuthorizationHeader(token)
+    }
+
+    const res = http.put(url, JSON.stringify(body), myParams)
     logResult(apiName, res)
     return res
 }
 
-export function getStatus(baseUrl, params, initiativeId) {
+export function getStatus(useInnerAccess, token, initiativeId) {
     const apiName = ONBOARDING_API_NAMES.getStatus
-    const myParams = Object.assign({}, params, { tags: { apiName } })
-    const res = http.get(
-        `${baseUrl}${API_PREFIX}/onboarding/${initiativeId}/status`,
-        myParams
-    )
+
+    let url
+    const myParams = buildDefaultParams(apiName)
+
+    if (useInnerAccess) {
+        url = `${innerBaseUrl}${API_PREFIX}/${initiativeId}/${token}/status`
+    } else {
+        url = `${apimBaseUrl}${API_PREFIX}/${initiativeId}/status`
+        myParams.headers = buildIOAuthorizationHeader(token)
+    }
+
+    const res = http.get(url, myParams)
     logResult(apiName, res)
     return res
 }
 
-export function putSaveConsent(baseUrl, body, params) {
+export function putSaveConsent(useInnerAccess, token, initiativeId) {
     const apiName = ONBOARDING_API_NAMES.putSaveConsent
-    const myParams = Object.assign({}, params, { tags: { apiName } })
-    const res = http.put(
-        `${baseUrl}${API_PREFIX}/onboarding/consent`,
-        body,
-        myParams
-    )
+
+    let url
+    const myParams = buildDefaultParams(apiName)
+    const body = {
+        initiativeId,
+        pdndAccept: true,
+        selfDeclarationList: [],
+    }
+    if (useInnerAccess) {
+        url = `${innerBaseUrl}${API_PREFIX}/consent/${token}`
+    } else {
+        url = `${apimBaseUrl}${API_PREFIX}/consent`
+        myParams.headers = buildIOAuthorizationHeader(token)
+    }
+
+    const res = http.put(url, JSON.stringify(body), myParams)
     logResult(apiName, res)
     return res
 }

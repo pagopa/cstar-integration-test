@@ -267,6 +267,14 @@ jobs:
                     ls -lrt ./assets
                 displayName: Retrieve resource from cstar-cli
                 timeoutInMinutes: 0
+
+              - script: |
+                    echo PDV_ID > ./assets/userIdList.csv
+                    for x in {0..${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }}}; do echo randomid-0000-0000-$(echo $RANDOM | md5sum | head -c 4)-$(echo $RANDOM | md5sum | head -c 12); done >> ./assets/userIdList.csv
+                displayName: TEMP RANDOM USERID GEN
+                condition: ${{ parameters.USE_INTERNAL_ACCESS_ENV }}
+                timeoutInMinutes: 0
+
               - task: Bash@3
                 inputs:
                     targetType: 'inline'
@@ -319,7 +327,7 @@ jobs:
                           SCENARIO_TIME_UNIT_ENV: ${{ parameters.SCENARIO_TIME_UNIT_ENV }}
                           SCENARIO_RAMP_STAGE_NUMBER_ENV: ${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }}
 
-                          APIM_PORTAL_SK: $(apimSK)
+                          APIM_IO_SK: $(apimSK)
                           APIM_MIL_SK: $(milApiKey)
                           APIM_ACQUIRER_SK: $(acquirerApiKey)
                           APIM_ISSUER_SK: $(issuerSK)
