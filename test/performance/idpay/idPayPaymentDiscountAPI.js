@@ -7,19 +7,27 @@ import {
 } from '../../common/api/idpay/idPayPaymentDiscount.js'
 import { assert, statusCreated, statusOk } from '../../common/assertions.js'
 import { DEV, UAT, getBaseUrl } from '../../common/envs.js'
-import { getFCList, getMerchantList } from '../../common/utils.js'
+import {
+    getFCList,
+    getMerchantIdList,
+    getMerchantList,
+    getUserIdsList,
+} from '../../common/utils.js'
 import { SharedArray } from 'k6/data'
 import defaultHandleSummaryBuilder from '../../common/handleSummaryBuilder.js'
 import {
     IDPAY_CONFIG,
     retrieveAndBuildIOAuthorizationHeader,
     idpayDefaultHeaders,
+    getIdPayScenarioUserToken,
+    getIdPayScenarioMerchantToken,
 } from '../../common/idpay/envVars.js'
 import { defaultApiOptionsBuilder } from '../../common/dynamicScenarios/defaultOptions.js'
 import {
     getScenarioTestEntity,
     logErrorResult,
 } from '../../common/dynamicScenarios/utils.js'
+import { CONFIG } from '../../common/dynamicScenarios/envVars.js'
 
 // Environments allowed to be tested
 const REGISTERED_ENVS = [DEV, UAT]
@@ -30,8 +38,14 @@ const application = 'idpay'
 const testName = 'idpayPaymentDiscountAPI'
 
 // Set up data for processing, share data among VUs
-const cfList = new SharedArray('cfList', getFCList)
-const merchantList = new SharedArray('merchantList', getMerchantList)
+const usersList = new SharedArray(
+    'usersList',
+    CONFIG.USE_INTERNAL_ACCESS_ENV ? getUserIdsList : getFCList
+)
+const merchantList = new SharedArray(
+    'merchantList',
+    CONFIG.USE_INTERNAL_ACCESS_ENV ? getMerchantIdList : getMerchantList
+)
 
 // Dynamic scenarios' K6 configuration
 export const options = defaultApiOptionsBuilder(
@@ -53,41 +67,25 @@ export default () => {
     let checked = true
     let trxCode
 
-    // selecting current scenario/iteration test entity
-    const cf = getScenarioTestEntity(cfList).FC
-    const citizenParams = { headers: retrieveAndBuildIOAuthorizationHeader(cf) }
-
-    const merchantFiscalCode = getScenarioTestEntity(merchantList).CF
-
-    const merchantHeaders = Object.assign(
-        {
-            'x-merchant-fiscalcode': merchantFiscalCode,
-            'x-acquirer-id': IDPAY_CONFIG.CONTEXT_DATA.acquirerId,
-        },
-        idpayDefaultHeaders,
-        { 'Ocp-Apim-Subscription-Key': IDPAY_CONFIG.AUTH_KEYS.APIM_MIL_SK }
-    )
+    // selecting current scenario/iteration test tokens
+    const citizenToken = getIdPayScenarioUserToken(usersList)
+    const merchantToken = getIdPayScenarioMerchantToken(merchantList)
 
     group('Create Transaction', () => {
         if (checked) {
-            const params = {
-                headers: merchantHeaders,
-                body: {
-                    initiativeId: IDPAY_CONFIG.CONTEXT_DATA.initiativeId,
-                    idTrxAcquirer: `IDTRXACQUIRER${Math.floor(
-                        Math.random() * (100 - 10 + 10) + 1
-                    )}`,
-                    amountCents: '100',
-                    mcc: `MCC${Math.floor(
-                        Math.random() * (100 - 10 + 10) + 1
-                    )}`,
-                },
+            const trx = {
+                initiativeId: IDPAY_CONFIG.CONTEXT_DATA.initiativeId,
+                idTrxAcquirer: `IDTRXACQUIRER${Math.floor(
+                    Math.random() * (100 - 10 + 10) + 1
+                )}`,
+                amountCents: '100',
+                mcc: `MCC${Math.floor(Math.random() * (100 - 10 + 10) + 1)}`,
             }
 
             const res = createTransaction(
-                baseUrl,
-                JSON.stringify(params.body),
-                params
+                CONFIG.USE_INTERNAL_ACCESS_ENV,
+                merchantToken,
+                trx
             )
 
             assert(res, [statusCreated()])
@@ -104,7 +102,11 @@ export default () => {
 
     group('Pre Auth Transaction', () => {
         if (checked) {
-            const res = preAuth(baseUrl, trxCode, citizenParams)
+            const res = preAuth(
+                CONFIG.USE_INTERNAL_ACCESS_ENV,
+                citizenToken,
+                trxCode
+            )
 
             assert(res, [statusOk()])
             if (res.status != 200) {
@@ -116,7 +118,11 @@ export default () => {
     })
     group('Auth Transaction', () => {
         if (checked) {
-            const res = authTrx(baseUrl, trxCode, citizenParams)
+            const res = authTrx(
+                CONFIG.USE_INTERNAL_ACCESS_ENV,
+                citizenToken,
+                trxCode
+            )
 
             assert(res, [statusOk()])
             if (res.status != 200) {
