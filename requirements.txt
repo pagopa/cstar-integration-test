@@ -25,3 +25,5 @@ psycopg-binary
 pandas
 requests
 schwifty
+asyncio==3.4.3
+aiohttp==3.8.5
