@@ -265,7 +265,9 @@ jobs:
                     pip install --no-deps --force-reinstall src/cstar-cli
                 displayName: Set environment
               - script: |
-                    cst idpay idpaydataset --action $CSTAR_CLI_COMMAND --env ${{ parameters.TARGET_ENV }} --api-key $API_KEY --out-dir ./generated --num-fc ${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} $CSTAR_CLI_EXTRA_ARGS
+                    CLI_INVOKE_COMMAND="cst idpay idpaydataset --action $CSTAR_CLI_COMMAND --env ${{ parameters.TARGET_ENV }} --api-key $API_KEY --out-dir ./generated --num-fc ${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} $CSTAR_CLI_EXTRA_ARGS"
+                    echo $CLI_INVOKE_COMMAND
+                    $CLI_INVOKE_COMMAND
                     mkdir -p assets
                     mkdir -p results
                     cp ./generated/*/* ./assets
