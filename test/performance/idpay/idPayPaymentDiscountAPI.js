@@ -6,7 +6,6 @@ import {
     PAYMENT_API_NAMES,
 } from '../../common/api/idpay/idPayPaymentDiscount.js'
 import { assert, statusCreated, statusOk } from '../../common/assertions.js'
-import { DEV, UAT, getBaseUrl } from '../../common/envs.js'
 import {
     getFCList,
     getMerchantIdList,
@@ -17,21 +16,12 @@ import { SharedArray } from 'k6/data'
 import defaultHandleSummaryBuilder from '../../common/handleSummaryBuilder.js'
 import {
     IDPAY_CONFIG,
-    retrieveAndBuildIOAuthorizationHeader,
-    idpayDefaultHeaders,
     getIdPayScenarioUserToken,
     getIdPayScenarioMerchantToken,
 } from '../../common/idpay/envVars.js'
 import { defaultApiOptionsBuilder } from '../../common/dynamicScenarios/defaultOptions.js'
-import {
-    getScenarioTestEntity,
-    logErrorResult,
-} from '../../common/dynamicScenarios/utils.js'
+import { logErrorResult } from '../../common/dynamicScenarios/utils.js'
 import { CONFIG } from '../../common/dynamicScenarios/envVars.js'
-
-// Environments allowed to be tested
-const REGISTERED_ENVS = [DEV, UAT]
-const baseUrl = getBaseUrl(REGISTERED_ENVS, 'io') // api-io services baseUrl
 
 // test tags
 const application = 'idpay'
