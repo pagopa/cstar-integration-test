@@ -13,7 +13,9 @@ if (!CONFIG.SCENARIOS.perVuIterations.ONESHOT) {
         //random vus with a maximum number of vus
         const randomVus = Math.min(
             availableEntitiesData,
-            randomIntBetween(1, CONFIG.VIRTUAL_USERS)
+            CONFIG.SCENARIOS.perVuIterations.RAMPING_SIZE
+                ? randomIntBetween(1, CONFIG.VIRTUAL_USERS)
+                : CONFIG.VIRTUAL_USERS
         )
 
         scenarios[`${testEntitiesBasedScenarioPrefix}${counter}`] =
