@@ -17,7 +17,6 @@ import {
     statusOk,
     bodyJsonSelectorValue,
 } from '../../common/assertions.js'
-import { DEV, UAT, getBaseUrl } from '../../common/envs.js'
 import { getFCList, getUserIdsList } from '../../common/utils.js'
 import { SharedArray } from 'k6/data'
 import defaultHandleSummaryBuilder from '../../common/handleSummaryBuilder.js'
@@ -28,10 +27,6 @@ import {
 } from '../../common/idpay/envVars.js'
 import { logErrorResult } from '../../common/dynamicScenarios/utils.js'
 import { CONFIG } from '../../common/dynamicScenarios/envVars.js'
-
-// Environments allowed to be tested
-const REGISTERED_ENVS = [DEV, UAT]
-const baseUrl = getBaseUrl(REGISTERED_ENVS, 'io') // api-io services baseUrl
 
 // test tags
 const application = 'idpay'
@@ -47,10 +42,16 @@ const usersList = new SharedArray(
 export const options = defaultApiOptionsBuilder(
     application,
     testName,
-    Object.values(ONBOARDING_API_NAMES).concat({
-        apiName: WALLET_API_NAMES.getWalletDetail,
-        maxHttpReqFailedRate: 0.999,
-    }) // applying apiName tags to thresholds
+    Object.values(ONBOARDING_API_NAMES)
+        .filter(
+            (api) =>
+                api !== ONBOARDING_API_NAMES.checkInitiativeBudget &&
+                api !== ONBOARDING_API_NAMES.getInitiative
+        )
+        .concat({
+            apiName: WALLET_API_NAMES.getWalletDetail,
+            maxHttpReqFailedRate: 0.999,
+        }) // applying apiName tags to thresholds
 )
 
 // K6 summary configuration

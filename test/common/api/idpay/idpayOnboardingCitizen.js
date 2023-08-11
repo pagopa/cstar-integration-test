@@ -10,6 +10,7 @@ export const ONBOARDING_API_NAMES = {
     putCheckPrerequisites: 'onboarding/putCheckPrerequisites',
     getStatus: 'onboarding/getStatus',
     putSaveConsent: 'onboarding/putSaveConsent',
+    checkInitiativeBudget: 'onboarding/checkInitiativeBudget',
 }
 
 // Environments allowed to be tested
@@ -19,6 +20,10 @@ const innerBaseUrl = `${getBaseUrl(
     REGISTERED_ENVS,
     'internal'
 )}/idpayonboardingworkflow`
+const admissibilityInnerBaseUrl = `${getBaseUrl(
+    REGISTERED_ENVS,
+    'internal'
+)}/idpayadmissibility`
 const apimBaseUrl = getBaseUrl(REGISTERED_ENVS, 'io') // api-io services baseUrl
 
 const API_PREFIX = '/idpay/onboarding'
@@ -116,6 +121,23 @@ export function putSaveConsent(useInnerAccess, token, initiativeId) {
     }
 
     const res = http.put(url, JSON.stringify(body), myParams)
+    logResult(apiName, res)
+    return res
+}
+
+export function checkInitiativeBudget(useInnerAccess, initiativeId) {
+    const apiName = ONBOARDING_API_NAMES.checkInitiativeBudget
+
+    let url
+    const myParams = buildDefaultParams(apiName)
+
+    if (useInnerAccess) {
+        url = `${admissibilityInnerBaseUrl}/idpay/admissibility/initiative/${initiativeId}`
+    } else {
+        throw new Error('Initiative budget API not exposed')
+    }
+
+    const res = http.get(url, myParams)
     logResult(apiName, res)
     return res
 }
