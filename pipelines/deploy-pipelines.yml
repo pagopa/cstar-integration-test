@@ -24,14 +24,15 @@ parameters:
       type: string
       default: 'idpayOnboardingAPI'
       values:
-          - putTokenMockedPdv
-          - putTokenPdv
           - idpayOnboardingAPI
+          - idpayCheckInitiativeBudgetAPI
           - getWalletDetails
           - idPayPaymentDiscountAPI
           - ioPutEnrollInstrumentIssuer
           - ioPutEnrollIban
           - rtdTransactionsFile
+          - putTokenMockedPdv
+          - putTokenPdv
           - testPDV
 
     - name: 'INITIATIVE_ID'
