@@ -88,7 +88,7 @@ export const defaultHeaders = {
 
 export function buildDefaultParams(apiName) {
     return {
-        headers: defaultHeaders,
+        headers: Object.assign({}, defaultHeaders),
         tags: { apiName },
     }
 }

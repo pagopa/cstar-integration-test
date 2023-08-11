@@ -94,6 +94,12 @@ export function getMerchantList() {
     )
 }
 
+export function getMerchantIdList() {
+    return getCsvData(
+        `${getRelativePathToRootFolder()}/assets/merchantIdList.csv`
+    )
+}
+
 function getFiscalCodeMonth(month) {
     const monthDict = {
         1: 'A',

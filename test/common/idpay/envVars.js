@@ -66,3 +66,14 @@ export function getIdPayScenarioUserToken(usersList) {
         return getIOToken(user.FC)
     }
 }
+
+export function getIdPayScenarioMerchantToken(merchantsList) {
+    // selecting current scenario/iteration test entity
+    const merchant = getScenarioTestEntity(merchantsList)
+
+    if (CONFIG.USE_INTERNAL_ACCESS_ENV) {
+        return merchant.ID
+    } else {
+        return merchant.CF
+    }
+}
