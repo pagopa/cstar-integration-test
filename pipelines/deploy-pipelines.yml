@@ -148,6 +148,8 @@ variables:
       value: testPDV
     - name: k6Test_getWalletDetails
       value: idpayOnboardingAPI,getWalletDetails
+    - name: k6Test_idpayCheckInitiativeBudgetAPI
+      value: idpayCheckInitiativeBudgetAPI
 
     # resolved list of k6 script to execute
     - ${{ if and(parameters.USE_INTERNAL_ACCESS_ENV, eq(variables.MERCHANT_LIST_REQUIRED, 'true') ) }}:
