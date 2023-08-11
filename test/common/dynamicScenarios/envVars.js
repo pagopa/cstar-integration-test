@@ -28,6 +28,9 @@ export const CONFIG = {
         TYPES: coalesce(__ENV.SCENARIO_TYPE_ENV, 'ALL').split(','),
 
         perVuIterations: {
+            RAMPING_SIZE:
+                __ENV.SCENARIO_PER_VU_RAMPING_SIZE &&
+                __ENV.SCENARIO_PER_VU_RAMPING_SIZE.toLowerCase() === 'true',
             ONESHOT:
                 __ENV.SCENARIO_PER_VU_SINGLE_ITERATION_ENV &&
                 __ENV.SCENARIO_PER_VU_SINGLE_ITERATION_ENV.toLowerCase() !==

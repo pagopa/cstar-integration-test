@@ -349,6 +349,7 @@ jobs:
                           ${{ if eq(k6Test, parameters.SCRIPT) }}:
                               SCENARIO_TYPE_ENV: ${{ parameters.SCENARIO_TYPE_ENV }}
                               VUS_MAX_ENV: ${{ parameters.VUS_MAX_ENV }}
+                              SCENARIO_PER_VU_RAMPING_SIZE: 'true'
                               SCENARIO_PER_VU_SINGLE_ITERATION_ENV: ${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }}
                               SCENARIO_PER_VU_EXECUTIONS_ENV: ${{ parameters.SCENARIO_PER_VU_EXECUTIONS_ENV }}
                               SCENARIO_DURATION_ENV: ${{ parameters.SCENARIO_DURATION_ENV }}
@@ -358,6 +359,7 @@ jobs:
                           ${{ else }}: # intermediate tests will execute this configuration, which ensure the execution of all test entities
                               SCENARIO_TYPE_ENV: perVuIterations
                               VUS_MAX_ENV: '20'
+                              SCENARIO_PER_VU_RAMPING_SIZE: 'false'
                               SCENARIO_PER_VU_SINGLE_ITERATION_ENV: 'false'
                               SCENARIO_PER_VU_EXECUTIONS_ENV: '1'
                               SCENARIO_DURATION_ENV: '2'
