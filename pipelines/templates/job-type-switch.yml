@@ -1,0 +1,48 @@
+parameters:
+    - name: 'name'
+      type: string
+    - name: 'displayName'
+      type: string
+    - name: 'timeoutInMinutes'
+      type: number
+    - name: 'continueOnError'
+      type: boolean
+
+    - name: 'isDeployment'
+      type: boolean
+      default: false
+    - name: 'deploymentPoolName'
+      type: string
+      default: ''
+    - name: 'deploymentEnvironment'
+      type: string
+      default: ''
+
+    - name: 'dependsOn'
+      type: object
+      default: []
+
+    - name: 'steps'
+      type: stepList
+      default: []
+
+jobs:
+    - ${{ if parameters.isDeployment }}:
+          deployment: ${{ parameters.name }}
+          pool:
+              name: ${{ parameters.deploymentPoolName }}
+          environment: ${{ parameters.deploymentEnvironment }}
+          strategy:
+              runOnce:
+                  deploy:
+                      steps:
+                          - checkout: self
+                          - ${{ parameters.steps }}
+      ${{ else }}:
+          job: ${{ parameters.name }}
+          steps: ${{ parameters.steps }}
+
+      displayName: ${{ parameters.displayName }}
+      timeoutInMinutes: ${{ parameters.timeoutInMinutes }}
+      continueOnError: ${{ parameters.continueOnError }}
+      dependsOn: ${{ parameters.dependsOn }}

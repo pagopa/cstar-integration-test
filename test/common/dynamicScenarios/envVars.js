@@ -9,8 +9,14 @@ const rampStageNumber = Math.max(
 
 export const CONFIG = {
     TARGET_ENV: __ENV.TARGET_ENV,
+    USE_INTERNAL_ACCESS_ENV:
+        __ENV.USE_INTERNAL_ACCESS_ENV &&
+        __ENV.USE_INTERNAL_ACCESS_ENV.toLowerCase() === 'true',
     SCRIPT_ENV: __ENV.SCRIPT_ENV,
     DUMP_REQUESTS: __ENV.REQ_DUMP && __ENV.REQ_DUMP.toLowerCase() === 'true',
+    ENABLE_FILE_WRITING:
+        __ENV.ENABLE_FILE_WRITING &&
+        __ENV.ENABLE_FILE_WRITING.toLowerCase() === 'true',
 
     VIRTUAL_USERS: vu,
     MAX_AVAILABLE_TEST_ENTITIES_ENV: coalesce(
@@ -22,6 +28,9 @@ export const CONFIG = {
         TYPES: coalesce(__ENV.SCENARIO_TYPE_ENV, 'ALL').split(','),
 
         perVuIterations: {
+            RAMPING_SIZE:
+                __ENV.SCENARIO_PER_VU_RAMPING_SIZE &&
+                __ENV.SCENARIO_PER_VU_RAMPING_SIZE.toLowerCase() === 'true',
             ONESHOT:
                 __ENV.SCENARIO_PER_VU_SINGLE_ITERATION_ENV &&
                 __ENV.SCENARIO_PER_VU_SINGLE_ITERATION_ENV.toLowerCase() !==
@@ -78,4 +87,11 @@ export const CONFIG = {
 
 export const defaultHeaders = {
     'Content-Type': 'application/json',
+}
+
+export function buildDefaultParams(apiName) {
+    return {
+        headers: Object.assign({}, defaultHeaders),
+        tags: { apiName },
+    }
 }

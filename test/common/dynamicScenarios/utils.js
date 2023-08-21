@@ -27,7 +27,7 @@ export function testEntitiesBasedScenariosBaseIndexRetriever() {
     )
     return coalesce(scenariosBaseIndexes[scenario.name], 0)
 }
-export function getScenarioTestEntity(testEntities) {
+export function getScenarioTestEntityIndex(testEntities) {
     const baseIndex = testEntitiesBasedScenariosBaseIndexRetriever()
     const index = baseIndex + scenario.iterationInTest
     if (index > testEntities.length) {
@@ -35,7 +35,10 @@ export function getScenarioTestEntity(testEntities) {
             'Reached the end of the provided test entities! reading from start!'
         )
     }
-    return testEntities[index % testEntities.length]
+    return index % testEntities.length
+}
+export function getScenarioTestEntity(testEntities) {
+    return testEntities[getScenarioTestEntityIndex(testEntities)]
 }
 
 export function logResult(opName, result, expectedHttpState) {

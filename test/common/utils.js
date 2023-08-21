@@ -58,31 +58,46 @@ export function getRelativePathToRootFolder() {
     return '../..'
 }
 
+export const csvDelimiter = coalesce(__ENV.CSV_DELIMITER, '')
+
+export function getCsvData(filePath, hasHeader) {
+    if (hasHeader === undefined) {
+        hasHeader = true
+    }
+
+    return papaparse
+        .parse(open(filePath), {
+            header: hasHeader,
+            delimiter: csvDelimiter,
+        })
+        .data.filter((r) => Object.values(r)[0])
+}
+
 export function getFCList() {
-    return papaparse.parse(
-        open(`${getRelativePathToRootFolder()}/assets/fc_pgpans.csv`),
-        { header: true }
-    ).data
+    return getCsvData(`${getRelativePathToRootFolder()}/assets/fc_pgpans.csv`)
+}
+
+export function getUserIdsList() {
+    return getCsvData(`${getRelativePathToRootFolder()}/assets/userIdList.csv`)
 }
 
 export function getFCPanList() {
-    return papaparse.parse(
-        open(`${getRelativePathToRootFolder()}/assets/fc_pgpans.csv`),
-        { header: true }
-    ).data
+    return getCsvData(`${getRelativePathToRootFolder()}/assets/fc_pgpans.csv`)
 }
 export function getFCIbanList() {
-    return papaparse.parse(
-        open(`${getRelativePathToRootFolder()}/assets/fc_iban.csv`),
-        { header: true }
-    ).data
+    return getCsvData(`${getRelativePathToRootFolder()}/assets/fc_iban.csv`)
 }
 
 export function getMerchantList() {
-    return papaparse.parse(
-        open(`${getRelativePathToRootFolder()}/assets/merchantList.csv`),
-        { header: true }
-    ).data
+    return getCsvData(
+        `${getRelativePathToRootFolder()}/assets/merchantList.csv`
+    )
+}
+
+export function getMerchantIdList() {
+    return getCsvData(
+        `${getRelativePathToRootFolder()}/assets/merchantIdList.csv`
+    )
 }
 
 function getFiscalCodeMonth(month) {
