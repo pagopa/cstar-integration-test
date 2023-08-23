@@ -3,7 +3,7 @@ import { DEV, UAT, getBaseUrl } from '../../envs.js'
 import { logResult } from '../../dynamicScenarios/utils.js'
 
 export const INITIATIVE_API_NAMES = {
-    deleteInitiative: '/delete'
+    deleteInitiative: 'initiative/delete'
 }
 
 // Environments allowed to be tested
