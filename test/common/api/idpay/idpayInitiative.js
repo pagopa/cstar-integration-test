@@ -15,10 +15,10 @@ const innerBaseUrl = `${getBaseUrl(REGISTERED_ENVS, 'internal')}/idpayportalwelf
 const API_PREFIX = '/idpay/initiative'
 
 
-export function deleteInitiative(){
+export function deleteInitiative(initiativeId){
     const apiName = INITIATIVE_API_NAMES.deleteInitiative
-
-    let url = `${innerBaseUrl}${API_PREFIX}/${INITIATIVE_ID}`
+    
+    let url = `${innerBaseUrl}${API_PREFIX}/${initiativeId}`
 
     const res = http.delete(url)
     logResult(apiName, res)
