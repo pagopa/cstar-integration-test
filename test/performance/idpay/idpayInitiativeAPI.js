@@ -6,6 +6,7 @@ import {
 import { getFCList, getUserIdsList } from '../../common/utils.js'
 import { SharedArray } from 'k6/data'
 import defaultHandleSummaryBuilder from '../../common/handleSummaryBuilder.js'
+import { defaultApiOptionsBuilder } from '../../common/dynamicScenarios/defaultOptions.js'
 import { CONFIG } from '../../common/dynamicScenarios/envVars.js'
 import {
     assert,
