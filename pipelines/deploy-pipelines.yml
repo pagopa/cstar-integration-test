@@ -28,6 +28,7 @@ parameters:
           - idpayCheckInitiativeBudgetAPI
           - getWalletDetails
           - idPayPaymentDiscountAPI
+          - idPayInitiativeAPI
           - ioPutEnrollInstrumentIssuer
           - ioPutEnrollIban
           - rtdTransactionsFile
@@ -138,6 +139,8 @@ variables:
       value: idpayOnboardingAPI
     - name: k6Test_idPayPaymentDiscountAPI
       value: idpayOnboardingAPI,idPayPaymentDiscountAPI
+    - name: k6Test_idPayInitiativeAPI
+      value: idpayInitiativeAPI
     - name: k6Test_ioPutEnrollInstrumentIssuer
       value: idpayOnboardingAPI,ioPutEnrollInstrumentIssuer
     - name: k6Test_ioPutEnrollIban
