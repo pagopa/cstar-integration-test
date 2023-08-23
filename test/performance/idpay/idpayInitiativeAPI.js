@@ -12,6 +12,10 @@ import {
     assert,
     statusNoContent,
 } from '../../common/assertions.js'
+import { logErrorResult } from '../../common/dynamicScenarios/utils.js'
+import {
+    IDPAY_CONFIG
+} from '../../common/idpay/envVars.js'
 
 // test tags
 const application = 'idpay'
