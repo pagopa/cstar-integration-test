@@ -40,12 +40,10 @@ export const handleSummary = defaultHandleSummaryBuilder(application, testName)
 
 export default () => {
     let checked = true
-    const isInitiativeTestScript = CONFIG.SCRIPT_ENV === 'idpayInitiativeAPI'
 
     group('Delete initiative', () => {
         if (checked) {
             const res = deleteInitiative(
-                CONFIG.USE_INTERNAL_ACCESS_ENV,
                 IDPAY_CONFIG.CONTEXT_DATA.initiativeId
             )
             assert(res, [statusNoContent()])
