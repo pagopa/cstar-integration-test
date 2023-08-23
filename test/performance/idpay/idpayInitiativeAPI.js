@@ -26,12 +26,7 @@ const usersList = new SharedArray(
 export const options = defaultApiOptionsBuilder(
     application,
     testName,
-    Object.values(INITIATIVE_API_NAMES)
-        .filter(
-            (api) =>
-                api !== INITIATIVE_API_NAMES.deleteInitiative
-        )
-      // applying apiName tags to thresholds
+    [INITIATIVE_API_NAMES.deleteInitiative] // applying apiName tags to thresholds
 )
 
 
