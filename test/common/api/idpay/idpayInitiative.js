@@ -10,7 +10,6 @@ export const INITIATIVE_API_NAMES = {
 const REGISTERED_ENVS = [DEV, UAT]
 
 const innerBaseUrl = `${getBaseUrl(REGISTERED_ENVS, 'internal')}/idpayportalwelfarebackendinitiative`
-// const apimBaseUrl = getBaseUrl(REGISTERED_ENVS, 'io') // api-io services baseUrl
 
 const API_PREFIX = '/idpay/initiative'
 
