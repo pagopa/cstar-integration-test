@@ -140,7 +140,7 @@ variables:
     - name: k6Test_idPayPaymentDiscountAPI
       value: idpayOnboardingAPI,idPayPaymentDiscountAPI
     - name: k6Test_idPayInitiativeAPI
-      value: idpayOnboardingAPI,idPayPaymentDiscountAPI,idpayInitiativeAPI
+      value: idpayOnboardingAPI,idpayInitiativeAPI
     - name: k6Test_ioPutEnrollInstrumentIssuer
       value: idpayOnboardingAPI,ioPutEnrollInstrumentIssuer
     - name: k6Test_ioPutEnrollIban
