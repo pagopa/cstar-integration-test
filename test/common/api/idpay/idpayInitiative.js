@@ -19,7 +19,7 @@ export function deleteInitiative(initiativeId){
     
     let url = `${innerBaseUrl}${API_PREFIX}/${initiativeId}`
 
-    const res = http.delete(url)
+    const res = http.del(url)
     logResult(apiName, res)
     return res
 }
