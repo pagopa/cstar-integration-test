@@ -28,12 +28,38 @@ const usersList = new SharedArray(
 )
 
 // Dynamic scenarios' K6 configuration
-export const options = defaultApiOptionsBuilder(
-    application,
-    testName,
-    [INITIATIVE_API_NAMES.deleteInitiative] // applying apiName tags to thresholds
-)
-
+// export const options = defaultApiOptionsBuilder(
+//     application,
+//     testName,
+//     [INITIATIVE_API_NAMES.deleteInitiative] // applying apiName tags to thresholds
+// )
+export let options = {
+    scenarios: {
+        perVuIterations: {
+            executor: 'per-vu-iterations',
+            vus: 1,
+            iterations: 1,
+            startTime: '0s',
+            maxDuration: `${__ENV.DURATION_PER_VU_ITERATION}s`,
+        },
+    },
+    thresholds: {
+        http_req_failed: [
+            {
+                threshold: 'rate<0.01',
+                abortOnFail: false,
+                delayAbortEval: '10s',
+            },
+        ], // http errors should be less than 1%
+        http_reqs: [
+            {
+                threshold: 'count<=2',
+                abortOnFail: false,
+                delayAbortEval: '10s',
+            },
+        ],
+    },
+}
 
 // K6 summary configuration
 export const handleSummary = defaultHandleSummaryBuilder(application, testName)
