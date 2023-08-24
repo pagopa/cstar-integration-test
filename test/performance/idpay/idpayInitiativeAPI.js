@@ -3,6 +3,7 @@ import {
     deleteInitiative,
     INITIATIVE_API_NAMES
 } from '../../common/api/idpay/idpayInitiative.js'
+import idpayOnboardingAPI from './idpayOnboardingAPI.js'
 import { getFCList, getUserIdsList } from '../../common/utils.js'
 import { SharedArray } from 'k6/data'
 import defaultHandleSummaryBuilder from '../../common/handleSummaryBuilder.js'
@@ -16,6 +17,7 @@ import { logErrorResult } from '../../common/dynamicScenarios/utils.js'
 import {
     IDPAY_CONFIG
 } from '../../common/idpay/envVars.js'
+import idPayPaymentDiscountAPI from './idPayPaymentDiscountAPI.js'
 
 // test tags
 const application = 'idpay'
@@ -39,19 +41,17 @@ export const options = defaultApiOptionsBuilder(
 export const handleSummary = defaultHandleSummaryBuilder(application, testName)
 
 export default () => {
-    let checked = true
 
     group('Delete initiative', () => {
-        if (checked) {
-            const res = deleteInitiative(
-                IDPAY_CONFIG.CONTEXT_DATA.initiativeId
-            )
-            assert(res, [statusNoContent()])
-            if (res.status != 204) {
-                logErrorResult('deleteInitiative', res, true)
-                checked = false
-                return
-            }
+        
+        const res = deleteInitiative(
+            IDPAY_CONFIG.CONTEXT_DATA.initiativeId
+        )
+        assert(res, [statusNoContent()])
+        if (res.status != 204) {
+            logErrorResult('deleteInitiative', res, true)
+            return
         }
+        
     })
 }
