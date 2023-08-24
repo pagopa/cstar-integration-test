@@ -40,7 +40,7 @@ export let options = {
             vus: 1,
             iterations: 1,
             startTime: '0s',
-            maxDuration: `${__ENV.DURATION_PER_VU_ITERATION}s`,
+            maxDuration: '10s',
         },
     },
     thresholds: {
