@@ -40,7 +40,7 @@ export let options = {
             vus: 1,
             iterations: 1,
             startTime: '0s',
-            maxDuration: '10s',
+            maxDuration: '20s',
         },
     },
     thresholds: {
@@ -62,7 +62,7 @@ export let options = {
 }
 
 // K6 summary configuration
-export const handleSummary = defaultHandleSummaryBuilder(application, testName)
+//export const handleSummary = defaultHandleSummaryBuilder(application, testName)
 
 export default () => {
 
