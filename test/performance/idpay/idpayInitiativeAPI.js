@@ -29,7 +29,7 @@ const usersList = new SharedArray(
 )
 
 // K6 VuIteration scenarios 
-export const scenarios = scenarios({
+export const buildVuScenario = scenarios({
     executor: 'per-vu-iterations',
     vus: 1,
     iterations: 1,
