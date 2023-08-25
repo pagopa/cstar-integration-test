@@ -27,7 +27,15 @@ const usersList = new SharedArray(
 )
 
 // K6 VuIteration scenarios
-export const buildVuScenario = CONFIG.SCENARIOS.perVuIterations(false,true,1,10) 
+function scenarioPerVuIteration(startTime, vus) {
+    return {
+        executor: 'per-vu-iterations',
+        vus,
+        iterations: CONFIG.SCENARIOS.perVuIterations.ONESHOT,
+        startTime: `${startTime}s`,
+        maxDuration: `${CONFIG.SCENARIOS.perVuIterations.DURATION}s`,
+    }
+}
 
 // K6 summary configuration
 export const handleSummary = defaultHandleSummaryBuilder(application, testName)
