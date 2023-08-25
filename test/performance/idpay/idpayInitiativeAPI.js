@@ -6,7 +6,6 @@ import {
 import { getFCList, getUserIdsList } from '../../common/utils.js'
 import { SharedArray } from 'k6/data'
 import defaultHandleSummaryBuilder from '../../common/handleSummaryBuilder.js'
-import { defaultApiOptions, defaultApiOptionsBuilder } from '../../common/dynamicScenarios/defaultOptions.js'
 import { CONFIG } from '../../common/dynamicScenarios/envVars.js'
 import {
     assert,
@@ -16,7 +15,6 @@ import { logErrorResult } from '../../common/dynamicScenarios/utils.js'
 import {
     IDPAY_CONFIG
 } from '../../common/idpay/envVars.js'
-import scenarios from '../../common/dynamicScenarios/scenarios/perVuIterations.js'
 
 // test tags
 const application = 'idpay'
@@ -29,13 +27,7 @@ const usersList = new SharedArray(
 )
 
 // K6 VuIteration scenarios
-export const buildVuScenario = scenarios.perVuIterations({
-    executor: 'per-vu-iterations',
-    vus: 1,
-    iterations: 1,
-    startTime: '0s',
-    maxDuration: '10s'
-});
+export const buildVuScenario = CONFIG.SCENARIOS.perVuIterations(false,true,1,10) 
 
 // K6 summary configuration
 export const handleSummary = defaultHandleSummaryBuilder(application, testName)
