@@ -6,7 +6,7 @@ import {
 import { getFCList, getUserIdsList } from '../../common/utils.js'
 import { SharedArray } from 'k6/data'
 import defaultHandleSummaryBuilder from '../../common/handleSummaryBuilder.js'
-import { defaultApiOptionsBuilder } from '../../common/dynamicScenarios/defaultOptions.js'
+import { defaultApiOptions, defaultApiOptionsBuilder } from '../../common/dynamicScenarios/defaultOptions.js'
 import { CONFIG } from '../../common/dynamicScenarios/envVars.js'
 import {
     assert,
@@ -16,6 +16,7 @@ import { logErrorResult } from '../../common/dynamicScenarios/utils.js'
 import {
     IDPAY_CONFIG
 } from '../../common/idpay/envVars.js'
+import scenarios from '../../common/dynamicScenarios/scenarios/perVuIterations.js'
 
 // test tags
 const application = 'idpay'
@@ -27,39 +28,14 @@ const usersList = new SharedArray(
     CONFIG.USE_INTERNAL_ACCESS_ENV ? getUserIdsList : getFCList
 )
 
-// Dynamic scenarios' K6 configuration
-// export const options = defaultApiOptionsBuilder(
-//     application,
-//     testName,
-//     [INITIATIVE_API_NAMES.deleteInitiative] // applying apiName tags to thresholds
-// )
-export let options = {
-    scenarios: {
-        perVuIterations: {
-            executor: 'per-vu-iterations',
-            vus: 1,
-            iterations: 1,
-            startTime: '0s',
-            maxDuration: '20s',
-        },
-    },
-    thresholds: {
-        http_req_failed: [
-            {
-                threshold: 'rate<0.01',
-                abortOnFail: false,
-                delayAbortEval: '10s',
-            },
-        ], // http errors should be less than 1%
-        http_reqs: [
-            {
-                threshold: 'count<=2',
-                abortOnFail: false,
-                delayAbortEval: '10s',
-            },
-        ],
-    },
-}
+// K6 VuIteration scenarios 
+export const scenarios = scenarios({
+    executor: 'per-vu-iterations',
+    vus: 1,
+    iterations: 1,
+    startTime: '0s',
+    maxDuration: '10s'
+});
 
 // K6 summary configuration
 export const handleSummary = defaultHandleSummaryBuilder(application, testName)
@@ -72,6 +48,7 @@ export default () => {
             CONFIG.USE_INTERNAL_ACCESS_ENV,
             IDPAY_CONFIG.CONTEXT_DATA.initiativeId
         )
+
         assert(res, [statusNoContent()])
         if (res.status != 204) {
             logErrorResult('deleteInitiative', res, true)

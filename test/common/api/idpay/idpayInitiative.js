@@ -18,7 +18,7 @@ function configureInitiativeRequest(useInnerAccess, initiativeId) {
     if (useInnerAccess) {
         baseUrl = `${innerBaseUrl}${API_PREFIX}/${initiativeId}`
     } else {
-        baseUrl = `${apimBaseUrl}${API_PREFIX}/${initiativeId}`   
+        throw new Error('Delete Initiative apim invoke not implemented!')   
     }
 
     return baseUrl
