@@ -20,12 +20,6 @@ import {
 const application = 'idpay'
 const testName = 'idpayInitiativeAPI'
 
-// Set up data for processing, share data among VUs
-const usersList = new SharedArray(
-    'usersList',
-    CONFIG.USE_INTERNAL_ACCESS_ENV ? getUserIdsList : getFCList
-)
-
 // K6 summary configuration
 export const handleSummary = defaultHandleSummaryBuilder(application, testName)
 
