@@ -69,6 +69,7 @@ export default () => {
     group('Delete initiative', () => {
         
         const res = deleteInitiative(
+            CONFIG.USE_INTERNAL_ACCESS_ENV,
             IDPAY_CONFIG.CONTEXT_DATA.initiativeId
         )
         assert(res, [statusNoContent()])

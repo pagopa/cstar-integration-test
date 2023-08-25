@@ -13,21 +13,13 @@ const innerBaseUrl = `${getBaseUrl(REGISTERED_ENVS, 'internal')}/idpayportalwelf
 
 const API_PREFIX = '/idpay/initiative'
 
-function configureMerchantRequest(useInnerAccess) {
+function configureInitiativeRequest(useInnerAccess, initiativeId) {
     let baseUrl
-    let tokenHeader
     if (useInnerAccess) {
-        baseUrl = `${innerBaseUrl}${API_PREFIX}/merchant`
-        tokenHeader = 'x-merchant-id'
-        params.headers['x-apim-request-id'] = Math.random()
+        baseUrl = `${innerBaseUrl}${API_PREFIX}/${initiativeId}`
     } else {
-        baseUrl = `${apimBaseUrl}${API_MIL_PREFIX}`
-        tokenHeader = 'x-merchant-fiscalcode'
-        params.headers['Ocp-Apim-Subscription-Key'] =
-            IDPAY_CONFIG.AUTH_KEYS.APIM_MIL_SK
+        baseUrl = `${apimBaseUrl}${API_PREFIX}/${initiativeId}`   
     }
-    params.headers[tokenHeader] = merchantToken
-    params.headers['x-acquirer-id'] = IDPAY_CONFIG.CONTEXT_DATA.acquirerId
 
     return baseUrl
 }
@@ -35,7 +27,10 @@ function configureMerchantRequest(useInnerAccess) {
 export function deleteInitiative(useInnerAccess,initiativeId){
     const apiName = INITIATIVE_API_NAMES.deleteInitiative
     
-    let url = `${innerBaseUrl}${API_PREFIX}/${initiativeId}`
+    let url = configureInitiativeRequest(
+        useInnerAccess, 
+        initiativeId
+        )
 
     const res = http.del(url)
     logResult(apiName, res)

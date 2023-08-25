@@ -417,8 +417,6 @@ jobs:
   
     - ${{ if eq(parameters.DELETE_INITIATIVE, 1)}}:
           - deployment: DeleteInitiative
-            dependsOn: PerformanceTest
-            condition: true
             timeoutInMinutes: 0
             displayName: 'Delete initiative on ${{ parameters.TARGET_ENV }}'
             pool:
