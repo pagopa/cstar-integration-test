@@ -417,7 +417,12 @@ jobs:
   
     - ${{ if eq(parameters.DELETE_INITIATIVE, 1)}}:
           - deployment: DeleteInitiative
+            dependsOn: PerformanceTest
+            condition: true
+            timeoutInMinutes: 0
             displayName: 'Delete initiative on ${{ parameters.TARGET_ENV }}'
+            pool:
+                name: $(selfHostedAgentPool)
             environment: '${{ upper(parameters.TARGET_ENV) }}'
             strategy:
                 runOnce:
@@ -426,3 +431,4 @@ jobs:
                             - script: |
                                   response= $(curl -s -X DELETE https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpayportalwelfarebackendinitiative/idpay/initiative/${{ parameters.INITIATIVE_ID }})  
                                   echo "Delete initiative expiration result: " $response 
+                                  echo $response | grep \"initiativeId\":\"${{ parameters.INITIATIVE_ID }}\" > /dev/null
