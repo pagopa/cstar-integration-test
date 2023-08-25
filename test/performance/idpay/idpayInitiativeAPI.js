@@ -62,7 +62,7 @@ export let options = {
 }
 
 // K6 summary configuration
-//export const handleSummary = defaultHandleSummaryBuilder(application, testName)
+export const handleSummary = defaultHandleSummaryBuilder(application, testName)
 
 export default () => {
 
