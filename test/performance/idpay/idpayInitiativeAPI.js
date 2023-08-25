@@ -26,17 +26,6 @@ const usersList = new SharedArray(
     CONFIG.USE_INTERNAL_ACCESS_ENV ? getUserIdsList : getFCList
 )
 
-// K6 VuIteration scenarios
-function scenarioPerVuIteration(startTime, vus) {
-    return {
-        executor: 'per-vu-iterations',
-        vus,
-        iterations: CONFIG.SCENARIOS.perVuIterations.ONESHOT,
-        startTime: `${startTime}s`,
-        maxDuration: `${CONFIG.SCENARIOS.perVuIterations.DURATION}s`,
-    }
-}
-
 // K6 summary configuration
 export const handleSummary = defaultHandleSummaryBuilder(application, testName)
 
