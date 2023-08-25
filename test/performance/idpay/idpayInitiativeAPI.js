@@ -28,8 +28,8 @@ const usersList = new SharedArray(
     CONFIG.USE_INTERNAL_ACCESS_ENV ? getUserIdsList : getFCList
 )
 
-// K6 VuIteration scenarios 
-export const buildVuScenario = scenarios({
+// K6 VuIteration scenarios
+export const buildVuScenario = scenarios.perVuIterations({
     executor: 'per-vu-iterations',
     vus: 1,
     iterations: 1,
