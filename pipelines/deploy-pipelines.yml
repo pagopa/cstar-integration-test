@@ -325,7 +325,7 @@ jobs:
               - ${{ each k6Test in split(variables.SCRIPTS_TO_EXECUTE, ',') }}:
                     - script: ./xk6 run ./test/performance/idpay/${{k6Test}}.js
                       env:
-                          RESULTS_DIR: /app
+                          RESULTS_DIR: '.'
                           CSV_DELIMITER: ';'
                           ENABLE_FILE_WRITING: true
 
