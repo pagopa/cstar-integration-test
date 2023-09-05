@@ -28,7 +28,6 @@ parameters:
           - idpayCheckInitiativeBudgetAPI
           - getWalletDetails
           - idPayPaymentDiscountAPI
-          - idPayInitiativeAPI
           - ioPutEnrollInstrumentIssuer
           - ioPutEnrollIban
           - rtdTransactionsFile
@@ -56,6 +55,10 @@ parameters:
       displayName: 'Expected number of days to add to the current date when forcing refunds export (if -1 it will be skipped)'
       type: number
       default: 6
+    - name: 'DELETE_INITIATIVE'
+      displayName: 'Change the parameter to true to start the delete initiative (if false it will be skipped)'
+      type: boolean
+      default: false
 
     - name: 'SCENARIO_TYPE_ENV'
       displayName: 'Scenario type'
@@ -129,6 +132,17 @@ variables:
     # resolved merchantList requirement
     - name: MERCHANT_LIST_REQUIRED
       value: ${{ containsValue(split(variables['k6TestRequiringMerchantList'], ','), parameters.SCRIPT) }}
+    # resolved refund export requirement
+    - ${{ if and( containsValue(split(variables[format('k6Test_{0}', parameters.SCRIPT)], ','), 'idPayPaymentDiscountAPI'), ne(parameters.DAYS_TO_ADD, -1)) }}:
+      - name: REFUND2EXPORT
+        value: true
+      - name: INITIATIVE_DELETE_DEPENDENCY
+        value: ForceExportRefund
+    - ${{ else }}:
+      - name: REFUND2EXPORT
+        value: false
+      - name: INITIATIVE_DELETE_DEPENDENCY
+        value: PerformanceTest
 
     # comma separated list of tests to execute based on the SCRIPT parameter
     - name: k6Test_putTokenMockedPdv
@@ -139,8 +153,6 @@ variables:
       value: idpayOnboardingAPI
     - name: k6Test_idPayPaymentDiscountAPI
       value: idpayOnboardingAPI,idPayPaymentDiscountAPI
-    - name: k6Test_idPayInitiativeAPI
-      value: idpayInitiativeAPI
     - name: k6Test_ioPutEnrollInstrumentIssuer
       value: idpayOnboardingAPI,ioPutEnrollInstrumentIssuer
     - name: k6Test_ioPutEnrollIban
@@ -388,7 +400,7 @@ jobs:
                     targetPath: 'results'
                     publishLocation: 'pipeline'
 
-    - ${{ if and( containsValue(split(variables[format('k6Test_{0}', parameters.SCRIPT)], ','), 'idPayPaymentDiscountAPI'), ne(parameters.DAYS_TO_ADD, -1)) }}:
+    - ${{ if variables.REFUND2EXPORT }}:
           - deployment: ForceExportRefund
             dependsOn: PerformanceTest
             condition: true
@@ -409,4 +421,22 @@ jobs:
                                   echo "using notification date $NOTIFICATION_DATE"
                                   response=$(curl -s -X GET https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpayrewardnotification/idpay/reward/notification/exports/start?notificationDateToSearch=$NOTIFICATION_DATE -H 'accept: */*' )
                                   echo "Refund result: " $response
+                                  echo $response | grep \"initiativeId\":\"${{ parameters.INITIATIVE_ID }}\" > /dev/null
+
+    - ${{ if parameters.DELETE_INITIATIVE }}:
+          - deployment: DeleteInitiative
+            dependsOn: variables.INITIATIVE_DELETE_DEPENDENCY
+            condition: true
+            timeoutInMinutes: 0
+            displayName: 'Delete initiative on ${{ parameters.TARGET_ENV }}'
+            pool:
+                name: $(selfHostedAgentPool)
+            environment: '${{ upper(parameters.TARGET_ENV) }}'
+            strategy:
+                runOnce:
+                    deploy:
+                        steps:
+                            - script: |
+                                  response= $(curl -s -X DELETE https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpayportalwelfarebackendinitiative/idpay/initiative/${{ parameters.INITIATIVE_ID }})  
+                                  echo "Delete initiative expiration result: " $response 
                                   echo $response | grep \"initiativeId\":\"${{ parameters.INITIATIVE_ID }}\" > /dev/null
