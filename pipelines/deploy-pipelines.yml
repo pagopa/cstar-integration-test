@@ -56,7 +56,7 @@ parameters:
       type: number
       default: 6
     - name: 'DELETE_INITIATIVE'
-      displayName: 'Change the parameter to true to start the delete initiative (if false it will be skipped)'
+      displayName: 'Delete given initiative at the end of the test'
       type: boolean
       default: false
 
