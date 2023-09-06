@@ -133,13 +133,11 @@ variables:
     - name: MERCHANT_LIST_REQUIRED
       value: ${{ containsValue(split(variables['k6TestRequiringMerchantList'], ','), parameters.SCRIPT) }}
     # resolved refund export requirement
-    
-    - ${{ if ne(parameters.DAYS_TO_ADD, -1) }}:
-          - name: INITIATIVE_DELETE_DEPENDENCY
-            value: 'ForceExportRefund'
-    - ${{ else }}:
-          - name: INITIATIVE_DELETE_DEPENDENCY
-            value: 'PerformanceTest'
+    - name: INITIATIVE_DELETE_DEPENDENCY
+      ${{ if ne(parameters['DAYS_TO_ADD'], -1) }}:
+        value: 'ForceExportRefund'
+      ${{ else }}:
+        value: 'PerformanceTest'
 
     # comma separated list of tests to execute based on the SCRIPT parameter
     - name: k6Test_putTokenMockedPdv
