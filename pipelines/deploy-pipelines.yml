@@ -135,15 +135,15 @@ variables:
 
     # resolved refund export requirement
     - ${{ if and( containsValue(split(variables[format('k6Test_{0}', parameters.SCRIPT)], ','), 'idPayPaymentDiscountAPI'), ne(parameters.DAYS_TO_ADD, -1)) }}:
-      - name: REFUND2EXPORT
-        value: true
-      - name: INITIATIVE_DELETE_DEPENDENCY
-        value: ForceExportRefund
+          - name: REFUND2EXPORT
+            value: true
+          - name: INITIATIVE_DELETE_DEPENDENCY
+            value: ForceExportRefund
     - ${{ else }}:
-      - name: REFUND2EXPORT
-        value: false
-      - name: INITIATIVE_DELETE_DEPENDENCY
-        value: PerformanceTest
+          - name: REFUND2EXPORT
+            value: false
+          - name: INITIATIVE_DELETE_DEPENDENCY
+            value: PerformanceTest
 
     # comma separated list of tests to execute based on the SCRIPT parameter
     - name: k6Test_putTokenMockedPdv
@@ -440,4 +440,4 @@ jobs:
                             - script: |
                                   response=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpayportalwelfarebackendinitiative/idpay/initiative/${{ parameters.INITIATIVE_ID }})  
                                   echo "Delete initiative expiration result: " $response 
-                                  if [ $response -eq 204 ] ; then echo 0; fi
+                                  if [ $response -eq 204 ] ; then echo 0; else echo 1; fi
