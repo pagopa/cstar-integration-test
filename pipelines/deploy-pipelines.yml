@@ -401,7 +401,7 @@ jobs:
                     targetPath: 'results'
                     publishLocation: 'pipeline'
 
-    - ${{ if ${{ variables.REFUND2EXPORT }} }}:
+    - ${{ if variables.REFUND2EXPORT }}:
           - deployment: ForceExportRefund
             dependsOn: PerformanceTest
             condition: true
@@ -424,7 +424,7 @@ jobs:
                                   echo "Refund result: " $response
                                   echo $response | grep \"initiativeId\":\"${{ parameters.INITIATIVE_ID }}\" > /dev/null
 
-    - ${{ if ${{ parameters.DELETE_INITIATIVE }} }}:
+    - ${{ if parameters.DELETE_INITIATIVE }}:
           - deployment: DeleteInitiative
             dependsOn: ${{ variables.INITIATIVE_DELETE_DEPENDENCY }}
             condition: true
