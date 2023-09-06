@@ -134,7 +134,7 @@ variables:
       value: ${{ containsValue(split(variables['k6TestRequiringMerchantList'], ','), parameters.SCRIPT) }}
     # resolved refund export requirement
     - name: INITIATIVE_DELETE_DEPENDENCY
-      ${{ if ne(parameters.DAYS_TO_ADD, -1}}:
+      ${{ if ne(parameters.DAYS_TO_ADD, -1) }}:
         value: ForceExportRefund
       ${{ else }}:
         value: PerformanceTest
