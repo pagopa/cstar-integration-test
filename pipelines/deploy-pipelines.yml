@@ -133,14 +133,8 @@ variables:
     - name: MERCHANT_LIST_REQUIRED
       value: ${{ containsValue(split(variables['k6TestRequiringMerchantList'], ','), parameters.SCRIPT) }}
     # resolved refund export requirement
-    - name: REFUND2EXPORT
-      ${{ if and( containsValue(split(variables[format('k6Test_{0}', parameters.SCRIPT)], ','), 'idPayPaymentDiscountAPI'), ne(parameters.DAYS_TO_ADD, -1)) }}:
-        value: true
-      ${{ else }}:
-        value: false
-
     - name: INITIATIVE_DELETE_DEPENDENCY
-      ${{ if variables.REFUND2EXPORT }}:
+      ${{ if ne(parameters.DAYS_TO_ADD, -1}}:
         value: ForceExportRefund
       ${{ else }}:
         value: PerformanceTest
@@ -401,7 +395,7 @@ jobs:
                     targetPath: 'results'
                     publishLocation: 'pipeline'
 
-    - ${{ if variables.REFUND2EXPORT }}:
+    - ${{ if and( containsValue(split(variables[format('k6Test_{0}', parameters.SCRIPT)], ','), 'idPayPaymentDiscountAPI'), ne(parameters.DAYS_TO_ADD, -1)) }}:
           - deployment: ForceExportRefund
             dependsOn: PerformanceTest
             condition: true
