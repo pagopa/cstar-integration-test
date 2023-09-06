@@ -136,10 +136,10 @@ variables:
     
     - ${{ if ne(parameters.DAYS_TO_ADD, -1) }}:
           - name: INITIATIVE_DELETE_DEPENDENCY
-            value: ForceExportRefund
+            value: 'ForceExportRefund'
     - ${{ else }}:
           - name: INITIATIVE_DELETE_DEPENDENCY
-            value: PerformanceTest
+            value: 'PerformanceTest'
 
     # comma separated list of tests to execute based on the SCRIPT parameter
     - name: k6Test_putTokenMockedPdv
