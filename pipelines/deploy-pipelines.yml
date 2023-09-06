@@ -132,12 +132,6 @@ variables:
     # resolved merchantList requirement
     - name: MERCHANT_LIST_REQUIRED
       value: ${{ containsValue(split(variables['k6TestRequiringMerchantList'], ','), parameters.SCRIPT) }}
-    # resolved refund export requirement
-    - name: INITIATIVE_DELETE_DEPENDENCY
-      ${{ if ne(parameters['DAYS_TO_ADD'], -1) }}:
-        value: 'ForceExportRefund'
-      ${{ else }}:
-        value: 'PerformanceTest'
 
     # comma separated list of tests to execute based on the SCRIPT parameter
     - name: k6Test_putTokenMockedPdv
@@ -420,7 +414,10 @@ jobs:
 
     - ${{ if parameters.DELETE_INITIATIVE }}:
           - deployment: DeleteInitiative
-            dependsOn: variables.INITIATIVE_DELETE_DEPENDENCY
+            ${{ if ne(parameters.DAYS_TO_ADD, -1)}}:
+              dependsOn: ForceExportRefund
+            ${{ else }}:
+              dependsOn: PerformanceTest
             condition: true
             timeoutInMinutes: 0
             displayName: 'Delete initiative on ${{ parameters.TARGET_ENV }}'
