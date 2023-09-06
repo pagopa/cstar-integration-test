@@ -137,12 +137,12 @@ variables:
     - ${{ if and( containsValue(split(variables[format('k6Test_{0}', parameters.SCRIPT)], ','), 'idPayPaymentDiscountAPI'), ne(parameters.DAYS_TO_ADD, -1)) }}:
           - name: REFUND2EXPORT
             value: true
-          - name: INITIATIVE_DELETE_DEPENDENCY
+          - name: DELETE_INITIATIVE_DEPENDENCY
             value: ForceExportRefund
     - ${{ else }}:
           - name: REFUND2EXPORT
             value: false
-          - name: INITIATIVE_DELETE_DEPENDENCY
+          - name: DELETE_INITIATIVE_DEPENDENCY
             value: PerformanceTest
 
     # comma separated list of tests to execute based on the SCRIPT parameter
@@ -426,7 +426,7 @@ jobs:
 
     - ${{ if eq(parameters.DELETE_INITIATIVE, true) }}:
           - deployment: DeleteInitiative
-            dependsOn: ${{ variables.INITIATIVE_DELETE_DEPENDENCY }}
+            dependsOn: ${{ variables.DELETE_INITIATIVE_DEPENDENCY }}
             condition: true
             timeoutInMinutes: 0
             displayName: 'Delete initiative on ${{ parameters.TARGET_ENV }}'
