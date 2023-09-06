@@ -429,6 +429,6 @@ jobs:
                     deploy:
                         steps:
                             - script: |
-                                  response= $(curl -s -o /dev/null -w "%{http_code}" -X DELETE https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpayportalwelfarebackendinitiative/idpay/initiative/${{ parameters.INITIATIVE_ID }})  
+                                  response=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpayportalwelfarebackendinitiative/idpay/initiative/${{ parameters.INITIATIVE_ID }})  
                                   echo "Delete initiative expiration result: " $response 
-                                  echo if [ $response -eq 204 ] ; then echo 0; fi
+                                  if [ $response -eq 204 ] ; then echo 0; fi
