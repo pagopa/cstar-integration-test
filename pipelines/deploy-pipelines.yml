@@ -179,7 +179,7 @@ variables:
           - name: milApiKey
             value: $(mil_apikey_dev)
           - name: selfHostedAgentPool
-            value: cstar-dev-linux
+            value: cstar-dev-perf-linux
 
           - name: PDV_RATE_LIMIT
             value: '150'
@@ -199,7 +199,7 @@ variables:
           - name: milApiKey
             value: $(mil_apikey_uat)
           - name: selfHostedAgentPool
-            value: cstar-uat-linux
+            value: cstar-uat-perf-linux
 
           - name: PDV_RATE_LIMIT
             value: '290'
