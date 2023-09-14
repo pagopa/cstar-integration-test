@@ -166,5 +166,4 @@ export default () => {
             })
         }
     })
-    sleep(1)
 }
