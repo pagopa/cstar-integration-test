@@ -21,20 +21,23 @@ const usersList = new SharedArray(
 const application = 'idpay'
 const testName = 'idpayVerifyOnboarding'
 
-export const options = defaultApiOptionsBuilder(
-    application,
-    testName,
-    Object.values(ONBOARDING_API_NAMES)
-        .filter(
-            (api) =>
-                api !== ONBOARDING_API_NAMES.checkInitiativeBudget &&
-                api !== ONBOARDING_API_NAMES.getInitiative
-        )
-        .concat({
-            apiName: WALLET_API_NAMES.getWalletDetail,
-            maxHttpReqFailedRate: 0.999,
-        }) // applying apiName tags to thresholds
-)
+export const options = {
+    ...defaultApiOptionsBuilder(
+        application,
+        testName,
+        Object.values(ONBOARDING_API_NAMES)
+            .filter(
+                (api) =>
+                    api !== ONBOARDING_API_NAMES.checkInitiativeBudget &&
+                    api !== ONBOARDING_API_NAMES.getInitiative
+            )
+            .concat({
+                apiName: WALLET_API_NAMES.getWalletDetail,
+                maxHttpReqFailedRate: 0.999,
+            }) // applying apiName tags to thresholds
+    ),
+    setupTimeout: '120s'
+}
 
 export function setup() {
     console.log("Waiting 1 minute before verify")
