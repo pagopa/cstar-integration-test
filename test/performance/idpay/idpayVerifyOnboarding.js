@@ -21,10 +21,6 @@ const usersList = new SharedArray(
 const application = 'idpay'
 const testName = 'idpayVerifyOnboarding'
 
-console.log("Waiting 1 minute before verify")
-sleep(60) // 1 minute
-console.log("Starting verify")
-
 export const options = defaultApiOptionsBuilder(
     application,
     testName,
@@ -39,6 +35,12 @@ export const options = defaultApiOptionsBuilder(
             maxHttpReqFailedRate: 0.999,
         }) // applying apiName tags to thresholds
 )
+
+export function setup() {
+    console.log("Waiting 1 minute before verify")
+    sleep(60) // 1 minute
+    console.log("Starting verify")
+}
 
 export default () => {
     // selecting current scenario/iteration test token
