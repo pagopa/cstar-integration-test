@@ -38,14 +38,13 @@ export const options = Object.assign(
             }) // applying apiName tags to thresholds
     ),
     {
-        setupTimeout: '120s'
+        setupTimeout: `${CONFIG.WAIT_ONBOARDING_SECONDS * 1.5}s` // increase setup time to avoid timeout
     }
 );
 
 export function setup() {
-    console.log("Waiting 1 minute before verify")
-    sleep(60) // 1 minute
-    console.log("Starting verify")
+    console.log(`Waiting ${CONFIG.WAIT_ONBOARDING_SECONDS} seconds before start`)
+    sleep(CONFIG.WAIT_ONBOARDING_SECONDS) // 1 minute
 }
 
 export default () => {
@@ -60,8 +59,7 @@ export default () => {
         )
 
         check(res, {
-            'HTTP status is 200 or 404': (r) =>
-                r.status === 200 || r.status === 404,
+            'HTTP status is 200': (r) => r.status === 200
         })
 
         if (res.status === 404) {
