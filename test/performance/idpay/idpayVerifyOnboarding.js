@@ -1,14 +1,15 @@
 import { group, sleep, check } from 'k6'
+import { SharedArray } from 'k6/data'
+import { ONBOARDING_API_NAMES } from '../../common/api/idpay/idpayOnboardingCitizen.js'
 import {
-    IDPAY_CONFIG,
-    getIdPayScenarioUserToken,
-} from '../../common/idpay/envVars.js'
+    getWalletDetail,
+    WALLET_API_NAMES,
+} from '../../common/api/idpay/idpayWallet.js'
 import { getFCList, getUserIdsList } from '../../common/utils.js'
+import { defaultApiOptionsBuilder } from '../../common/dynamicScenarios/defaultOptions.js'
+import { IDPAY_CONFIG, getIdPayScenarioUserToken } from '../../common/idpay/envVars.js'
+import { logErrorResult } from '../../common/dynamicScenarios/utils.js'
 import { CONFIG } from '../../common/dynamicScenarios/envVars.js'
-import {defaultApiOptionsBuilder} from "../../common/dynamicScenarios/defaultOptions";
-import {ONBOARDING_API_NAMES} from "../../common/api/idpay/idpayOnboardingCitizen";
-import {getWalletDetail, WALLET_API_NAMES} from "../../common/api/idpay/idpayWallet";
-import {logErrorResult} from "../../common/dynamicScenarios/utils";
 
 // Set up data for processing, share data among VUs
 const usersList = new SharedArray(
