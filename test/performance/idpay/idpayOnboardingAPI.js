@@ -57,6 +57,15 @@ export const options = defaultApiOptionsBuilder(
 // K6 summary configuration
 export const handleSummary = defaultHandleSummaryBuilder(application, testName)
 
+// initiatives for performance must be created with a self declaration with "value" = 1
+const selfDeclarations = [
+    {
+        '_type': 'boolean',
+        'code': '1',
+        'accepted': 'true'
+    }
+]
+
 export default () => {
     let checked = true
     const isOnboardingTestScript = CONFIG.SCRIPT_ENV === 'idpayOnboardingAPI'
@@ -127,7 +136,8 @@ export default () => {
                 const res = putSaveConsent(
                     CONFIG.USE_INTERNAL_ACCESS_ENV,
                     token,
-                    IDPAY_CONFIG.CONTEXT_DATA.initiativeId
+                    IDPAY_CONFIG.CONTEXT_DATA.initiativeId,
+                    selfDeclarations
                 )
 
                 assert(res, [statusAccepted()])

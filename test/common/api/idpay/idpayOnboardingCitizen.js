@@ -103,7 +103,7 @@ export function getStatus(useInnerAccess, token, initiativeId) {
     return res
 }
 
-export function putSaveConsent(useInnerAccess, token, initiativeId) {
+export function putSaveConsent(useInnerAccess, token, initiativeId, selfDeclaration = []) {
     const apiName = ONBOARDING_API_NAMES.putSaveConsent
 
     let url
@@ -111,7 +111,7 @@ export function putSaveConsent(useInnerAccess, token, initiativeId) {
     const body = {
         initiativeId,
         pdndAccept: true,
-        selfDeclarationList: [],
+        selfDeclarationList: selfDeclaration,
     }
     if (useInnerAccess) {
         url = `${innerBaseUrl}${API_PREFIX}/consent/${token}`
