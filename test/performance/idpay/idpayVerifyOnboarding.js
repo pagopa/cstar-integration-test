@@ -1,6 +1,5 @@
 import { group, sleep, check } from 'k6'
 import { SharedArray } from 'k6/data'
-import { ONBOARDING_API_NAMES } from '../../common/api/idpay/idpayOnboardingCitizen.js'
 import {
     getWalletDetail,
     WALLET_API_NAMES,
@@ -26,16 +25,10 @@ export const options = Object.assign(
     defaultApiOptionsBuilder(
         application,
         testName,
-        Object.values(ONBOARDING_API_NAMES)
-            .filter(
-                (api) =>
-                    api !== ONBOARDING_API_NAMES.checkInitiativeBudget &&
-                    api !== ONBOARDING_API_NAMES.getInitiative
-            )
-            .concat({
-                apiName: WALLET_API_NAMES.getWalletDetail,
-                maxHttpReqFailedRate: 0.999,
-            }) // applying apiName tags to thresholds
+        [{
+            apiName: WALLET_API_NAMES.getWalletDetail,
+            maxHttpReqFailedRate: 0.999,
+        }]
     ),
     {
         setupTimeout: `${CONFIG.WAIT_ONBOARDING_SECONDS * 1.5}s` // increase setup time to avoid timeout
@@ -44,14 +37,14 @@ export const options = Object.assign(
 
 export function setup() {
     console.log(`Waiting ${CONFIG.WAIT_ONBOARDING_SECONDS} seconds before start`)
-    sleep(CONFIG.WAIT_ONBOARDING_SECONDS) // 1 minute
+    sleep(CONFIG.WAIT_ONBOARDING_SECONDS)
 }
 
 export default () => {
     // selecting current scenario/iteration test token
     const token = getIdPayScenarioUserToken(usersList)
 
-    group('Wallet must exist', () => {
+    group('Wallet must exists', () => {
         const res = getWalletDetail(
             CONFIG.USE_INTERNAL_ACCESS_ENV,
             token,
