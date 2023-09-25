@@ -109,6 +109,10 @@ parameters:
       displayName: 'Max P95 milliseconds applied as default to single API tests'
       type: number
       default: 1000
+    - name: 'WAIT_ONBOARDING_SECONDS'
+      displayName: 'Time in seconds to wait before wallet presence check. Useful with Payments or test which depends on onboarding (idpayVerifyOnboarding)'
+      type: number
+      default: 60
 
 variables:
     # Python version: 3.10
@@ -138,7 +142,7 @@ variables:
     - name: k6Test_idpayOnboardingAPI
       value: idpayOnboardingAPI
     - name: k6Test_idPayPaymentDiscountAPI
-      value: idpayOnboardingAPI,idPayPaymentDiscountAPI
+      value: idpayOnboardingAPI,idpayVerifyOnboarding,idPayPaymentDiscountAPI
     - name: k6Test_idPayInitiativeAPI
       value: idpayInitiativeAPI
     - name: k6Test_ioPutEnrollInstrumentIssuer
