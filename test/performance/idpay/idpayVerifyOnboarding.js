@@ -44,7 +44,7 @@ export default () => {
     // selecting current scenario/iteration test token
     const token = getIdPayScenarioUserToken(usersList)
 
-    group('Wallet must exists', () => {
+    group('Wallet must exist', () => {
         const res = getWalletDetail(
             CONFIG.USE_INTERNAL_ACCESS_ENV,
             token,
