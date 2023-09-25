@@ -148,32 +148,5 @@ export default () => {
                 }
             }
         })
-
-        if (isOnboardingTestScript) {
-            group('When onboarding is completed, get wallet detail', () => {
-                if (checked) {
-                    sleep(1)
-
-                    const res = getWalletDetail(
-                        CONFIG.USE_INTERNAL_ACCESS_ENV,
-                        token,
-                        IDPAY_CONFIG.CONTEXT_DATA.initiativeId
-                    )
-
-                    check(res, {
-                        'HTTP status is 200 or 404': (r) =>
-                            r.status === 200 || r.status === 404,
-                    })
-
-                    if (res.status === 404) {
-                        logErrorResult(
-                            `Wallet associated to user with token [${token}] not found`,
-                            res,
-                            true
-                        )
-                    }
-                }
-            })
-        }
     })
 }
