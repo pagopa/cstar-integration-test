@@ -308,7 +308,7 @@ jobs:
                       name: merchantList
                       displayName: 'Download merchant list file'
                       inputs:
-                          secureFile: 'merchantList.csv'
+                          secureFile: 'merchantList_150.csv'
                     - script: |
                           cp $(merchantList.secureFilePath) ./assets
                           response=$(curl -X PUT https://api-io.${{ parameters.TARGET_ENV}}.cstar.pagopa.it/idpay/mil/payment/qr-code/merchant/initiative/${{ parameters.INITIATIVE_ID }}/upload \
