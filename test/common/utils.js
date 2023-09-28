@@ -88,9 +88,9 @@ export function getFCIbanList() {
     return getCsvData(`${getRelativePathToRootFolder()}/assets/fc_iban.csv`)
 }
 
-export function getMerchantList() {
+export function getMerchantList(filename) {
     return getCsvData(
-        `${getRelativePathToRootFolder()}/assets/merchantList_150.csv`
+        `${getRelativePathToRootFolder()}/assets/${filename}`
     )
 }
 
