@@ -90,7 +90,7 @@ export function getFCIbanList() {
 
 export function getMerchantList() {
     return getCsvData(
-        `${getRelativePathToRootFolder()}/assets/merchantList.csv`
+        `${getRelativePathToRootFolder()}/assets/merchantList_150.csv`
     )
 }
 
