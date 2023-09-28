@@ -353,7 +353,6 @@ jobs:
                           APIM_RTD_MOCK_API_SK: $(rtdMockApiSK)
                           PDV_API_KEY: $(pdvApiKey)
                           WAIT_ONBOARDING_SECONDS: ${{ parameters.WAIT_ONBOARDING_SECONDS }}
-                          MERCHANT_FILENAME: 'merchantList_150.csv'
 
                           ${{ if eq(k6Test, parameters.SCRIPT) }}:
                               SCENARIO_TYPE_ENV: ${{ parameters.SCENARIO_TYPE_ENV }}

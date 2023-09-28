@@ -83,8 +83,7 @@ export const CONFIG = {
     SUMMARY: {
         RESULTS_DIR: __ENV.RESULTS_DIR,
     },
-    WAIT_ONBOARDING_SECONDS: parseInt(coalesce(__ENV.WAIT_ONBOARDING_SECONDS, 60)),
-    MERCHANT_FILENAME: coalesce(__ENV.MERCHANT_FILENAME, "merchantList.csv")
+    WAIT_ONBOARDING_SECONDS: parseInt(coalesce(__ENV.WAIT_ONBOARDING_SECONDS, 60))
 }
 
 export const defaultHeaders = {

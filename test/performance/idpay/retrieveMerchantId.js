@@ -19,7 +19,7 @@ const application = 'idpay'
 const testName = 'retrieveMerchantId'
 
 // Set up data for processing, share data among VUs
-const merchantList = new SharedArray('merchantList', getMerchantList(CONFIG.MERCHANT_FILENAME))
+const merchantList = new SharedArray('merchantList', getMerchantList)
 const merchantIdListFilePath = 'assets/merchantIdList.csv'
 
 export function setup() {
