@@ -206,7 +206,7 @@ variables:
             value: cstar-uat-perf-linux
 
           - name: PDV_RATE_LIMIT
-            value: '290'
+            value: '150'
 
     - name: xk6CacheKey
       value: '"xk6" | "0.45.1"'
