@@ -1,7 +1,7 @@
 import http from 'k6/http'
 import { logResult } from '../../dynamicScenarios/utils.js'
 import { DEV, UAT, getBaseUrl } from '../../envs.js'
-import { CONFIG, buildDefaultParams } from '../../dynamicScenarios/envVars.js'
+import { buildDefaultParams } from '../../dynamicScenarios/envVars.js'
 import {
     IDPAY_CONFIG,
     buildIOAuthorizationHeader,
@@ -20,7 +20,7 @@ const innerBaseUrl = `${getBaseUrl(REGISTERED_ENVS, 'internal')}/idpaypayment`
 const apimBaseUrl = getBaseUrl(REGISTERED_ENVS, 'io') // api-io services baseUrl
 
 const API_PREFIX = '/idpay/payment/qr-code'
-const API_MIL_PREFIX = '/idpay/mil/payment/qr-code/merchant'
+const API_MIL_PREFIX = '/idpay/mil/payment'
 
 function configureMerchantRequest(useInnerAccess, merchantToken, params) {
     let baseUrl
