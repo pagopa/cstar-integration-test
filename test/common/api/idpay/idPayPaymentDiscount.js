@@ -19,7 +19,7 @@ const REGISTERED_ENVS = [DEV, UAT]
 const innerBaseUrl = `${getBaseUrl(REGISTERED_ENVS, 'internal')}/idpaypayment`
 const apimBaseUrl = getBaseUrl(REGISTERED_ENVS, 'io') // api-io services baseUrl
 
-const API_PREFIX = '/idpay/payment'
+const API_PREFIX = '/idpay/payment/'
 const API_QRCODE_PREFIX = '/idpay/payment/qr-code'
 const API_MIL_PREFIX = '/idpay/mil/payment'
 
