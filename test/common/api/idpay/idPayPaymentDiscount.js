@@ -1,7 +1,7 @@
 import http from 'k6/http'
 import { logResult } from '../../dynamicScenarios/utils.js'
 import { DEV, UAT, getBaseUrl } from '../../envs.js'
-import { CONFIG, buildDefaultParams } from '../../dynamicScenarios/envVars.js'
+import { buildDefaultParams } from '../../dynamicScenarios/envVars.js'
 import {
     IDPAY_CONFIG,
     buildIOAuthorizationHeader,
@@ -19,14 +19,15 @@ const REGISTERED_ENVS = [DEV, UAT]
 const innerBaseUrl = `${getBaseUrl(REGISTERED_ENVS, 'internal')}/idpaypayment`
 const apimBaseUrl = getBaseUrl(REGISTERED_ENVS, 'io') // api-io services baseUrl
 
-const API_PREFIX = '/idpay/payment/qr-code'
-const API_MIL_PREFIX = '/idpay/mil/payment/qr-code/merchant'
+const API_PREFIX = '/idpay/payment/'
+const API_QRCODE_PREFIX = '/idpay/payment/qr-code'
+const API_MIL_PREFIX = '/idpay/mil/payment'
 
 function configureMerchantRequest(useInnerAccess, merchantToken, params) {
     let baseUrl
     let tokenHeader
     if (useInnerAccess) {
-        baseUrl = `${innerBaseUrl}${API_PREFIX}/merchant`
+        baseUrl = `${innerBaseUrl}${API_PREFIX}`
         tokenHeader = 'x-merchant-id'
         params.headers['x-apim-request-id'] = Math.random()
     } else {
@@ -81,7 +82,7 @@ export function preAuth(useInnerAccess, citizenToken, trxCode) {
     )
 
     const res = http.put(
-        `${baseUrl}${API_PREFIX}/${trxCode}/relate-user`,
+        `${baseUrl}${API_QRCODE_PREFIX}/${trxCode}/relate-user`,
         null,
         myParams
     )
@@ -100,7 +101,7 @@ export function authTrx(useInnerAccess, citizenToken, trxCode) {
     )
 
     const res = http.put(
-        `${baseUrl}${API_PREFIX}/${trxCode}/authorize`,
+        `${baseUrl}${API_QRCODE_PREFIX}/${trxCode}/authorize`,
         null,
         myParams
     )
