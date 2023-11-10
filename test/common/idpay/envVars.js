@@ -13,15 +13,7 @@ export const IDPAY_CONFIG = {
 
     ENABLE_TRACE: coalesce(__ENV.ENABLE_TRACE, 'false'),
 
-    AUTH_KEYS: {
-        APIM_IO_SK: __ENV.APIM_IO_SK,
-        APIM_MIL_SK: __ENV.APIM_MIL_SK,
-        APIM_ACQUIRER_SK: __ENV.APIM_ACQUIRER_SK,
-        APIM_ISSUER_SK: __ENV.APIM_ISSUER_SK,
-        APIM_RTD_SK: __ENV.APIM_RTD_SK,
-        APIM_RTD_MOCK_API_SK: __ENV.APIM_RTD_MOCK_API_SK,
-        PDV_API_KEY: __ENV.PDV_API_KEY,
-    },
+    AUTH_KEYS: dotenv.parse(open(__ENV.SECRETS_FILE_PATH))
 }
 
 export const idpayDefaultHeaders = Object.assign(
