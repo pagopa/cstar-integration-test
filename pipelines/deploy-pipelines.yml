@@ -228,8 +228,7 @@ jobs:
     - job:
       displayName: 'Test print environment variables'
       steps:
-        - script: |
-            echo $DUMMY_SECRET
+        - script: printenv DUMMY_SECRET
           displayName: 'Test print DUMMY_SECRET'
 
 #    - template: templates\xk6-build.yml
