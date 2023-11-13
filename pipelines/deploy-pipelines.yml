@@ -213,7 +213,6 @@ variables:
 
 jobs:
     - job: SetSecrets
-      name: download_secrets_file
       displayName: 'Download secrets file'
       steps:
         - task: DownloadSecureFile@1
