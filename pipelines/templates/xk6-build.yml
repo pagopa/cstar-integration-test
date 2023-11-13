@@ -13,12 +13,12 @@ jobs:
       displayName: Building xk6
       timeoutInMinutes: 0
       steps:
-#          - task: Cache@2
-#            inputs:
-#                key: '$(xk6CacheKey)'
-#                path: '$(Build.SourcesDirectory)/xk6'
-#                cacheHitVar: XK6_RESTORED
-#            displayName: Retrieve xk6 from Cache
+          - task: Cache@2
+            inputs:
+                key: '$(xk6CacheKey)'
+                path: '$(Build.SourcesDirectory)/xk6'
+                cacheHitVar: XK6_RESTORED
+            displayName: Retrieve xk6 from Cache
           - script: |
                 mkdir xk6
                 docker run --rm -u "$(id -u):$(id -g)" -v "${PWD}/xk6:/xk6" grafana/xk6:latest build ${{ parameters.k6Version }} --output xk6 ${{ parameters.xk6Extensions }}
