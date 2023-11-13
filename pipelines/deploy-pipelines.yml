@@ -226,12 +226,12 @@ jobs:
             done < $(idpay_secrets.secureFilePath)
             displayName: 'Set environment variables'
     - job:
-        displayName: 'Test print environment variables'
-        steps:
-          - script: |
-              echo $DUMMY_SECRET1
-              echo $DUMMY_SECRET2
-            displayName: 'Test print DUMMY_SECRET'
+      displayName: 'Test print environment variables'
+      steps:
+        - script: |
+            echo $DUMMY_SECRET1
+            echo $DUMMY_SECRET2
+          displayName: 'Test print DUMMY_SECRET'
 #    - template: templates\xk6-build.yml
 #      parameters:
 #          xk6CacheKey: '$(xk6CacheKey)'
