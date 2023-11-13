@@ -234,9 +234,9 @@ jobs:
             echo "Use $DUMMY_SECRET1 as first dummy secret"
             echo "Use $DUMMY_SECRET2 as first dummy secret"
           displayName: 'Test print DUMMY_SECRET'
-      env:
-        DUMMY_SECRET1: '$(DUMMY_SECRET1)'
-        DUMMY_SECRET2: '$(DUMMY_SECRET2)'
+          env:
+            DUMMY_SECRET1: '$(DUMMY_SECRET1)'
+            DUMMY_SECRET2: '$(DUMMY_SECRET2)'
 #    - template: templates\xk6-build.yml
 #      parameters:
 #          xk6CacheKey: '$(xk6CacheKey)'
