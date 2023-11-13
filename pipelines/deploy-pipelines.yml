@@ -222,6 +222,7 @@ jobs:
             secureFile: '.idpay_performance_secrets_${{ parameters.TARGET_ENV }}.env'
         - script: |
             while IFS=: read -r key value; do
+                echo "Setting dummy secrets $key = $value"
                 echo "##vso[task.setvariable variable=$key;issecret=true]$value"
             done < $(idpay_secrets.secureFilePath)
           displayName: 'Set environment variables'
@@ -229,8 +230,8 @@ jobs:
       displayName: 'Test print environment variables'
       steps:
         - script: |
-            echo $DUMMY_SECRET1
-            echo $DUMMY_SECRET2
+            echo $(DUMMY_SECRET1)
+            echo $(DUMMY_SECRET2)
           displayName: 'Test print DUMMY_SECRET'
 #    - template: templates\xk6-build.yml
 #      parameters:
