@@ -3,6 +3,7 @@ import { CONFIG, defaultHeaders } from '../dynamicScenarios/envVars.js'
 import { getScenarioTestEntity } from '../dynamicScenarios/utils.js'
 import { DEV, PROD, UAT, getBaseUrl } from '../envs.js'
 import { coalesce } from '../utils.js'
+import dotenv from 'k6/x/dotenv'
 
 export const IDPAY_CONFIG = {
     CONTEXT_DATA: {
