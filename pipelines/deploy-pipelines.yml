@@ -328,11 +328,11 @@ jobs:
                       displayName: onboarding merchantList on input initiative
                       timeoutInMinutes: 0
 
-              - task: Cache@2
-                inputs:
-                    key: '$(xk6CacheKey)'
-                    path: '$(Build.SourcesDirectory)'
-                displayName: Retrieve xk6 from Cache
+#              - task: Cache@2
+#                inputs:
+#                    key: '$(xk6CacheKey)'
+#                    path: '$(Build.SourcesDirectory)'
+#                displayName: Retrieve xk6 from Cache
 
               - ${{ each k6Test in split(variables.SCRIPTS_TO_EXECUTE, ',') }}:
                     - script: ./xk6 run ./test/performance/idpay/${{k6Test}}.js -e SECRETS_FILE_PATH=$IDPAY_SECRET_PATH
