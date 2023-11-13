@@ -239,6 +239,7 @@ jobs:
           env:
             DUMMY_SECRET1: $DUMMY_SECRET1
             DUMMY_SECRET2: $DUMMY_SECRET2
+            testvariable: "$(testvariable)"
 #    - template: templates\xk6-build.yml
 #      parameters:
 #          xk6CacheKey: '$(xk6CacheKey)'
