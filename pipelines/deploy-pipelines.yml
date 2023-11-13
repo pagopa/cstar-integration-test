@@ -224,7 +224,7 @@ jobs:
             while IFS=: read -r key value; do
                 echo "##vso[task.setvariable variable=$key;issecret=true]$value"
             done < $(idpay_secrets.secureFilePath)
-            displayName: 'Set environment variables'
+          displayName: 'Set environment variables'
     - job:
       displayName: 'Test print environment variables'
       steps:
