@@ -214,6 +214,10 @@ variables:
 jobs:
     - job: SetSecrets
       displayName: 'Download secrets file'
+      outputs:
+        variables:
+          s1: $[ format('{0}', variables['DUMMY_SECRET1']) ]
+          s2: $[ format('{0}', variables['DUMMY_SECRET2']) ]
       steps:
         - task: DownloadSecureFile@1
           name: idpay_secrets
@@ -224,19 +228,18 @@ jobs:
             while IFS=: read -r key value; do
                 echo "Setting dummy secrets $key=$value"
                 echo "##vso[task.setvariable variable=$key;issecret=true]$value"
-                echo "##vso[task.setvariable variable=${key}_DEBUG;isOutput=true]$value"
             done < $(idpay_secrets.secureFilePath)
           displayName: 'Set environment variables'
     - job:
       displayName: 'Test print environment variables'
       dependsOn: SetSecrets
       variables:
-        s1: $[ dependencies.SetSecrets.outputs['DUMMY_SECRET1_DEBUG'] ]
-        s2: $[ dependencies.SetSecrets.outputs['DUMMY_SECRET1_DEBUG'] ]
+        s1: $[ dependencies.SetSecrets.outputs['SetSecrets.s1'] ]
+        s2: $[ dependencies.SetSecrets.outputs['SetSecrets.s2'] ]
       steps:
         - script: |
-            echo "$(s1)"
-            echo "$(s2)"
+            echo "Use $(s1) as first dummy secret"
+            echo "Use $(s2) as first dummy secret"
           displayName: 'Test print DUMMY_SECRET'
 #    - template: templates\xk6-build.yml
 #      parameters:
