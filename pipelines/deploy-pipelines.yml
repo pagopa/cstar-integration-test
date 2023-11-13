@@ -168,8 +168,8 @@ variables:
 
     #Setting Api Key
     - ${{ if eq(parameters.TARGET_ENV, 'dev') }}:
-#          - name: rtdSK
-#            value: $(rtd_sk_dev)
+          - name: rtdSK
+            value: $(rtd_sk_dev)
 #          - name: rtdMockApiSK
 #            value: $(rtd_mock_api_dev)
 #          - name: apimSK
@@ -188,8 +188,8 @@ variables:
           - name: PDV_RATE_LIMIT
             value: '150'
     - ${{ else }}:
-#          - name: rtdSK
-#            value: $(rtd_sk_uat)
+          - name: rtdSK
+            value: $(rtd_sk_uat)
 #          - name: rtdMockApiSK
 #            value: $(rtd_mock_api_uat)
 #          - name: apimSK
@@ -220,226 +220,206 @@ jobs:
           displayName: 'Download IDPay secrets'
           inputs:
             secureFile: '.idpay_performance_secrets_${{ parameters.TARGET_ENV }}.env'
-        - script: |
-            while IFS=: read -r key value; do
-                echo "Setting dummy secrets $key=$value"
-                echo "##vso[task.setvariable variable=$key]$value"
-                echo "##vso[task.setvariable variable=testvariable]Prova"
-            done < $(idpay_secrets.secureFilePath)
-          displayName: 'Set environment variables'
-    - job:
-      displayName: 'Test print environment variables'
-      dependsOn: SetSecrets
-      steps:
-        - script: |
-            echo "Use $DUMMY_SECRET1 as first dummy secret"
-            echo "Use $DUMMY_SECRET2 as first dummy secret"
-            echo "Use $(testvariable) as test variable"
-          displayName: 'Test print DUMMY_SECRET'
-          env:
-            DUMMY_SECRET1: $DUMMY_SECRET1
-            DUMMY_SECRET2: $DUMMY_SECRET2
-            testvariable: "$(testvariable)"
-#    - template: templates\xk6-build.yml
-#      parameters:
-#          xk6CacheKey: '$(xk6CacheKey)'
-#          k6Version: v0.45.1
-#
-#    - template: templates\job-type-switch.yml
-#      parameters:
-#          name: PerformanceTest
-#          displayName: 'Executing ${{ parameters.SCRIPT }} on ${{ parameters.TARGET_ENV }} (internal access: ${{ parameters.USE_INTERNAL_ACCESS_ENV }})'
-#          timeoutInMinutes: 0
-#          continueOnError: true
-#          dependsOn: xk6Build
-#
-#          isDeployment: ${{ parameters.USE_INTERNAL_ACCESS_ENV }}
-#          deploymentPoolName: $(selfHostedAgentPool)
-#          deploymentEnvironment: '${{ upper(parameters.TARGET_ENV) }}'
-#          steps:
-#              - task: UsePythonVersion@0
-#                inputs:
-#                    versionSpec: '$(pythonVersion)'
-#                displayName: 'Use Python $(pythonVersion)'
-#              - task: DownloadSecureFile@1
-#                name: rtd_acquirer_mauth_pem
-#                displayName: 'RTD Certification File'
-#                inputs:
-#                    secureFile: 'rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.pem'
-#              - task: DownloadSecureFile@1
-#                name: rtd_acquirer_mauth_key
-#                displayName: 'RTD Key File'
-#                inputs:
-#                    secureFile: 'rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.key'
-#              - task: DownloadSecureFile@1
-#                name: bpd_pm
-#                displayName: 'Download BPD PM public uat'
-#                inputs:
-#                    secureFile: 'bpd-pm-${{ parameters.TARGET_ENV }}.asc'
-#              - script: |
-#                    mkdir $(pwd)/certs
-#                displayName: Create Certs Folder
-#              - script: |
-#                    cp $(rtd_acquirer_mauth_pem.secureFilePath) $(pwd)/certs/rtd-acquirer-mauth.pem
-#                displayName: Copy RTD PEM File
-#              - script: |
-#                    cp $(rtd_acquirer_mauth_key.secureFilePath) $(pwd)/certs/rtd-acquirer-mauth.key
-#                displayName: Copy RTD Key File
-#              - script: |
-#                    docker info | grep -i mem
-#                displayName: Display Docker Memory Info
-#              - script: |
-#                    python -m venv .venv
-#                    source .venv/bin/activate
-#                    python -m pip install --upgrade pip
-#                workingDirectory: $(projectRoot)
-#                displayName: 'Install CLI requirements'
-#              - script: |
-#                    curl -L https://github.com/pagopa/cstar-cli/archive/refs/heads/main.zip -o cstar-cli.zip
-#                    unzip cstar-cli.zip
-#                    cd cstar-cli-main
-#                    pip install -r ../requirements.txt
-#                    pip install --force-reinstall src/cstar-cli-core
-#                    pip install --no-deps --force-reinstall src/cstar-cli
-#                displayName: Set environment
-#              - script: |
-#                    CLI_INVOKE_COMMAND="cst idpay idpaydataset --action $CSTAR_CLI_COMMAND --env ${{ parameters.TARGET_ENV }} --api-key $API_KEY --out-dir ./generated --num-fc ${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} $CSTAR_CLI_EXTRA_ARGS"
-#                    echo $CLI_INVOKE_COMMAND
-#                    $CLI_INVOKE_COMMAND
-#                    mkdir -p assets
-#                    mkdir -p results
-#                    cp ./generated/*/* ./assets
-#                    ls -lrt ./assets
-#                displayName: Retrieve resource from cstar-cli
-#                timeoutInMinutes: 0
-#                env:
-#                    ${{ if parameters.USE_INTERNAL_ACCESS_ENV }}:
-#                        CSTAR_CLI_COMMAND: 'fc_and_pdv_tokens'
-#                        CSTAR_CLI_EXTRA_ARGS: '--pdv-rate-limit ${{ variables.PDV_RATE_LIMIT }}'
-#                        API_KEY: '$(pdvApiKey)'
-#                    ${{ else }}:
-#                        CSTAR_CLI_COMMAND: 'dataset_and_transactions'
-#                        CSTAR_CLI_EXTRA_ARGS: '--key $(rtd_acquirer_mauth_key.secureFilePath) --cert $(rtd_acquirer_mauth_pem.secureFilePath) --PM-pubk $(bpd_pm.secureFilePath) --trx-per-fc 1 --start-datetime ${{ parameters.ASYNC_TRX_DATE }} --mcc 1234 --PM-salt SALT123'
-#                        API_KEY: '$(rtdSK)'
-#              - task: Bash@3
-#                inputs:
-#                    targetType: 'inline'
-#                    script: |
-#                        WantedFile=$( find . -name "*.pgp")
-#                        BaseName=$(basename $WantedFile)
-#                        echo $BaseName
-#                        echo "##vso[task.setvariable variable=trxFileName]$BaseName"
-#                displayName: Set variable trxFileName
-#
-#              - ${{ if eq(variables.MERCHANT_LIST_REQUIRED, 'true') }}:
-#                    - task: DownloadSecureFile@1
-#                      name: merchantList
-#                      displayName: 'Download merchant list file'
-#                      inputs:
-#                          secureFile: 'merchantList_150.csv'
-#                    - script: |
-#                          cp $(merchantList.secureFilePath) ./assets
-#                          response=$(curl -X PUT https://api-io.${{ parameters.TARGET_ENV}}.cstar.pagopa.it/idpay/mil/payment/qr-code/merchant/initiative/${{ parameters.INITIATIVE_ID }}/upload \
-#                            -H 'x-acquirer-id: ${{ parameters.ACQUIRER_ID }}' \
-#                            -H 'Ocp-Apim-Subscription-Key: $(milApiKey)' \
-#                            -F 'file=@$(merchantList.secureFilePath);type=text/csv;fileName=merchantList_$(Build.BuildNumber).csv')
-#                          echo "Onboarding result: " $response
-#                          echo $response | grep \"VALIDATED\"
-#                      displayName: onboarding merchantList on input initiative
-#                      timeoutInMinutes: 0
-#
-#              - task: Cache@2
-#                inputs:
-#                    key: '$(xk6CacheKey)'
-#                    path: '$(Build.SourcesDirectory)'
-#                displayName: Retrieve xk6 from Cache
-#
-#              - ${{ each k6Test in split(variables.SCRIPTS_TO_EXECUTE, ',') }}:
-#                    - script: ./xk6 run ./test/performance/idpay/${{k6Test}}.js -e SECRETS_FILE_PATH=$(idpay_secrets.secureFilePath)
-#                      env:
-#                          RESULTS_DIR: '.'
-#                          CSV_DELIMITER: ';'
-#                          ENABLE_FILE_WRITING: true
-#
-#                          TARGET_ENV: ${{ parameters.TARGET_ENV }}
-#                          USE_INTERNAL_ACCESS_ENV: ${{ parameters.USE_INTERNAL_ACCESS_ENV }}
-#                          SCRIPT_ENV: ${{ parameters.SCRIPT }}
-#                          MAX_AVAILABLE_TEST_ENTITIES_ENV: ${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }}
-#
-#                          INITIATIVE_ID: ${{ parameters.INITIATIVE_ID }}
-#                          ACQUIRER_ID: ${{ parameters.ACQUIRER_ID }}
-#                          MERCHANT_FISCALCODE: ${{ parameters.MERCHANT_FISCALCODE }}
-#
-#                          SCENARIO_TIME_UNIT_ENV: ${{ parameters.SCENARIO_TIME_UNIT_ENV }}
-#                          SCENARIO_RAMP_STAGE_NUMBER_ENV: ${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }}
-#
-#                          APIM_IO_SK: $(apimSK)
-#                          APIM_MIL_SK: $(milApiKey)
-#                          APIM_ACQUIRER_SK: $(acquirerApiKey)
-#                          APIM_ISSUER_SK: $(issuerSK)
-#                          APIM_RTD_SK: $(rtdSK)
-#                          APIM_RTD_MOCK_API_SK: $(rtdMockApiSK)
-#                          PDV_API_KEY: $(pdvApiKey)
-#                          WAIT_ONBOARDING_SECONDS: ${{ parameters.WAIT_ONBOARDING_SECONDS }}
-#
-#                          ${{ if eq(k6Test, parameters.SCRIPT) }}:
-#                              SCENARIO_TYPE_ENV: ${{ parameters.SCENARIO_TYPE_ENV }}
-#                              VUS_MAX_ENV: ${{ parameters.VUS_MAX_ENV }}
-#                              SCENARIO_PER_VU_RAMPING_SIZE: 'true'
-#                              SCENARIO_PER_VU_SINGLE_ITERATION_ENV: ${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }}
-#                              SCENARIO_PER_VU_EXECUTIONS_ENV: ${{ parameters.SCENARIO_PER_VU_EXECUTIONS_ENV }}
-#                              SCENARIO_DURATION_ENV: ${{ parameters.SCENARIO_DURATION_ENV }}
-#                              THRESHOLDS_API_MAX_AVG_MS_ENV: ${{ parameters.THRESHOLDS_API_MAX_AVG_MS_ENV }}
-#                              THRESHOLDS_API_MAX_P90_MS_ENV: ${{ parameters.THRESHOLDS_API_MAX_P90_MS_ENV }}
-#                              THRESHOLDS_API_MAX_P95_MS_ENV: ${{ parameters.THRESHOLDS_API_MAX_P95_MS_ENV }}
-#                          ${{ else }}: # intermediate tests will execute this configuration, which ensure the execution of all test entities
-#                              SCENARIO_TYPE_ENV: perVuIterations
-#                              VUS_MAX_ENV: '20'
-#                              SCENARIO_PER_VU_RAMPING_SIZE: 'false'
-#                              SCENARIO_PER_VU_SINGLE_ITERATION_ENV: 'false'
-#                              SCENARIO_PER_VU_EXECUTIONS_ENV: '1'
-#                              SCENARIO_DURATION_ENV: '2'
-#                              THRESHOLDS_API_MAX_AVG_MS_ENV: '10000'
-#                              THRESHOLDS_API_MAX_P90_MS_ENV: '10000'
-#                              THRESHOLDS_API_MAX_P95_MS_ENV: '10000'
-#
-#                      displayName: Run k6 ${{k6Test}}.js on ${{ parameters.TARGET_ENV }}
-#                      timeoutInMinutes: 0
-#
-#              - task: PublishTestResults@2
-#                condition: true
-#                inputs:
-#                    testResultsFormat: 'JUnit'
-#                    testResultsFiles: 'results/*-result.xml'
-#                    searchFolder: '$(System.DefaultWorkingDirectory)'
-#                    failTaskOnFailedTests: true
-#              - task: PublishPipelineArtifact@1
-#                displayName: 'Publishing results of k6 tests in folder: results'
-#                condition: true
-#                inputs:
-#                    artifact: 'results'
-#                    targetPath: 'results'
-#                    publishLocation: 'pipeline'
-#
-#    - ${{ if and( containsValue(split(variables[format('k6Test_{0}', parameters.SCRIPT)], ','), 'idPayPaymentDiscountAPI'), ne(parameters.DAYS_TO_ADD, -1)) }}:
-#          - deployment: ForceExportRefund
-#            dependsOn: PerformanceTest
-#            condition: true
-#            timeoutInMinutes: 0
-#            displayName: 'Forcing refund file export on ${{ parameters.TARGET_ENV }}'
-#            pool:
-#                name: $(selfHostedAgentPool)
-#            environment: '${{ upper(parameters.TARGET_ENV) }}'
-#            strategy:
-#                runOnce:
-#                    deploy:
-#                        steps:
-#                            - script: |
-#                                  response=$(curl -s -X PUT https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpaypayment/idpay/payment/qr-code/force-expiration/confirm/${{ parameters.INITIATIVE_ID }} -H 'accept: */*' )
-#                                  echo "Forcing confirm expiration result: " $response
-#
-#                                  NOTIFICATION_DATE=$(date +%Y-%m-%d -d "$(date) + ${{ parameters.DAYS_TO_ADD }} day")
-#                                  echo "using notification date $NOTIFICATION_DATE"
-#                                  response=$(curl -s -X GET https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpayrewardnotification/idpay/reward/notification/exports/start?notificationDateToSearch=$NOTIFICATION_DATE -H 'accept: */*' )
-#                                  echo "Refund result: " $response
-#                                  echo $response | grep \"initiativeId\":\"${{ parameters.INITIATIVE_ID }}\" > /dev/null
+    - template: templates\xk6-build.yml
+      parameters:
+          xk6CacheKey: '$(xk6CacheKey)'
+          k6Version: v0.45.1
+
+    - template: templates\job-type-switch.yml
+      parameters:
+          name: PerformanceTest
+          displayName: 'Executing ${{ parameters.SCRIPT }} on ${{ parameters.TARGET_ENV }} (internal access: ${{ parameters.USE_INTERNAL_ACCESS_ENV }})'
+          timeoutInMinutes: 0
+          continueOnError: true
+          dependsOn: xk6Build
+
+          isDeployment: ${{ parameters.USE_INTERNAL_ACCESS_ENV }}
+          deploymentPoolName: $(selfHostedAgentPool)
+          deploymentEnvironment: '${{ upper(parameters.TARGET_ENV) }}'
+          steps:
+              - task: UsePythonVersion@0
+                inputs:
+                    versionSpec: '$(pythonVersion)'
+                displayName: 'Use Python $(pythonVersion)'
+              - task: DownloadSecureFile@1
+                name: rtd_acquirer_mauth_pem
+                displayName: 'RTD Certification File'
+                inputs:
+                    secureFile: 'rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.pem'
+              - task: DownloadSecureFile@1
+                name: rtd_acquirer_mauth_key
+                displayName: 'RTD Key File'
+                inputs:
+                    secureFile: 'rtd-${{ parameters.TARGET_ENV }}-acquirer-mauth.key'
+              - task: DownloadSecureFile@1
+                name: bpd_pm
+                displayName: 'Download BPD PM public uat'
+                inputs:
+                    secureFile: 'bpd-pm-${{ parameters.TARGET_ENV }}.asc'
+              - script: |
+                    mkdir $(pwd)/certs
+                displayName: Create Certs Folder
+              - script: |
+                    cp $(rtd_acquirer_mauth_pem.secureFilePath) $(pwd)/certs/rtd-acquirer-mauth.pem
+                displayName: Copy RTD PEM File
+              - script: |
+                    cp $(rtd_acquirer_mauth_key.secureFilePath) $(pwd)/certs/rtd-acquirer-mauth.key
+                displayName: Copy RTD Key File
+              - script: |
+                    docker info | grep -i mem
+                displayName: Display Docker Memory Info
+              - script: |
+                    python -m venv .venv
+                    source .venv/bin/activate
+                    python -m pip install --upgrade pip
+                workingDirectory: $(projectRoot)
+                displayName: 'Install CLI requirements'
+              - script: |
+                    curl -L https://github.com/pagopa/cstar-cli/archive/refs/heads/main.zip -o cstar-cli.zip
+                    unzip cstar-cli.zip
+                    cd cstar-cli-main
+                    pip install -r ../requirements.txt
+                    pip install --force-reinstall src/cstar-cli-core
+                    pip install --no-deps --force-reinstall src/cstar-cli
+                displayName: Set environment
+              - script: |
+                    CLI_INVOKE_COMMAND="cst idpay idpaydataset --action $CSTAR_CLI_COMMAND --env ${{ parameters.TARGET_ENV }} --api-key $API_KEY --out-dir ./generated --num-fc ${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} $CSTAR_CLI_EXTRA_ARGS"
+                    echo $CLI_INVOKE_COMMAND
+                    $CLI_INVOKE_COMMAND
+                    mkdir -p assets
+                    mkdir -p results
+                    cp ./generated/*/* ./assets
+                    ls -lrt ./assets
+                displayName: Retrieve resource from cstar-cli
+                timeoutInMinutes: 0
+                env:
+                    ${{ if parameters.USE_INTERNAL_ACCESS_ENV }}:
+                        CSTAR_CLI_COMMAND: 'fc_and_pdv_tokens'
+                        CSTAR_CLI_EXTRA_ARGS: '--pdv-rate-limit ${{ variables.PDV_RATE_LIMIT }}'
+                        API_KEY: '$(pdvApiKey)'
+                    ${{ else }}:
+                        CSTAR_CLI_COMMAND: 'dataset_and_transactions'
+                        CSTAR_CLI_EXTRA_ARGS: '--key $(rtd_acquirer_mauth_key.secureFilePath) --cert $(rtd_acquirer_mauth_pem.secureFilePath) --PM-pubk $(bpd_pm.secureFilePath) --trx-per-fc 1 --start-datetime ${{ parameters.ASYNC_TRX_DATE }} --mcc 1234 --PM-salt SALT123'
+                        API_KEY: '$(rtdSK)'
+              - task: Bash@3
+                inputs:
+                    targetType: 'inline'
+                    script: |
+                        WantedFile=$( find . -name "*.pgp")
+                        BaseName=$(basename $WantedFile)
+                        echo $BaseName
+                        echo "##vso[task.setvariable variable=trxFileName]$BaseName"
+                displayName: Set variable trxFileName
+
+              - ${{ if eq(variables.MERCHANT_LIST_REQUIRED, 'true') }}:
+                    - task: DownloadSecureFile@1
+                      name: merchantList
+                      displayName: 'Download merchant list file'
+                      inputs:
+                          secureFile: 'merchantList_150.csv'
+                    - script: |
+                          cp $(merchantList.secureFilePath) ./assets
+                          response=$(curl -X PUT https://api-io.${{ parameters.TARGET_ENV}}.cstar.pagopa.it/idpay/mil/payment/qr-code/merchant/initiative/${{ parameters.INITIATIVE_ID }}/upload \
+                            -H 'x-acquirer-id: ${{ parameters.ACQUIRER_ID }}' \
+                            -H 'Ocp-Apim-Subscription-Key: $(milApiKey)' \
+                            -F 'file=@$(merchantList.secureFilePath);type=text/csv;fileName=merchantList_$(Build.BuildNumber).csv')
+                          echo "Onboarding result: " $response
+                          echo $response | grep \"VALIDATED\"
+                      displayName: onboarding merchantList on input initiative
+                      timeoutInMinutes: 0
+
+              - task: Cache@2
+                inputs:
+                    key: '$(xk6CacheKey)'
+                    path: '$(Build.SourcesDirectory)'
+                displayName: Retrieve xk6 from Cache
+
+              - ${{ each k6Test in split(variables.SCRIPTS_TO_EXECUTE, ',') }}:
+                    - script: ./xk6 run ./test/performance/idpay/${{k6Test}}.js -e SECRETS_FILE_PATH=$(idpay_secrets.secureFilePath)
+                      env:
+                          RESULTS_DIR: '.'
+                          CSV_DELIMITER: ';'
+                          ENABLE_FILE_WRITING: true
+
+                          TARGET_ENV: ${{ parameters.TARGET_ENV }}
+                          USE_INTERNAL_ACCESS_ENV: ${{ parameters.USE_INTERNAL_ACCESS_ENV }}
+                          SCRIPT_ENV: ${{ parameters.SCRIPT }}
+                          MAX_AVAILABLE_TEST_ENTITIES_ENV: ${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }}
+
+                          INITIATIVE_ID: ${{ parameters.INITIATIVE_ID }}
+                          ACQUIRER_ID: ${{ parameters.ACQUIRER_ID }}
+                          MERCHANT_FISCALCODE: ${{ parameters.MERCHANT_FISCALCODE }}
+
+                          SCENARIO_TIME_UNIT_ENV: ${{ parameters.SCENARIO_TIME_UNIT_ENV }}
+                          SCENARIO_RAMP_STAGE_NUMBER_ENV: ${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }}
+
+                          APIM_IO_SK: $(apimSK)
+                          APIM_MIL_SK: $(milApiKey)
+                          APIM_ACQUIRER_SK: $(acquirerApiKey)
+                          APIM_ISSUER_SK: $(issuerSK)
+                          APIM_RTD_SK: $(rtdSK)
+                          APIM_RTD_MOCK_API_SK: $(rtdMockApiSK)
+                          PDV_API_KEY: $(pdvApiKey)
+                          WAIT_ONBOARDING_SECONDS: ${{ parameters.WAIT_ONBOARDING_SECONDS }}
+
+                          ${{ if eq(k6Test, parameters.SCRIPT) }}:
+                              SCENARIO_TYPE_ENV: ${{ parameters.SCENARIO_TYPE_ENV }}
+                              VUS_MAX_ENV: ${{ parameters.VUS_MAX_ENV }}
+                              SCENARIO_PER_VU_RAMPING_SIZE: 'true'
+                              SCENARIO_PER_VU_SINGLE_ITERATION_ENV: ${{ parameters.SCENARIO_PER_VU_SINGLE_ITERATION_ENV }}
+                              SCENARIO_PER_VU_EXECUTIONS_ENV: ${{ parameters.SCENARIO_PER_VU_EXECUTIONS_ENV }}
+                              SCENARIO_DURATION_ENV: ${{ parameters.SCENARIO_DURATION_ENV }}
+                              THRESHOLDS_API_MAX_AVG_MS_ENV: ${{ parameters.THRESHOLDS_API_MAX_AVG_MS_ENV }}
+                              THRESHOLDS_API_MAX_P90_MS_ENV: ${{ parameters.THRESHOLDS_API_MAX_P90_MS_ENV }}
+                              THRESHOLDS_API_MAX_P95_MS_ENV: ${{ parameters.THRESHOLDS_API_MAX_P95_MS_ENV }}
+                          ${{ else }}: # intermediate tests will execute this configuration, which ensure the execution of all test entities
+                              SCENARIO_TYPE_ENV: perVuIterations
+                              VUS_MAX_ENV: '20'
+                              SCENARIO_PER_VU_RAMPING_SIZE: 'false'
+                              SCENARIO_PER_VU_SINGLE_ITERATION_ENV: 'false'
+                              SCENARIO_PER_VU_EXECUTIONS_ENV: '1'
+                              SCENARIO_DURATION_ENV: '2'
+                              THRESHOLDS_API_MAX_AVG_MS_ENV: '10000'
+                              THRESHOLDS_API_MAX_P90_MS_ENV: '10000'
+                              THRESHOLDS_API_MAX_P95_MS_ENV: '10000'
+
+                      displayName: Run k6 ${{k6Test}}.js on ${{ parameters.TARGET_ENV }}
+                      timeoutInMinutes: 0
+
+              - task: PublishTestResults@2
+                condition: true
+                inputs:
+                    testResultsFormat: 'JUnit'
+                    testResultsFiles: 'results/*-result.xml'
+                    searchFolder: '$(System.DefaultWorkingDirectory)'
+                    failTaskOnFailedTests: true
+              - task: PublishPipelineArtifact@1
+                displayName: 'Publishing results of k6 tests in folder: results'
+                condition: true
+                inputs:
+                    artifact: 'results'
+                    targetPath: 'results'
+                    publishLocation: 'pipeline'
+
+    - ${{ if and( containsValue(split(variables[format('k6Test_{0}', parameters.SCRIPT)], ','), 'idPayPaymentDiscountAPI'), ne(parameters.DAYS_TO_ADD, -1)) }}:
+          - deployment: ForceExportRefund
+            dependsOn: PerformanceTest
+            condition: true
+            timeoutInMinutes: 0
+            displayName: 'Forcing refund file export on ${{ parameters.TARGET_ENV }}'
+            pool:
+                name: $(selfHostedAgentPool)
+            environment: '${{ upper(parameters.TARGET_ENV) }}'
+            strategy:
+                runOnce:
+                    deploy:
+                        steps:
+                            - script: |
+                                  response=$(curl -s -X PUT https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpaypayment/idpay/payment/qr-code/force-expiration/confirm/${{ parameters.INITIATIVE_ID }} -H 'accept: */*' )
+                                  echo "Forcing confirm expiration result: " $response
+
+                                  NOTIFICATION_DATE=$(date +%Y-%m-%d -d "$(date) + ${{ parameters.DAYS_TO_ADD }} day")
+                                  echo "using notification date $NOTIFICATION_DATE"
+                                  response=$(curl -s -X GET https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpayrewardnotification/idpay/reward/notification/exports/start?notificationDateToSearch=$NOTIFICATION_DATE -H 'accept: */*' )
+                                  echo "Refund result: " $response
+                                  echo $response | grep \"initiativeId\":\"${{ parameters.INITIATIVE_ID }}\" > /dev/null
