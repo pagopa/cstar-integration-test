@@ -232,8 +232,8 @@ jobs:
       dependsOn: SetSecrets
       steps:
         - script: |
-            echo "Use $(s1) as first dummy secret"
-            echo "Use $(s2) as first dummy secret"
+            echo "Use $(DUMMY_SECRET1) as first dummy secret"
+            echo "Use $(DUMMY_SECRET2) as first dummy secret"
           displayName: 'Test print DUMMY_SECRET'
 #    - template: templates\xk6-build.yml
 #      parameters:
