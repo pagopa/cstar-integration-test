@@ -225,7 +225,7 @@ jobs:
             while IFS=: read -r key value; do
                 echo "Setting dummy secrets $key=$value"
                 echo "##vso[task.setvariable variable=$key]$value"
-                echo "##vso[task.setvariable variable=testvariable;isOutput=true]Prova"
+                echo "##vso[task.setvariable variable=testvariable]Prova"
             done < $(idpay_secrets.secureFilePath)
           displayName: 'Set environment variables'
     - job:
@@ -235,7 +235,7 @@ jobs:
         - script: |
             echo "Use $DUMMY_SECRET1 as first dummy secret"
             echo "Use $DUMMY_SECRET2 as first dummy secret"
-            echo "Use $(download_secrets_file.testvariable) as test variable"
+            echo "Use $(testvariable) as test variable"
           displayName: 'Test print DUMMY_SECRET'
           env:
             DUMMY_SECRET1: $DUMMY_SECRET1
