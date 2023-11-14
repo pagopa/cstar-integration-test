@@ -168,40 +168,28 @@ variables:
 
     #Setting Api Key
     - ${{ if eq(parameters.TARGET_ENV, 'dev') }}:
-#          - name: rtdSK
-#            value: $(rtd_sk_dev)
 #          - name: rtdMockApiSK
 #            value: $(rtd_mock_api_dev)
 #          - name: apimSK
 #            value: $(apim_sk_dev)
 #          - name: issuerSK
 #            value: $(issuer_sk_dev)
-#          - name: pdvApiKey
-#            value: $(pdv_apikey_dev)
 #          - name: acquirerApiKey
 #            value: $(acquirer_apikey_dev)
-#          - name: milApiKey
-#            value: $(mil_apikey_dev)
           - name: selfHostedAgentPool
             value: cstar-dev-perf-linux
 
           - name: PDV_RATE_LIMIT
             value: '150'
     - ${{ else }}:
-#          - name: rtdSK
-#            value: $(rtd_sk_uat)
 #          - name: rtdMockApiSK
 #            value: $(rtd_mock_api_uat)
 #          - name: apimSK
 #            value: $(apim_sk_uat)
 #          - name: issuerSK
 #            value: $(issuer_sk_uat)
-#          - name: pdvApiKey
-#            value: $(pdv_apikey_uat)
 #          - name: acquirerApiKey
 #            value: $(acquirer_apikey_uat)
-#          - name: milApiKey
-#            value: $(mil_apikey_uat)
           - name: selfHostedAgentPool
             value: cstar-uat-perf-linux
 
@@ -279,12 +267,16 @@ jobs:
                     pip install --force-reinstall src/cstar-cli-core
                     pip install --no-deps --force-reinstall src/cstar-cli
                 displayName: Set environment
+
               - task: Bash@3
                 inputs:
                   targetType: 'inline'
                   script: |
                     echo "##vso[task.setvariable variable=rtdSK;issecret=True]$(grep "^APIM_RTD_SK=" $(idpay_secrets.secureFilePath) | cut -d '=' -f2-)"
-                displayName: Set variable trxFileName
+                    echo "##vso[task.setvariable variable=milApiKey;issecret=True]$(grep "^APIM_MIL_SK=" $(idpay_secrets.secureFilePath) | cut -d '=' -f2-)"
+                    echo "##vso[task.setvariable variable=pdvApiKey;issecret=True]$(grep "^PDV_API_KEY=" $(idpay_secrets.secureFilePath) | cut -d '=' -f2-)"
+                displayName: Set secrets from file
+
               - script: |
                     CLI_INVOKE_COMMAND="cst idpay idpaydataset --action $CSTAR_CLI_COMMAND --env ${{ parameters.TARGET_ENV }} --api-key $API_KEY --out-dir ./generated --num-fc ${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} $CSTAR_CLI_EXTRA_ARGS"
                     echo $CLI_INVOKE_COMMAND
@@ -324,12 +316,14 @@ jobs:
                           cp $(merchantList.secureFilePath) ./assets
                           response=$(curl -X PUT https://api-io.${{ parameters.TARGET_ENV}}.cstar.pagopa.it/idpay/mil/payment/qr-code/merchant/initiative/${{ parameters.INITIATIVE_ID }}/upload \
                             -H 'x-acquirer-id: ${{ parameters.ACQUIRER_ID }}' \
-                            -H 'Ocp-Apim-Subscription-Key: $(milApiKey)' \
+                            -H 'Ocp-Apim-Subscription-Key: $API_KEY' \
                             -F 'file=@$(merchantList.secureFilePath);type=text/csv;fileName=merchantList_$(Build.BuildNumber).csv')
                           echo "Onboarding result: " $response
                           echo $response | grep \"VALIDATED\"
                       displayName: onboarding merchantList on input initiative
                       timeoutInMinutes: 0
+                      env:
+                        API_KEY: '$(milApiKey)'
 
               - task: Cache@2
                 inputs:
