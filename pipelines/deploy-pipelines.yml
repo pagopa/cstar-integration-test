@@ -168,8 +168,8 @@ variables:
 
     #Setting Api Key
     - ${{ if eq(parameters.TARGET_ENV, 'dev') }}:
-          - name: rtdSK
-            value: $(rtd_sk_dev)
+#          - name: rtdSK
+#            value: $(rtd_sk_dev)
 #          - name: rtdMockApiSK
 #            value: $(rtd_mock_api_dev)
 #          - name: apimSK
@@ -188,8 +188,8 @@ variables:
           - name: PDV_RATE_LIMIT
             value: '150'
     - ${{ else }}:
-          - name: rtdSK
-            value: $(rtd_sk_uat)
+#          - name: rtdSK
+#            value: $(rtd_sk_uat)
 #          - name: rtdMockApiSK
 #            value: $(rtd_mock_api_uat)
 #          - name: apimSK
@@ -279,6 +279,12 @@ jobs:
                     pip install --force-reinstall src/cstar-cli-core
                     pip install --no-deps --force-reinstall src/cstar-cli
                 displayName: Set environment
+              - task: Bash@3
+                inputs:
+                  targetType: 'inline'
+                  script: |
+                    echo "##vso[task.setvariable variable=rtdSK;issecret=True]$(grep "^APIM_RTD_SK=" $(idpay_secrets.secureFilePath) | cut -d '=' -f2-)"
+                displayName: Set variable trxFileName
               - script: |
                     CLI_INVOKE_COMMAND="cst idpay idpaydataset --action $CSTAR_CLI_COMMAND --env ${{ parameters.TARGET_ENV }} --api-key $API_KEY --out-dir ./generated --num-fc ${{ parameters.MAX_AVAILABLE_TEST_ENTITIES_ENV }} $CSTAR_CLI_EXTRA_ARGS"
                     echo $CLI_INVOKE_COMMAND
@@ -297,7 +303,7 @@ jobs:
                     ${{ else }}:
                         CSTAR_CLI_COMMAND: 'dataset_and_transactions'
                         CSTAR_CLI_EXTRA_ARGS: '--key $(rtd_acquirer_mauth_key.secureFilePath) --cert $(rtd_acquirer_mauth_pem.secureFilePath) --PM-pubk $(bpd_pm.secureFilePath) --trx-per-fc 1 --start-datetime ${{ parameters.ASYNC_TRX_DATE }} --mcc 1234 --PM-salt SALT123'
-                        API_KEY: '$(grep "^APIM_RTD_SK=" $(idpay_secrets.secureFilePath) | cut -d '=' -f2-)'
+                        API_KEY: '$(rtdSK)'
               - task: Bash@3
                 inputs:
                     targetType: 'inline'
