@@ -297,7 +297,7 @@ jobs:
                     ${{ else }}:
                         CSTAR_CLI_COMMAND: 'dataset_and_transactions'
                         CSTAR_CLI_EXTRA_ARGS: '--key $(rtd_acquirer_mauth_key.secureFilePath) --cert $(rtd_acquirer_mauth_pem.secureFilePath) --PM-pubk $(bpd_pm.secureFilePath) --trx-per-fc 1 --start-datetime ${{ parameters.ASYNC_TRX_DATE }} --mcc 1234 --PM-salt SALT123'
-                        API_KEY: $(grep "^APIM_RTD_SK=" $(idpay_secrets.secureFilePath) | cut -d '=' -f2-)
+                        API_KEY: '$(grep "^APIM_RTD_SK=" $(idpay_secrets.secureFilePath) | cut -d '=' -f2-)'
               - task: Bash@3
                 inputs:
                     targetType: 'inline'
