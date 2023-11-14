@@ -212,14 +212,6 @@ variables:
       value: '"xk6" | "0.45.1" | mykey'
 
 jobs:
-    - job: SetSecrets
-      displayName: 'Download secrets file'
-      steps:
-        - task: DownloadSecureFile@1
-          name: idpay_secrets
-          displayName: 'Download IDPay secrets'
-          inputs:
-            secureFile: '.idpay_performance_secrets_${{ parameters.TARGET_ENV }}.env'
     - template: templates\xk6-build.yml
       parameters:
           xk6CacheKey: '$(xk6CacheKey)'
@@ -335,7 +327,12 @@ jobs:
                 displayName: Retrieve xk6 from Cache
 
               - ${{ each k6Test in split(variables.SCRIPTS_TO_EXECUTE, ',') }}:
-                    - script: ./xk6 run ./test/performance/idpay/${{k6Test}}.js -e SECRETS_FILE_PATH=$IDPAY_SECRET_PATH
+                    - task: DownloadSecureFile@1
+                      name: idpay_secrets
+                      displayName: 'Download IDPay secrets'
+                      inputs:
+                        secureFile: '.idpay_performance_secrets_${{ parameters.TARGET_ENV }}.env'
+                    - script: ./xk6 run ./test/performance/idpay/${{k6Test}}.js -e SECRETS_FILE_PATH=$(idpay_secrets.secureFilePath)
                       env:
                           RESULTS_DIR: '.'
                           CSV_DELIMITER: ';'
@@ -361,8 +358,6 @@ jobs:
                           APIM_RTD_MOCK_API_SK: $(rtdMockApiSK)
                           PDV_API_KEY: $(pdvApiKey)
                           WAIT_ONBOARDING_SECONDS: ${{ parameters.WAIT_ONBOARDING_SECONDS }}
-
-                          IDPAY_SECRET_PATH: $(idpay_secrets.secureFilePath)
 
                           ${{ if eq(k6Test, parameters.SCRIPT) }}:
                               SCENARIO_TYPE_ENV: ${{ parameters.SCENARIO_TYPE_ENV }}
