@@ -350,13 +350,6 @@ jobs:
                           SCENARIO_TIME_UNIT_ENV: ${{ parameters.SCENARIO_TIME_UNIT_ENV }}
                           SCENARIO_RAMP_STAGE_NUMBER_ENV: ${{ parameters.SCENARIO_RAMP_STAGE_NUMBER_ENV }}
 
-                          APIM_IO_SK: $(apimSK)
-                          APIM_MIL_SK: $(milApiKey)
-                          APIM_ACQUIRER_SK: $(acquirerApiKey)
-                          APIM_ISSUER_SK: $(issuerSK)
-                          APIM_RTD_SK: $(rtdSK)
-                          APIM_RTD_MOCK_API_SK: $(rtdMockApiSK)
-                          PDV_API_KEY: $(pdvApiKey)
                           WAIT_ONBOARDING_SECONDS: ${{ parameters.WAIT_ONBOARDING_SECONDS }}
 
                           ${{ if eq(k6Test, parameters.SCRIPT) }}:
