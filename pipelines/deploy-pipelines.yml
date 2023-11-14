@@ -326,12 +326,13 @@ jobs:
                     path: '$(Build.SourcesDirectory)'
                 displayName: Retrieve xk6 from Cache
 
+              - task: DownloadSecureFile@1
+                name: idpay_secrets
+                displayName: 'Download IDPay secrets'
+                inputs:
+                  secureFile: '.idpay_performance_secrets_${{ parameters.TARGET_ENV }}.env'
+
               - ${{ each k6Test in split(variables.SCRIPTS_TO_EXECUTE, ',') }}:
-                    - task: DownloadSecureFile@1
-                      name: idpay_secrets
-                      displayName: 'Download IDPay secrets'
-                      inputs:
-                        secureFile: '.idpay_performance_secrets_${{ parameters.TARGET_ENV }}.env'
                     - script: ./xk6 run ./test/performance/idpay/${{k6Test}}.js -e SECRETS_FILE_PATH=$(idpay_secrets.secureFilePath)
                       env:
                           RESULTS_DIR: '.'
