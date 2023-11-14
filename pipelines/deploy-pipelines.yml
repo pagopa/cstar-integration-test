@@ -176,8 +176,8 @@ variables:
 #            value: $(issuer_sk_dev)
 #          - name: acquirerApiKey
 #            value: $(acquirer_apikey_dev)
-          - name: milApiKey
-            value: $(mil_apikey_dev)
+#          - name: milApiKey
+#            value: $(mil_apikey_dev)
           - name: selfHostedAgentPool
             value: cstar-dev-perf-linux
 
@@ -192,8 +192,8 @@ variables:
 #            value: $(issuer_sk_uat)
 #          - name: acquirerApiKey
 #            value: $(acquirer_apikey_uat)
-          - name: milApiKey
-            value: $(mil_apikey_uat)
+#          - name: milApiKey
+#            value: $(mil_apikey_uat)
           - name: selfHostedAgentPool
             value: cstar-uat-perf-linux
 
