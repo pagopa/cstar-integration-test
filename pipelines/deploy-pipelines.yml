@@ -209,7 +209,7 @@ variables:
             value: '290'
 
     - name: xk6CacheKey
-      value: '"xk6" | "0.45.1"'
+      value: '"xk6" | "0.45.1" | mykey'
 
 jobs:
     - job: SetSecrets
