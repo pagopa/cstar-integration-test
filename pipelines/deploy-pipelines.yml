@@ -168,32 +168,12 @@ variables:
 
     #Setting Api Key
     - ${{ if eq(parameters.TARGET_ENV, 'dev') }}:
-#          - name: rtdMockApiSK
-#            value: $(rtd_mock_api_dev)
-#          - name: apimSK
-#            value: $(apim_sk_dev)
-#          - name: issuerSK
-#            value: $(issuer_sk_dev)
-#          - name: acquirerApiKey
-#            value: $(acquirer_apikey_dev)
-#          - name: milApiKey
-#            value: $(mil_apikey_dev)
           - name: selfHostedAgentPool
             value: cstar-dev-perf-linux
 
           - name: PDV_RATE_LIMIT
             value: '150'
     - ${{ else }}:
-#          - name: rtdMockApiSK
-#            value: $(rtd_mock_api_uat)
-#          - name: apimSK
-#            value: $(apim_sk_uat)
-#          - name: issuerSK
-#            value: $(issuer_sk_uat)
-#          - name: acquirerApiKey
-#            value: $(acquirer_apikey_uat)
-#          - name: milApiKey
-#            value: $(mil_apikey_uat)
           - name: selfHostedAgentPool
             value: cstar-uat-perf-linux
 
