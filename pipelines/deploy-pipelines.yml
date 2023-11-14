@@ -181,7 +181,7 @@ variables:
             value: '290'
 
     - name: xk6CacheKey
-      value: '"xk6" | "0.45.1" | mykey'
+      value: '"xk6" | "0.45.1" | dotenv'
 
 jobs:
     - template: templates\xk6-build.yml
