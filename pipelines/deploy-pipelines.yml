@@ -248,6 +248,11 @@ jobs:
                 displayName: 'Download BPD PM public uat'
                 inputs:
                     secureFile: 'bpd-pm-${{ parameters.TARGET_ENV }}.asc'
+              - task: DownloadSecureFile@1
+                name: idpay_secrets
+                displayName: 'Download IDPay secrets'
+                inputs:
+                  secureFile: '.idpay_performance_secrets_${{ parameters.TARGET_ENV }}.env'
               - script: |
                     mkdir $(pwd)/certs
                 displayName: Create Certs Folder
@@ -325,12 +330,6 @@ jobs:
                     key: '$(xk6CacheKey)'
                     path: '$(Build.SourcesDirectory)'
                 displayName: Retrieve xk6 from Cache
-
-              - task: DownloadSecureFile@1
-                name: idpay_secrets
-                displayName: 'Download IDPay secrets'
-                inputs:
-                  secureFile: '.idpay_performance_secrets_${{ parameters.TARGET_ENV }}.env'
 
               - ${{ each k6Test in split(variables.SCRIPTS_TO_EXECUTE, ',') }}:
                     - script: ./xk6 run ./test/performance/idpay/${{k6Test}}.js -e SECRETS_FILE_PATH=$(idpay_secrets.secureFilePath)
