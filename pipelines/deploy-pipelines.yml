@@ -193,7 +193,7 @@ variables:
 #          - name: acquirerApiKey
 #            value: $(acquirer_apikey_uat)
           - name: milApiKey
-            value: $(mil_apikey_dev)
+            value: $(mil_apikey_uat)
           - name: selfHostedAgentPool
             value: cstar-uat-perf-linux
 
@@ -278,6 +278,7 @@ jobs:
                   script: |
                     echo "##vso[task.setvariable variable=rtdSK;issecret=True]$(grep "^APIM_RTD_SK=" $(idpay_secrets.secureFilePath) | cut -d '=' -f2-)"
                     echo "##vso[task.setvariable variable=pdvApiKey;issecret=True]$(grep "^PDV_API_KEY=" $(idpay_secrets.secureFilePath) | cut -d '=' -f2-)"
+                    echo "##vso[task.setvariable variable=milApiKey;issecret=True]$(grep "^APIM_MIL_SK=" $(idpay_secrets.secureFilePath) | cut -d '=' -f2-)"
                 displayName: Set secrets from file
 
               - script: |
