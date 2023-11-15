@@ -407,8 +407,12 @@ jobs:
                     deploy:
                         steps:
                             - script: |
-                                  response=$(curl -s -X PUT https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpaypayment/idpay/payment/qr-code/force-expiration/confirm/${{ parameters.INITIATIVE_ID }} -H 'accept: */*' )
-                                  echo "Forcing confirm expiration result: " $response 
+                                  response=$(curl -s -X PUT https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpaypayment/idpay/payment/force-expiration/confirm/${{ parameters.INITIATIVE_ID }} -H 'accept: */*' )
+                                  echo "Forcing confirm expiration result: " $response
+                                
+                                  SLEEP_SECONDS=5
+                                  echo "Sleeping $SLEEP_SECONDS in order to let reward-notification to process rewards just notified" 
+                                  sleep $SLEEP_SECONDS
 
                                   NOTIFICATION_DATE=$(date +%Y-%m-%d -d "$(date) + ${{ parameters.DAYS_TO_ADD }} day")
                                   echo "using notification date $NOTIFICATION_DATE"
