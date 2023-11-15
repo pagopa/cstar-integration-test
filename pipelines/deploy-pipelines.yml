@@ -311,7 +311,7 @@ jobs:
                           secureFile: 'merchantList_150.csv'
                     - script: |
                           cp $(merchantList.secureFilePath) ./assets
-                          response=$(curl -X PUT https://api-io.${{ parameters.TARGET_ENV}}.cstar.pagopa.it/idpay/mil/payment/qr-code/merchant/initiative/${{ parameters.INITIATIVE_ID }}/upload \
+                          response=$(curl -X PUT https://api-io.${{ parameters.TARGET_ENV}}.cstar.pagopa.it/idpay/mil/merchant/initiative/${{ parameters.INITIATIVE_ID }}/upload \
                             -H 'x-acquirer-id: ${{ parameters.ACQUIRER_ID }}' \
                             -H 'Ocp-Apim-Subscription-Key: $(milApiKey)' \
                             -F 'file=@$(merchantList.secureFilePath);type=text/csv;fileName=merchantList_$(Build.BuildNumber).csv')
