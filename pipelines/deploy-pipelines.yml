@@ -411,7 +411,7 @@ jobs:
                                   echo "Forcing confirm expiration result: " $response
                                 
                                   SLEEP_SECONDS=5
-                                  echo "Sleeping $SLEEP_SECONDS in order to let reward-notification to process rewards just notified" 
+                                  echo "Sleeping $SLEEP_SECONDS seconds in order to let reward-notification to process rewards just notified" 
                                   sleep $SLEEP_SECONDS
 
                                   NOTIFICATION_DATE=$(date +%Y-%m-%d -d "$(date) + ${{ parameters.DAYS_TO_ADD }} day")
