@@ -170,13 +170,11 @@ variables:
     - ${{ if eq(parameters.TARGET_ENV, 'dev') }}:
           - name: selfHostedAgentPool
             value: cstar-dev-perf-linux
-
           - name: PDV_RATE_LIMIT
             value: '150'
     - ${{ else }}:
           - name: selfHostedAgentPool
             value: cstar-uat-perf-linux
-
           - name: PDV_RATE_LIMIT
             value: '290'
 
