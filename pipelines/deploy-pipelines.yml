@@ -112,6 +112,10 @@ parameters:
       displayName: 'Max P95 milliseconds applied as default to single API tests'
       type: number
       default: 1000
+    - name: 'WAIT_ONBOARDING_SECONDS'
+      displayName: 'Time in seconds to wait before wallet presence check. Useful with Payments or test which depends on onboarding (idpayVerifyOnboarding)'
+      type: number
+      default: 60
 
 variables:
     # Python version: 3.10
@@ -153,7 +157,7 @@ variables:
     - name: k6Test_idpayOnboardingAPI
       value: idpayOnboardingAPI
     - name: k6Test_idPayPaymentDiscountAPI
-      value: idpayOnboardingAPI,idPayPaymentDiscountAPI
+      value: idpayOnboardingAPI,idpayVerifyOnboarding,idPayPaymentDiscountAPI
     - name: k6Test_ioPutEnrollInstrumentIssuer
       value: idpayOnboardingAPI,ioPutEnrollInstrumentIssuer
     - name: k6Test_ioPutEnrollIban
@@ -317,10 +321,10 @@ jobs:
                       name: merchantList
                       displayName: 'Download merchant list file'
                       inputs:
-                          secureFile: 'merchantList.csv'
+                          secureFile: 'merchantList_150.csv'
                     - script: |
                           cp $(merchantList.secureFilePath) ./assets
-                          response=$(curl -X PUT https://api-io.${{ parameters.TARGET_ENV}}.cstar.pagopa.it/idpay/mil/payment/qr-code/merchant/initiative/${{ parameters.INITIATIVE_ID }}/upload \
+                          response=$(curl -X PUT https://api-io.${{ parameters.TARGET_ENV}}.cstar.pagopa.it/idpay/mil/merchant/initiative/${{ parameters.INITIATIVE_ID }}/upload \
                             -H 'x-acquirer-id: ${{ parameters.ACQUIRER_ID }}' \
                             -H 'Ocp-Apim-Subscription-Key: $(milApiKey)' \
                             -F 'file=@$(merchantList.secureFilePath);type=text/csv;fileName=merchantList_$(Build.BuildNumber).csv')
@@ -361,6 +365,7 @@ jobs:
                           APIM_RTD_SK: $(rtdSK)
                           APIM_RTD_MOCK_API_SK: $(rtdMockApiSK)
                           PDV_API_KEY: $(pdvApiKey)
+                          WAIT_ONBOARDING_SECONDS: ${{ parameters.WAIT_ONBOARDING_SECONDS }}
 
                           ${{ if eq(k6Test, parameters.SCRIPT) }}:
                               SCENARIO_TYPE_ENV: ${{ parameters.SCENARIO_TYPE_ENV }}
@@ -415,8 +420,12 @@ jobs:
                     deploy:
                         steps:
                             - script: |
-                                  response=$(curl -s -X PUT https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpaypayment/idpay/payment/qr-code/force-expiration/confirm/${{ parameters.INITIATIVE_ID }} -H 'accept: */*' )
-                                  echo "Forcing confirm expiration result: " $response 
+                                  response=$(curl -s -X PUT https://${{ parameters.TARGET_ENV }}01.idpay.internal.${{ parameters.TARGET_ENV }}.cstar.pagopa.it/idpaypayment/idpay/payment/force-expiration/confirm/${{ parameters.INITIATIVE_ID }} -H 'accept: */*' )
+                                  echo "Forcing confirm expiration result: " $response
+                                
+                                  SLEEP_SECONDS=5
+                                  echo "Sleeping $SLEEP_SECONDS seconds in order to let reward-notification to process rewards just notified" 
+                                  sleep $SLEEP_SECONDS
 
                                   NOTIFICATION_DATE=$(date +%Y-%m-%d -d "$(date) + ${{ parameters.DAYS_TO_ADD }} day")
                                   echo "using notification date $NOTIFICATION_DATE"
