@@ -137,18 +137,6 @@ variables:
     - name: MERCHANT_LIST_REQUIRED
       value: ${{ containsValue(split(variables['k6TestRequiringMerchantList'], ','), parameters.SCRIPT) }}
 
-    # resolved refund export requirement
-    - ${{ if and( containsValue(split(variables[format('k6Test_{0}', parameters.SCRIPT)], ','), 'idPayPaymentDiscountAPI'), ne(parameters.DAYS_TO_ADD, -1)) }}:
-          - name: REFUND2EXPORT
-            value: true
-          - name: DELETE_INITIATIVE_DEPENDENCY
-            value: ForceExportRefund
-    - ${{ else }}:
-          - name: REFUND2EXPORT
-            value: false
-          - name: DELETE_INITIATIVE_DEPENDENCY
-            value: PerformanceTest
-
     # comma separated list of tests to execute based on the SCRIPT parameter
     - name: k6Test_putTokenMockedPdv
       value: putTokenMockedPdv
@@ -170,6 +158,18 @@ variables:
       value: idpayOnboardingAPI,getWalletDetails
     - name: k6Test_idpayCheckInitiativeBudgetAPI
       value: idpayCheckInitiativeBudgetAPI
+
+  # resolved refund export requirement
+    - ${{ if and( containsValue(split(variables[format('k6Test_{0}', parameters.SCRIPT)], ','), 'idPayPaymentDiscountAPI'), ne(parameters.DAYS_TO_ADD, -1)) }}:
+        - name: REFUND2EXPORT
+          value: true
+        - name: DELETE_INITIATIVE_DEPENDENCY
+          value: ForceExportRefund
+    - ${{ else }}:
+        - name: REFUND2EXPORT
+          value: false
+        - name: DELETE_INITIATIVE_DEPENDENCY
+          value: PerformanceTest
 
     # resolved list of k6 script to execute
     - ${{ if and(parameters.USE_INTERNAL_ACCESS_ENV, eq(variables.MERCHANT_LIST_REQUIRED, 'true') ) }}:
