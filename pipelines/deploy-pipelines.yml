@@ -235,7 +235,7 @@ jobs:
                 name: idpay_secrets
                 displayName: 'Download IDPay secrets'
                 inputs:
-                  secureFile: '.idpay_performance_secrets_${{ parameters.TARGET_ENV }}.env'
+                  secureFile: 'idpay_performance_secrets_${{ parameters.TARGET_ENV }}.env'
               - script: |
                     mkdir $(pwd)/certs
                 displayName: Create Certs Folder
