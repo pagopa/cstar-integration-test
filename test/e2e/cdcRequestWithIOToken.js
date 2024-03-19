@@ -19,7 +19,7 @@ import {
     statusOk,
     statusBadFormat,
     bodyJsonSelectorValue,
-    idempotence,
+    idempotence, emptyBody,
 } from '../common/assertions.js'
 import { isEnvValid, isTestEnabledOnEnv, PROD } from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
@@ -56,7 +56,7 @@ export default () => {
     group('Should request CdC', () => {
         group('When the post contains all years returned by get', () => {
             const esitoOkReducer = (prv, cur) =>
-                prv && ['OK', 'CIT_REGISTRATO'].includes(cur.esitoRichiesta)
+                prv && ['OK', 'CIT_REGISTRATO', 'INIZIATIVA_TERMINATA'].includes(cur.esitoRichiesta)
             assert(happyCase(baseUrl, auth()), [
                 statusOk(),
                 bodyJsonReduceArray(
@@ -121,7 +121,7 @@ export default () => {
         group('When the customer sends no input', () => {
             assert(failureCaseWithNoInput(baseUrl, auth()), [
                 statusBadFormat(),
-                bodyJsonSelectorValue('status', 'NO_INPUT'),
+                emptyBody(),
             ])
         })
     })

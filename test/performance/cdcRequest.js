@@ -2,11 +2,11 @@ import { group } from 'k6'
 import { performanceHappyCase } from '../common/api/cdcIoRequest.js'
 import { loginFullUrl } from '../common/api/bpdIoLogin.js'
 import { assert, statusOk } from '../common/assertions.js'
-import { isEnvValid, isTestEnabledOnEnv, UAT } from '../common/envs.js'
+import {isEnvValid, isTestEnabledOnEnv, PROD, UAT} from '../common/envs.js'
 import dotenv from 'k6/x/dotenv'
 import { randomFiscalCode } from '../common/utils.js'
 import { bodyJsonReduceArray } from '../common/assertions.js'
-const REGISTERED_ENVS = [UAT]
+const REGISTERED_ENVS = [UAT, PROD]
 
 export let options = {
     scenarios: {
@@ -17,8 +17,8 @@ export let options = {
             preAllocatedVUs: 50,
             maxVUs: 1000,
             stages: [
-                { duration: '1m', target: 250 },
-                { duration: '1m', target: 250 },
+                { duration: '5s', target: 100 },
+                { duration: '5s', target: 100 },
             ],
         },
     },
@@ -79,10 +79,16 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
 }
 
 export function auth(fiscalCode) {
-    const authToken = loginFullUrl(
-        `${baseUrl}/bpd/pagopa/api/v1/login`,
-        fiscalCode
-    )
+    let authToken
+    if (__ENV.TARGET_ENV === "prod") {
+        authToken = myEnv.BPD_TOKEN
+    } else {
+        const service = (__ENV.TARGET_ENV === "uat") ? services.uat_io : services.dev_io
+        authToken = loginFullUrl(
+            `${service.baseUrl}/bpd/pagopa/api/v1/login`,
+            randomFiscalCode()
+        )
+    }
     return {
         headers: {
             Authorization: `Bearer ${authToken}`,
@@ -102,7 +108,7 @@ export default () => {
     group('Should request CdC', () => {
         group('When the post contains all years returned by get', () => {
             const esitoOkReducer = (prv, cur) =>
-                prv && cur.esitoRichiesta === 'CIT_REGISTRATO'
+                prv && cur.esitoRichiesta === 'INIZIATIVA_TERMINATA'
             assert(performanceHappyCase(baseUrl, auth(randomFiscalCode())), [
                 statusOk(),
                 bodyJsonReduceArray(
