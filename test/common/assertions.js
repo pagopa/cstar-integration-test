@@ -84,6 +84,14 @@ export function bodyPgpPublicKey() {
     }
 }
 
+export function emptyBody() {
+    return function doCheck(res) {
+        check(res, {
+            'Response is body empty ': (r) => r.body === '',
+        })
+    }
+}
+
 export function bodyJsonSelectorValue(selector, expectedValue) {
     return function doCheck(res) {
         check(res, {

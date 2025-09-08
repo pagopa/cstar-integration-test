@@ -1,5 +1,4 @@
 import { group } from 'k6'
-import exec from 'k6/execution'
 import { sogeiHealthCheck } from '../common/api/cdcSogeiHealthCheck.js'
 import { loginFullUrl } from '../common/api/bpdIoLogin.js'
 import { assert, statusOk } from '../common/assertions.js'
@@ -18,11 +17,19 @@ if (isEnvValid(__ENV.TARGET_ENV)) {
     baseUrl = services[`${__ENV.TARGET_ENV}_io`].baseUrl
 }
 
+// PROD enviroment requires a BPD token generate by IO Token. So generate it and put it
+// int .env.prod.local file
 export function setup() {
-    const authToken = loginFullUrl(
-        `${services.uat_io.baseUrl}/bpd/pagopa/api/v1/login`,
-        randomFiscalCode()
-    )
+    let authToken;
+    if (__ENV.TARGET_ENV === "prod") {
+        authToken = myEnv.BPD_TOKEN
+    } else {
+        const service = (__ENV.TARGET_ENV === "uat") ? services.uat_io : services.dev_io
+        authToken = loginFullUrl(
+            `${service.baseUrl}/bpd/pagopa/api/v1/login`,
+            randomFiscalCode()
+        )
+    }
     return {
         headers: {
             Authorization: `Bearer ${authToken}`,
