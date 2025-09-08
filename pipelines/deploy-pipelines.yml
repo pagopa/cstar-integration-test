@@ -192,13 +192,13 @@ variables:
             value: '290'
 
     - name: xk6CacheKey
-      value: '"xk6" | "0.45.1" | dotenv'
+      value: '"xk6" | "v0.57.0" | dotenv'
 
 jobs:
     - template: templates\xk6-build.yml
       parameters:
           xk6CacheKey: '$(xk6CacheKey)'
-          k6Version: v0.45.1
+          k6Version: v0.57.0
 
     - template: templates\job-type-switch.yml
       parameters:

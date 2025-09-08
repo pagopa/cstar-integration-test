@@ -6,7 +6,7 @@ parameters:
       default: v0.57.0
     - name: 'xk6Extensions'
       type: string
-      default: '--with github.com/avitalique/xk6-file@latest --with github.com/szkiba/xk6-dotenv@v.0.1.3'
+      default: '--with github.com/avitalique/xk6-file@latest --with github.com/szkiba/xk6-dotenv@v0.1.3'
 
 jobs:
     - job: xk6Build
