@@ -7,6 +7,6 @@ export default {
         rate: CONFIG.SCENARIOS.constantArrivalRate.RATE,
         timeUnit: `${CONFIG.SCENARIOS.constantArrivalRate.TIME_UNIT}s`,
         preAllocatedVUs: CONFIG.VIRTUAL_USERS,
-        maxVUs: Math.min(CONFIG.VIRTUAL_USERS * 2, 500),
+        maxVUs: Math.max(CONFIG.VIRTUAL_USERS, 500),
     },
 }
